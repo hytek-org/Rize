@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "com.hytek.rize"
-        minSdk 21
+        minSdk 22
         targetSdk 34
-        versionCode 3
-        versionName "2.0.1"
+        versionCode 1
+        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
