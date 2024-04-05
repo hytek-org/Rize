@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Rize</string>
+    <string name="get_start">Get start</string>
+    <string name="more_card_content">More card content</string>
+    <string name="card_description">Card Description</string>
+    <string name="card_title">Card Title</string>
+    <string name="card_title_main">Card Title</string>
+    <string name="card_description_main">Card Description</string>
+    <string name="more_card_content_main">More card content</string>
 </resources>
