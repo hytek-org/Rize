@@ -7,4 +7,12 @@
     <string name="card_title_main">Card Title</string>
     <string name="card_description_main">Card Description</string>
     <string name="more_card_content_main">More card content</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="configure">Configure</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="compose_shortcut_short_label1">hello</string>
+    <string name="compose_shortcut_long_label1">hello world</string>
+    <string name="compose_disabled_message1">"this is disable "</string>
+
 </resources>

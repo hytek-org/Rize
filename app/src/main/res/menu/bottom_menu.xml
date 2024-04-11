@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home"
+        android:title="Home"
+        android:icon="@drawable/outline_add_home_24"
+       />
+
+    <item
+        android:id="@+id/shorts"
+        android:title="Tasks"
+        android:icon="@drawable/baseline_assignment_turned_in_24"
+        />
+    <item
+        android:id="@+id/fab"
+        android:title="Add"
+        android:enabled="false"
+        android:icon="@drawable/outline_add_diamond_24"
+        />
+    <item
+        android:id="@+id/subscriptions"
+        android:title="Notes"
+        android:icon="@drawable/baseline_auto_awesome_mosaic_24"
+
+       />
+    <item
+        android:id="@+id/library"
+        android:title="Profile"
+        android:icon="@drawable/baseline_account_circle_24"
+      />
+</menu>

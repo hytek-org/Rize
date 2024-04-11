@@ -27,10 +27,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.hytek.rize" />
+                  <option name="mobileSdkAppId" value="1:639979767080:android:a8c9d9fb8c6bca9353bc1d" />
+                  <option name="projectId" value="ktech-37346" />
+                  <option name="projectNumber" value="639979767080" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
