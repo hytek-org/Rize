@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="seed">#114232</color>
     <color name="md_theme_light_primary">#006C50</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
@@ -65,4 +65,6 @@
     <color name="light_blue_200">#FF81D4FA</color>
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
+
+
 </resources>

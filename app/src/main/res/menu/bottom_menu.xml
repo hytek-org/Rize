@@ -4,6 +4,7 @@
         android:id="@+id/home"
         android:title="Home"
         android:icon="@drawable/outline_add_home_24"
+        android:tooltipText="Home"
        />
 
     <item

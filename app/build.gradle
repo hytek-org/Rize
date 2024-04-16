@@ -6,7 +6,9 @@ plugins {
 android {
     namespace 'com.hytek.rize'
     compileSdk 34
-
+    buildFeatures {
+        buildConfig true
+    }
     defaultConfig {
         applicationId "com.hytek.rize"
         minSdk 22
@@ -15,11 +17,16 @@ android {
         versionName "2.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        buildConfigField "String","WEB_CLIENT_ID","\"${properties.getProperty("WEB_CLIENT_ID")}\""
+
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -39,9 +46,15 @@ dependencies {
     implementation libs.activity
     implementation libs.constraintlayout
     implementation libs.firebase.auth
+    implementation libs.google.services
     implementation libs.play.integrity
+    implementation libs.firebase.database
+    implementation libs.play.services.ads
+    implementation libs.play.services.auth
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation("com.google.firebase:firebase-auth")
 
 }
