@@ -3,6 +3,7 @@ package com.hytek.rize.auth;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -13,13 +14,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.hytek.rize.HomeActivity;
 import com.hytek.rize.R;
 
+import java.util.Objects;
+
 public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+
+
+
     private TextInputLayout emailTextInputLayout;
     private TextInputLayout passwordTextInputLayout;
 
@@ -55,8 +62,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void loginUser() {
-        String email = emailTextInputLayout.getEditText().getText().toString().trim();
-        String password = passwordTextInputLayout.getEditText().getText().toString().trim();
+        String email = Objects.requireNonNull(emailTextInputLayout.getEditText()).getText().toString().trim();
+        String password = Objects.requireNonNull(passwordTextInputLayout.getEditText()).getText().toString().trim();
 
         // Input validation
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
@@ -70,16 +77,27 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // Attempt to sign in the user
+       
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         FirebaseUser user = mAuth.getCurrentUser();
+
+
                         checkEmailVerification();
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                    }else {
+                        Exception e = task.getException();
+                        if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                            // Handle invalid email/password error
+                            Toast.makeText(LoginActivity.this, "Invalid email or password.", Toast.LENGTH_SHORT).show();
+                        } else if (e.getMessage().contains("blocked")) {
+                            // Handle blocked application error
+                            Toast.makeText(LoginActivity.this, "Rize app is currently blocked. Please contact the developer.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Handle other errors
+                            Toast.makeText(LoginActivity.this, "Login failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
     }

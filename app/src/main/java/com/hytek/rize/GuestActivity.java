@@ -9,13 +9,13 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseAuth;
+
 import com.hytek.rize.auth.LoginActivity;
 import com.hytek.rize.auth.RegisterActivity;
 
 public class GuestActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +46,7 @@ public class GuestActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Retrieve the web client ID from the environment variable
-                String webClientId = BuildConfig.WEB_CLIENT_ID;
+                String webClientId ="Something went wrong try another way to login";
 
                 // Check if the web client ID is not null
                 if (webClientId != null) {
