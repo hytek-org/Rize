@@ -1,6 +1,8 @@
 package com.hytek.rize;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -11,7 +13,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
+
     private FirebaseAuth mAuth;
+    private SharedPreferences prefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,27 +24,38 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mAuth = FirebaseAuth.getInstance();
+        prefs = getSharedPreferences(getPackageName() + "_preferences", Context.MODE_PRIVATE);
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 checkUserAuthentication();
             }
-        }, 3000);
-
-
-
+        }, 1000); // Consider adjusting delay based on your needs
     }
+
     private void checkUserAuthentication() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            // User is already authenticated, start HomeActivity
+        boolean isAuthenticated = prefs.getBoolean("isAuthenticated", false); // Default to false
+
+        if (isAuthenticated) {
+            // User is authenticated (based on SharedPreferences), proceed to HomeActivity
             Intent intent = new Intent(MainActivity.this, HomeActivity.class);
             startActivity(intent);
+            finish();
         } else {
-            // User is not authenticated, start GuestActivity
-            Intent intent = new Intent(MainActivity.this, GuestActivity.class);
-            startActivity(intent);
+            // User is not authenticated (or authentication state unknown), check Firebase
+            FirebaseUser currentUser = mAuth.getCurrentUser();
+            if (currentUser != null) {
+                // User is authenticated in Firebase, update SharedPreferences and start HomeActivity
+                prefs.edit().putBoolean("isAuthenticated", true).apply(); // Consider using commit() if needed
+                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                startActivity(intent);
+            } else {
+                // User is not authenticated, start GuestActivity
+                Intent intent = new Intent(MainActivity.this, GuestActivity.class);
+                startActivity(intent);
+            }
+            finish();
         }
-        finish();
     }
 }

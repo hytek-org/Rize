@@ -9,7 +9,7 @@
     <!-- First CardView with TextView -->
     <androidx.cardview.widget.CardView android:id="@+id/card_top"
         android:layout_width="match_parent" android:layout_height="150dp"
-        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+
         app:cardCornerRadius="20dp" app:cardElevation="8dp"
         app:layout_constraintBottom_toTopOf="@+id/card_bottom"
         app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
@@ -24,12 +24,14 @@
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="89dp"
+                android:layout_marginTop="10dp"
                 android:contentDescription="@string/app_name"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-android:src="@drawable/ic_launcher_foreground"             tools:srcCompat="@drawable/ic_launcher_foreground" />
+                android:src="@drawable/ic_launcher_foreground"
+                tools:srcCompat="@drawable/ic_launcher_foreground" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
@@ -38,8 +40,8 @@ android:src="@drawable/ic_launcher_foreground"             tools:srcCompat="@dra
     <androidx.cardview.widget.CardView android:id="@+id/card_bottom"
         android:layout_width="match_parent" android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp" app:cardCornerRadius="20dp" app:cardElevation="8dp"
+
+         app:cardCornerRadius="20dp" app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/card_top">
@@ -48,7 +50,8 @@ android:src="@drawable/ic_launcher_foreground"             tools:srcCompat="@dra
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp">
+            android:padding="26dp"
+            >
 
             <!-- Form elements -->
             <com.google.android.material.textfield.TextInputLayout
@@ -58,13 +61,13 @@ android:src="@drawable/ic_launcher_foreground"             tools:srcCompat="@dra
                 android:hint="@string/email"
                 app:endIconMode="clear_text"
                 app:errorEnabled="true"
-                app:helperText="i am just helping around"
+
                 app:hintEnabled="true"
                 app:layout_constraintTop_toTopOf="parent"
                 app:startIconContentDescription="hey google"
                 app:startIconDrawable="@drawable/mail_24px"
                 tools:layout_editor_absoluteX="16dp"
-                android:layout_marginTop="16dp">
+               >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -79,19 +82,18 @@ android:src="@drawable/ic_launcher_foreground"             tools:srcCompat="@dra
                 app:endIconMode="password_toggle"
 
                 app:errorEnabled="true"
-                app:helperText="i am just helping around"
+
                 app:hintEnabled="true"
                 app:layout_constraintTop_toBottomOf="@+id/email_field"
                 app:startIconContentDescription="hey google"
                 app:startIconDrawable="@drawable/lock_24px"
-                android:layout_marginTop="16dp">
+              >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
-
 
 
             <Button
@@ -105,15 +107,20 @@ android:src="@drawable/ic_launcher_foreground"             tools:srcCompat="@dra
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/password_field"
-                app:layout_constraintVertical_bias="0.065" />
+                app:layout_constraintVertical_bias="0.0" />
+
             <TextView
                 android:id="@+id/already_registered_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"  android:text="@string/already_registered"  app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="8dp"
+                android:text="@string/already_registered"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"  app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/register_button" />
+                app:layout_constraintHorizontal_bias="0.497"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/register_button"
+                app:layout_constraintVertical_bias="0.315" />
 
             <Button
                 android:id="@+id/login_link"

@@ -2,7 +2,7 @@
     <shortcut
         android:shortcutId="compose"
         android:enabled="true"
-        android:icon="@drawable/ic_launcher_foreground"
+        android:icon="@drawable/home_24px"
         android:shortcutShortLabel="@string/compose_shortcut_short_label1"
         android:shortcutLongLabel="@string/compose_shortcut_long_label1"
         android:shortcutDisabledMessage="@string/compose_disabled_message1">
@@ -20,14 +20,14 @@
     <shortcut
         android:shortcutId="compose1"
         android:enabled="true"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:shortcutShortLabel="@string/compose_shortcut_short_label1"
-        android:shortcutLongLabel="@string/compose_shortcut_long_label1"
-        android:shortcutDisabledMessage="@string/compose_disabled_message1">
+        android:icon="@drawable/checklist_24px"
+        android:shortcutShortLabel="@string/compose_shortcut_short_label2"
+        android:shortcutLongLabel="@string/compose_shortcut_long_label2"
+        android:shortcutDisabledMessage="@string/compose_disabled_message2">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.hytek.rize"
-            android:targetClass="com.hytek.rize.HomeActivity" />
+            android:targetClass="com.hytek.rize.tasks.TasksActivity" />
         <!-- If your shortcut is associated with multiple intents, include them
              here. The last intent in the list determines what the user sees when
              they launch this shortcut. -->
@@ -37,14 +37,14 @@
     <shortcut
         android:shortcutId="compose2"
         android:enabled="true"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:shortcutShortLabel="@string/compose_shortcut_short_label1"
-        android:shortcutLongLabel="@string/compose_shortcut_long_label1"
-        android:shortcutDisabledMessage="@string/compose_disabled_message1">
+        android:icon="@drawable/description_24px"
+        android:shortcutShortLabel="@string/compose_shortcut_short_label3"
+        android:shortcutLongLabel="@string/compose_shortcut_long_label3"
+        android:shortcutDisabledMessage="@string/compose_disabled_message3">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.hytek.rize"
-            android:targetClass="com.hytek.rize.HomeActivity" />
+            android:targetClass="com.hytek.rize.notes.NotesActivity" />
         <!-- If your shortcut is associated with multiple intents, include them
              here. The last intent in the list determines what the user sees when
              they launch this shortcut. -->
@@ -54,36 +54,20 @@
     <shortcut
         android:shortcutId="compose3"
         android:enabled="true"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:shortcutShortLabel="@string/compose_shortcut_short_label1"
-        android:shortcutLongLabel="@string/compose_shortcut_long_label1"
-        android:shortcutDisabledMessage="@string/compose_disabled_message1">
+        android:icon="@drawable/account_circle_24px"
+        android:shortcutShortLabel="@string/compose_shortcut_short_label4"
+        android:shortcutLongLabel="@string/compose_shortcut_long_label4"
+        android:shortcutDisabledMessage="@string/compose_disabled_message4">
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.hytek.rize"
-            android:targetClass="com.hytek.rize.HomeActivity" />
+            android:targetClass="com.hytek.rize.user.profile.ProfileActivity" />
         <!-- If your shortcut is associated with multiple intents, include them
              here. The last intent in the list determines what the user sees when
              they launch this shortcut. -->
         <categories android:name="android.shortcut.conversation" />
         <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
     </shortcut>
-    <shortcut
-        android:shortcutId="compose4"
-        android:enabled="true"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:shortcutShortLabel="@string/compose_shortcut_short_label1"
-        android:shortcutLongLabel="@string/compose_shortcut_long_label1"
-        android:shortcutDisabledMessage="@string/compose_disabled_message1">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:targetPackage="com.hytek.rize"
-            android:targetClass="com.hytek.rize.HomeActivity" />
-        <!-- If your shortcut is associated with multiple intents, include them
-             here. The last intent in the list determines what the user sees when
-             they launch this shortcut. -->
-        <categories android:name="android.shortcut.conversation" />
-        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
-    </shortcut>
+
 </shortcuts>
   

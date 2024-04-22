@@ -9,7 +9,7 @@
     <!-- First CardView with TextView -->
     <androidx.cardview.widget.CardView android:id="@+id/card_top"
         android:layout_width="match_parent" android:layout_height="150dp"
-        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+
         app:cardCornerRadius="20dp" app:cardElevation="8dp"
         app:layout_constraintBottom_toTopOf="@+id/card_bottom"
         app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
@@ -24,6 +24,7 @@
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="89dp"
+                android:layout_marginTop="10dp"
                 android:contentDescription="@string/app_name"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -39,8 +40,8 @@
     <androidx.cardview.widget.CardView android:id="@+id/card_bottom"
         android:layout_width="match_parent" android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp" app:cardCornerRadius="20dp" app:cardElevation="8dp"
+
+         app:cardCornerRadius="20dp" app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/card_top">
@@ -49,7 +50,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp">
+            android:padding="26dp">
 
             <!-- Form elements -->
             <com.google.android.material.textfield.TextInputLayout
@@ -59,13 +60,13 @@
                 android:hint="@string/email"
                 app:endIconMode="clear_text"
                 app:errorEnabled="true"
-                app:helperText="i am just helping around"
+
                 app:hintEnabled="true"
                 app:layout_constraintTop_toTopOf="parent"
                 app:startIconContentDescription="hey google"
                 app:startIconDrawable="@drawable/mail_24px"
                 tools:layout_editor_absoluteX="16dp"
-                android:layout_marginTop="16dp">
+               >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -79,12 +80,12 @@
                 android:hint="@string/password"
                 app:endIconMode="password_toggle"
                 app:errorEnabled="true"
-                app:helperText="i am just helping around"
+
                 app:hintEnabled="true"
                 app:layout_constraintTop_toBottomOf="@+id/email_field"
                 app:startIconContentDescription="hey google"
                 app:startIconDrawable="@drawable/lock_24px"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="6dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -97,24 +98,26 @@
                 android:id="@+id/login_button"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="5dp"
                 android:text="@string/login"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/password_field"
-                app:layout_constraintVertical_bias="0.065" />
+                app:layout_constraintVertical_bias="0.012" />
+
             <TextView
                 android:id="@+id/not_registered_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" android:text="@string/new_here_sign_up_now"
+                android:layout_marginTop="8dp"
+                android:text="@string/new_here_sign_up_now"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/login_button" />
+                app:layout_constraintTop_toBottomOf="@+id/login_button"
+                app:layout_constraintVertical_bias="0.362" />
 
             <Button
                 android:id="@+id/register_link"

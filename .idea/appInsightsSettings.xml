@@ -6,6 +6,11 @@
         <entry key="Android Vitals">
           <value>
             <InsightsFilterSettings>
+              <option name="connection">
+                <ConnectionSetting>
+                  <option name="appId" value="com.hytek.rize" />
+                </ConnectionSetting>
+              </option>
               <option name="failureTypes">
                 <list>
                   <option value="FATAL" />
@@ -23,9 +28,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.hytek.rize" />
-                  <option name="mobileSdkAppId" value="1:639979767080:android:33c1a35d466cf4ee53bc1d" />
-                  <option name="projectId" value="ktech-37346" />
-                  <option name="projectNumber" value="639979767080" />
+                  <option name="mobileSdkAppId" value="1:887145664837:android:a768dee2a9b2f88a42ae2c" />
+                  <option name="projectId" value="clubquiz-2c191" />
+                  <option name="projectNumber" value="887145664837" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

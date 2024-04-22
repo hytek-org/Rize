@@ -1,9 +1,12 @@
 package com.hytek.rize.auth;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.Log;
+
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -13,11 +16,13 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputLayout;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.hytek.rize.HomeActivity;
 import com.hytek.rize.R;
+import com.hytek.rize.user.profile.ProfileActivity;
 
 import java.util.Objects;
 
@@ -111,6 +116,21 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
                     //  Navigate to next activity or handle successful registration
                     // Start the new activity here
+                    // Get a reference to the application context
+                    Context context = getApplicationContext();
+
+                    // Use getSharedPreferences() to access the default shared preferences file
+                    SharedPreferences prefs = context.getSharedPreferences(
+                            context.getPackageName() + "_preferences", // Use your app's package name as the preference file name
+                            Context.MODE_PRIVATE);
+
+                    // Edit the preferences
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putBoolean("isAuthenticated", true);
+
+                    // Apply the changes (consider using commit() for synchronous operation)
+                    editor.apply();
+
                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                     startActivity(intent);
                     // Finish the current activity
@@ -118,9 +138,24 @@ public class LoginActivity extends AppCompatActivity {
 
                 } else {
                     // Email is not verified, inform the user
-                    Toast.makeText(LoginActivity.this, "Please verify your email before logging in.", Toast.LENGTH_SHORT).show();
+                    // Send verification email
+                    sendEmailVerification();
+                    // Toast.makeText(LoginActivity.this, "Please verify your email before logging in.", Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+    }
+    private void sendEmailVerification() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            user.sendEmailVerification()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(LoginActivity.this, "Verification email sent to " + user.getEmail(), Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Failed to send verification email.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         }
     }
 

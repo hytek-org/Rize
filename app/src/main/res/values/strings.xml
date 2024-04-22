@@ -11,8 +11,8 @@
     <string name="configure">Configure</string>
     <string name="add_widget">Add widget</string>
     <string name="app_widget_description">This is an app widget description</string>
-    <string name="compose_shortcut_short_label1">hello</string>
-    <string name="compose_shortcut_long_label1">hello world</string>
+    <string name="compose_shortcut_short_label1">View Home</string>
+    <string name="compose_shortcut_long_label1">View Home </string>
     <string name="compose_disabled_message1">"this is disable "</string>
     <string name="welcome_to_our_app">Welcome to our app!</string>
     <string name="sign_in">Sign In</string>
@@ -27,5 +27,21 @@
     <string name="log_in">Log in</string>
     <string name="new_here_sign_up_now">New here? Sign up now!</string>
     <string name="register">Register</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home">Home</string>
+    <string name="tasks">Tasks</string>
+    <string name="compose_shortcut_short_label4">View Profile</string>
+    <string name="compose_shortcut_long_label4">View Profile</string>
+    <string name="compose_disabled_message4">this is disabled</string>
+    <string name="compose_disabled_message3">this is disabled</string>
+    <string name="compose_shortcut_long_label3">View Notes</string>
+    <string name="compose_shortcut_short_label3">View Notes</string>
+    <string name="compose_disabled_message2">this is disable</string>
+    <string name="compose_shortcut_long_label2">View Tasks</string>
+    <string name="compose_shortcut_short_label2">View Tasks</string>
 
 </resources>

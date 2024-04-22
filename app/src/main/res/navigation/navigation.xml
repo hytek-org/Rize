@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/guestActivity">
+
+    <!-- Guest Activity -->
+    <activity
+        android:id="@+id/guestActivity"
+        android:name="com.hytek.rize.GuestActivity"
+        android:label="GuestActivity"
+        tools:layout="@layout/activity_guest">
+        <action
+            android:id="@+id/action_guest_to_login"
+            app:destination="@id/loginActivity" />
+        <action
+            android:id="@+id/action_guest_to_register"
+            app:destination="@id/registerActivity" />
+    </activity>
+
+
+    <!-- Login Activity -->
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.hytek.rize.auth.LoginActivity"
+        android:label="LoginActivity"
+        tools:layout="@layout/activity_login" />
+
+    <!-- Register Activity -->
+    <activity
+        android:id="@+id/registerActivity"
+        android:name="com.hytek.rize.auth.RegisterActivity"
+        android:label="RegisterActivity"
+        tools:layout="@layout/activity_register" />
+
+
+
+    <!-- Define conditional navigation based on authentication status -->
+    <fragment
+        android:id="@+id/authCheckFragment"
+        android:name="com.hytek.rize.AuthCheckFragment">
+
+        <!-- If authenticated, navigate to HomeActivity -->
+        <action
+            android:id="@+id/action_authCheckFragment_to_homeActivity"
+            app:destination="@id/homeActivity"
+            app:popUpTo="@id/authCheckFragment"
+            app:popUpToInclusive="true"
+            tools:ignore="UnusedNavigation" />
+
+        <!-- If not authenticated, navigate to GuestActivity -->
+        <action
+            android:id="@+id/action_authCheckFragment_to_guestActivity"
+            app:destination="@id/guestActivity"
+            app:popUpTo="@id/authCheckFragment"
+            app:popUpToInclusive="true"
+            tools:ignore="UnusedNavigation" />
+
+        <!-- Add more conditions and actions as needed -->
+        <action
+            android:id="@+id/action_authCheckFragment_to_notesActivity"
+            app:destination="@id/notesActivity"
+            app:popUpTo="@id/authCheckFragment"
+            app:popUpToInclusive="true"
+            tools:ignore="UnusedNavigation" />
+        <action
+            android:id="@+id/action_authCheckFragment_to_profileActivity"
+            app:destination="@id/profileActivity"
+            app:popUpTo="@id/authCheckFragment"
+            app:popUpToInclusive="true"
+            tools:ignore="UnusedNavigation" />
+        <action
+            android:id="@+id/action_authCheckFragment_to_settingsActivity"
+            app:destination="@id/settingsActivity"
+            app:popUpTo="@id/authCheckFragment"
+            app:popUpToInclusive="true"
+            tools:ignore="UnusedNavigation" />
+        <action
+            android:id="@+id/action_authCheckFragment_to_tasksActivity"
+            app:destination="@id/tasksActivity"
+            app:popUpTo="@id/authCheckFragment"
+            app:popUpToInclusive="true"
+            tools:ignore="UnusedNavigation" />
+    </fragment>
+
+    <!-- Home Activity -->
+    <activity
+        android:id="@+id/homeActivity"
+        android:name="com.hytek.rize.HomeActivity"
+        android:label="HomeActivity"
+        tools:layout="@layout/activity_home" />
+
+    <activity
+        android:id="@+id/notesActivity"
+        android:name="com.hytek.rize.notes.NotesActivity"
+        android:label="activity_notes"
+        tools:layout="@layout/activity_notes" />
+
+    <activity
+        android:id="@+id/profileActivity"
+        android:name="com.hytek.rize.user.profile.ProfileActivity"
+        android:label="activity_profile"
+        tools:layout="@layout/activity_profile" />
+
+    <activity
+        android:id="@+id/settingsActivity"
+        android:name="com.hytek.rize.user.SettingsActivity"
+        android:label="activity_settings"
+        tools:layout="@layout/activity_settings" />
+
+    <activity
+        android:id="@+id/tasksActivity"
+        android:name="com.hytek.rize.tasks.TasksActivity"
+        android:label="TasksActivity" />
+
+</navigation>

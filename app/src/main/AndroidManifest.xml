@@ -15,6 +15,22 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
+            android:name=".user.profile.ProfileActivity"
+            android:exported="false" />
+
+        <receiver
+            android:name=".HomeAppWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/home_app_widget_info" />
+        </receiver>
+
+        <activity
             android:name=".tasks.TasksActivity"
             android:exported="false" />
         <activity
@@ -29,26 +45,6 @@
         <activity
             android:name=".GuestActivity"
             android:exported="false" />
-
-        <receiver
-            android:name=".widgets.HomeWidget"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/home_widget_info" />
-        </receiver>
-
-        <activity
-            android:name=".widgets.HomeWidgetConfigureActivity"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".HomeActivity"
             android:exported="false"
@@ -66,6 +62,7 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-2588057035083565~1488716536" />
