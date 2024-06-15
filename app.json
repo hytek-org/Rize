@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "rize",
+    "name": "Rize",
     "slug": "rize",
-    "version": "1.0.0",
+    "version": "2.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rize",
@@ -16,10 +16,13 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.hytek.rize",
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
+     
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +34,15 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "1d476dbb-bd8f-42d0-b3a7-06b5023193b4"
+      },
+      "permissions": ["NOTIFICATIONS"]
     }
   }
 }

@@ -9,7 +9,8 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
-
+.eas.json
+eas.json
 # macOS
 .DS_Store
 
