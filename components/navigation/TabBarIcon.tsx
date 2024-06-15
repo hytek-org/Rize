@@ -6,6 +6,7 @@ import { type ComponentProps } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome6 } from '@expo/vector-icons';
 
 export function TabBarIcon({ style, ...rest }: IconProps<ComponentProps<typeof Ionicons>['name']>) {
   return <Ionicons size={28} style={[{ marginBottom: -3 }, style]} {...rest} />;
@@ -21,3 +22,6 @@ export function TabProfileIcon({ style, ...rest }: IconProps<ComponentProps<type
   return <FontAwesome5 size={28} style={[{ marginBottom: -3 }, style]} {...rest} />;
 }
 
+export function TabFontAwesomenew({ style, ...rest }: IconProps<ComponentProps<typeof FontAwesome6>['name']>) {
+  return <FontAwesome6 size={28} style={[{ marginBottom: -3 }, style]} {...rest} />;
+}
