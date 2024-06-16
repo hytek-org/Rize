@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  expo:
+    build:
+      context: .
+    ports:
+      - "8081:8081"
+    volumes:
+      - .:/app
+    environment:
+      - REACT_NATIVE_PACKAGER_HOSTNAME=localhost
