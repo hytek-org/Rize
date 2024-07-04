@@ -53,7 +53,7 @@ export default function ParallaxScrollView({
           ]}>
           {headerImage}
         </Animated.View>
-        <ThemedView style={styles.content}>{children}</ThemedView>
+        <ThemedView style={styles.content} className='rounded-t-3xl'>{children}</ThemedView>
       </Animated.ScrollView>
     </ThemedView>
   );

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, View, TextInput, Text, useColorScheme, FlatList, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { Alert, View, TextInput, Text, useColorScheme, FlatList, StyleSheet, Modal, Pressable, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabProfileIcon } from "@/components/navigation/TabBarIcon";
 import { TabFontAwesomenew } from "@/components/navigation/TabBarIcon";
 import { ExternalLink } from '@/components/ExternalLink';
-
+// import { requestPermissions, scheduleNotification } from '@/utils/Notification';
 
 
 
@@ -53,11 +53,22 @@ const HomeScreen = () => {
 
     fetchLatestTasks();
   }, []);
-  const openModal = (task: Task) => {
-    setSelectedTask(task);
-    setEditedContent(task.content);
-    setModalVisible(true);
-  };
+
+  // notification
+  // useEffect(() => {
+  //   (async () => {
+  //     const status = await requestPermissions();
+  //     if (status !== 'granted') {
+  //       Alert.alert('Permission to receive notifications was denied.');
+  //     }
+  //   })();
+  // }, []);
+
+   const openModal = (task: Task) => {
+     setSelectedTask(task);
+     setEditedContent(task.content);
+     setModalVisible(true);
+   };
   const saveEditedTask = async () => {
     if (selectedTask) {
       const updatedTasks = tasks.map(task =>
@@ -114,14 +125,14 @@ const HomeScreen = () => {
                   {convertHourTo12HourFormat(item.time)}
                 </Text>
                 {item.time == currentHourString && (
-                  <TouchableOpacity onPress={() => openModal(item)}>
+                  <Pressable onPress={() => openModal(item)}>
                     <TabProfileIcon name="edit" className="dark:text-white" />
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
                 {item.time == nextHour && (
-                  <TouchableOpacity onPress={() => openModal(item)}>
+                  <Pressable onPress={() => openModal(item)}>
                     <TabProfileIcon name="edit" className="dark:text-white" />
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
               </View>
               <View className="p-2 md:p-5 ">
@@ -170,7 +181,7 @@ const HomeScreen = () => {
                   value={editedContent}
                   onChangeText={setEditedContent}
                 />
-                <TouchableOpacity
+                <Pressable
                   style={
                     colorScheme === "dark"
                       ? stylesDark.modalButton
@@ -188,8 +199,8 @@ const HomeScreen = () => {
                   >
                     Save
                   </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
+                </Pressable>
+                <Pressable
                   className="mx-auto mt-4 hover:underline"
                   onPress={() => setModalVisible(false)}
                 >
@@ -198,14 +209,16 @@ const HomeScreen = () => {
                   >
                     Cancel
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </Modal>}
         </View>
       </View>
       <View className='h-[25vh] sm:h-screen  md:pb-20 '>
         <View className='  flex flex-col justify-center items-center space-y-2 px-2  md:mt-32'>
-          
+          {/* <View> 
+            <Button title="Show Notification" onPress={scheduleNotification} />
+            </View> */}
              <View className='hidden md:block'>
                 <ExternalLink className="flex-none text-xl font-semibold text-black dark:text-white" href="https://hytek.org.in" aria-label="Brand">HYTEK</ExternalLink>
              </View>

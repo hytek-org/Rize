@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image,ScrollView } from 'react-native';
+import { View, Text, Pressable, Image,ScrollView } from 'react-native';
 
 
 export default function Guide() {
@@ -15,18 +15,18 @@ export default function Guide() {
                     Fully customizable rules to match your unique needs
                 </Text>
                 <View className="mt-10">
-                    <TouchableOpacity onPress={() => setActiveTab(1)} className="p-4 mb-5 rounded-xl bg-white shadow-md">
+                    <Pressable onPress={() => setActiveTab(1)} className="p-4 mb-5 rounded-xl bg-white shadow-md">
                         <Text className="text-lg font-semibold text-blue-600">Advanced tools</Text>
                         <Text>Use Preline thoroughly thought and automated libraries to manage your businesses.</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setActiveTab(2)} className="p-4 mb-5 rounded-xl bg-white shadow-md">
+                    </Pressable>
+                    <Pressable onPress={() => setActiveTab(2)} className="p-4 mb-5 rounded-xl bg-white shadow-md">
                         <Text className="text-lg font-semibold text-blue-600">Smart dashboards</Text>
                         <Text>Quickly Preline sample components, copy-paste codes, and start right off.</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setActiveTab(3)} className="p-4 mb-5  rounded-xl bg-white shadow-md">
+                    </Pressable>
+                    <Pressable onPress={() => setActiveTab(3)} className="p-4 mb-5  rounded-xl bg-white shadow-md">
                         <Text className="text-lg font-semibold text-blue-600">Powerful features</Text>
                         <Text>Reduce time and effort on building modern look design with Preline only.</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 </View>
             </View>
             <View className="flex-1 w-full mr-5  ">

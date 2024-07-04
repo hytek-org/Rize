@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   FlatList,
   Modal,
@@ -15,6 +15,7 @@ import {
   TabProfileIcon,
   TabTaskIcon
 } from "@/components/navigation/TabBarIcon";
+
 interface Task {
   id: number;
   content: string;
@@ -26,7 +27,7 @@ interface HistoryItem {
   tasks: Task[];
 }
 
-const TEMPLATE_KEY = "dailyTemplate";
+const TEMPLATE_KEY = "Templates";
 const TASKS_KEY = "dailyTasks";
 const LAST_DATE_KEY = "lastDate";
 
@@ -40,6 +41,12 @@ export default function TabTwoScreen() {
   const [selectedTab, setSelectedTab] = useState("morning");
   useEffect(() => {
     const loadTasks = async () => {
+      const currentHour = new Date().getHours();
+      if (currentHour < 12) {
+        setSelectedTab("morning");
+      } else {
+        setSelectedTab("afternoon");
+      }
       const today = new Date().toLocaleDateString();
       const lastDate = await AsyncStorage.getItem(LAST_DATE_KEY);
       if (lastDate !== today) {
@@ -153,13 +160,13 @@ export default function TabTwoScreen() {
           {convertHourTo12HourFormat(item.time)}
         </Text>
         {item.time == currentHourString &&
-          <TouchableOpacity onPress={() => openModal(item)}>
+          <Pressable onPress={() => openModal(item)}>
             <TabProfileIcon name="edit" className="dark:text-white" />
-          </TouchableOpacity>}
+          </Pressable>}
         {item.time >= nextHour &&
-          <TouchableOpacity onPress={() => openModal(item)}>
+          <Pressable onPress={() => openModal(item)}>
             <TabProfileIcon name="edit" className="dark:text-white" />
-          </TouchableOpacity>}
+          </Pressable>}
       </View>
       <View className="p-2 md:p-5">
         <Text className="text-base overflow-y-auto h-auto max-h-32 text-gray-800 dark:text-white">
@@ -179,7 +186,7 @@ export default function TabTwoScreen() {
       <View className="flex flex-col   md:flex-row">
         <View className="flex flex-row justify-center items-center  mb-4 md:w-1/4 md:flex-col md:justify-normal ">
           <View className="flex flex-row  space-x-2 md:flex-col md:space-x-0 md:space-y-4">
-            <TouchableOpacity
+            <Pressable
               className={`inline-flex flex-row space-x-2 p-2 md:py-4 rounded-lg justify-center  ${selectedTab ==
                 "morning"
                 ? "bg-[#0c891b]  "
@@ -206,8 +213,8 @@ export default function TabTwoScreen() {
               >
                 Tasks
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               className={`inline-flex flex-row space-x-2 p-2 md:py-4 rounded-lg justify-center  ${selectedTab ==
                 "afternoon"
                 ? "bg-[#0c891b]  "
@@ -234,7 +241,7 @@ export default function TabTwoScreen() {
               >
                 Tasks
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 
@@ -291,7 +298,7 @@ export default function TabTwoScreen() {
                 value={editedContent}
                 onChangeText={setEditedContent}
               />
-              <TouchableOpacity
+              <Pressable
                 style={
                   colorScheme === "dark"
                     ? stylesDark.modalButton
@@ -309,8 +316,8 @@ export default function TabTwoScreen() {
                 >
                   Save
                 </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </Pressable>
+              <Pressable
                 className="mx-auto mt-4 hover:underline"
                 onPress={() => setModalVisible(false)}
               >
@@ -319,7 +326,7 @@ export default function TabTwoScreen() {
                 >
                   Cancel
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </Modal>}
       </View>

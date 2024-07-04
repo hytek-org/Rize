@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, ScrollView, Switch,TextInput } from 'react-native';
+import { View, Text, Pressable, ScrollView, Switch,TextInput } from 'react-native';
 
 export default function History() {
   return (
@@ -40,12 +40,12 @@ export default function History() {
           />
         </View>
 
-        <TouchableOpacity
+        <Pressable
           className="bg-blue-500 dark:bg-blue-600 py-2 px-4 rounded-md text-white text-center"
           onPress={() => {}}
         >
           <Text className="text-sm font-semibold">Save Changes</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Notification Settings Section */}
@@ -77,12 +77,12 @@ export default function History() {
           />
         </View>
 
-        <TouchableOpacity
+        <Pressable
           className="bg-blue-500 dark:bg-blue-600 py-2 px-4 rounded-md text-white text-center"
           onPress={() => {}}
         >
           <Text className="text-sm font-semibold">Save Changes</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Security Settings Section */}
@@ -104,12 +104,12 @@ export default function History() {
           />
         </View>
 
-        <TouchableOpacity
+        <Pressable
           className="bg-blue-500 dark:bg-blue-600 py-2 px-4 rounded-md text-white text-center"
           onPress={() => {}}
         >
           <Text className="text-sm font-semibold">Change Password</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Appearance Settings Section */}
@@ -131,12 +131,12 @@ export default function History() {
           />
         </View>
 
-        <TouchableOpacity
+        <Pressable
           className="bg-blue-500 dark:bg-blue-600 py-2 px-4 rounded-md text-white text-center"
           onPress={() => {}}
         >
           <Text className="text-sm font-semibold">Save Changes</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Account Management Section */}
@@ -149,12 +149,12 @@ export default function History() {
           Manage your account and preferences.
         </Text>
         </View>
-        <TouchableOpacity
+        <Pressable
           className=" w-52 bg-red-500 dark:bg-red-600 py-2 px-4 rounded-md text-white text-center"
           onPress={() => {}}
         >
           <Text className="text-lg md:text-2xl md:mt-3 font-semibold text-white/90">Delete Account</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
       </View>
     </View>

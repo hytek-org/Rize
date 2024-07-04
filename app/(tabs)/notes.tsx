@@ -4,7 +4,7 @@ import {
   Text,
   TextInput,
   FlatList,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   Alert,
   Platform,
@@ -165,18 +165,18 @@ export default function TabTwoScreen() {
               <View className="flex flex-row justify-between  ">
                 <Text className="text-lg ml-2 dark:text-white "> <TabCreateIcon className="mr-2" name={"tago"} size={16} /> {item.tag ? item.tag : 'Default'}</Text>
                 <View className="flex flex-row rounded-lg border border-gray-100 bg-gray-100 py-1 sm:py-2 mr-2">
-                  <TouchableOpacity
+                  <Pressable
                     className=" rounded-md px-4 py-2 text-sm text-gray-500 hover:text-gray-700 focus:relative"
                     onPress={() => startEditingNote(item)}
                   >
                     <TabProfileIcon name={"edit"} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
+                  </Pressable>
+                  <Pressable
                     className=" rounded bg-white  px-4 py-2 text-sm text-blue-500 shadow-sm focus:relative"
                     onPress={() => deleteNote(item.id)}
                   >
                     <TabCreateIcon name={"delete"} />
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               </View>
               <View>
@@ -214,7 +214,7 @@ export default function TabTwoScreen() {
           />
         </View>
         <View className="w-52 mx-auto mt-4">
-          <TouchableOpacity
+          <Pressable
             className=" flex flex-row w-full text-center justify-center items-center   rounded-lg shadow-xl hover:shadow-white/50 space-x-2 bg-yellow-400 px-4 py-2"
             onPress={editMode ? editNote : addNote}
           >
@@ -222,11 +222,11 @@ export default function TabTwoScreen() {
             <Text className="text-xl font-medium ">
               {editMode ? "Update Note" : "Add Note"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
       <View className=" sm:hidden">
-        <FloatingButton onPress={openModal} />
+        <FloatingButton onPress={openModal}  />
         <MyModal
           visible={modalVisible}
           onClose={closeModal}
