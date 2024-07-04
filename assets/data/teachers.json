@@ -1,0 +1,27 @@
+[
+    { "id": 1, "content": "Sleep", "time": "00" },
+    { "id": 2, "content": "Sleep", "time": "01" },
+    { "id": 3, "content": "Sleep", "time": "02" },
+    { "id": 4, "content": "Sleep", "time": "03" },
+    { "id": 5, "content": "Sleep", "time": "04" },
+    { "id": 6, "content": "Wake up and Morning Routine", "time": "05" },
+    { "id": 7, "content": "Exercise and Breakfast", "time": "06" },
+    { "id": 8, "content": "Class Preparation", "time": "07" },
+    { "id": 9, "content": "Morning Classes", "time": "08" },
+    { "id": 10, "content": "Morning Classes", "time": "09" },
+    { "id": 11, "content": "Morning Classes", "time": "10" },
+    { "id": 12, "content": "Morning Classes", "time": "11" },
+    { "id": 13, "content": "Lunch Break", "time": "12" },
+    { "id": 14, "content": "Afternoon Classes", "time": "13" },
+    { "id": 15, "content": "Afternoon Classes", "time": "14" },
+    { "id": 16, "content": "Grading/Assessment", "time": "15" },
+    { "id": 17, "content": "Grading/Assessment", "time": "16" },
+    { "id": 18, "content": "Afternoon Break", "time": "17" },
+    { "id": 19, "content": "Professional Development/Meetings", "time": "18" },
+    { "id": 20, "content": "Dinner", "time": "19" },
+    { "id": 21, "content": "Family Time/Leisure", "time": "20" },
+    { "id": 22, "content": "Class Preparation for Next Day", "time": "21" },
+    { "id": 23, "content": "Class Preparation for Next Day", "time": "22" },
+    { "id": 24, "content": "Prepare for Bed", "time": "23" }
+  ]
+  
