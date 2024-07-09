@@ -22,9 +22,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "notification": {
-        "icon": "./assets/icons/notification-icon.png"
-      },
+     
       "permissions": ["RECEIVE_BOOT_COMPLETED"]
     },
     "web": {
@@ -41,7 +39,7 @@
         "expo-notifications",
         
         {
-          "icon": "./assets/icons/notification-icon.png",
+          "icon": "./assets/images/notification.png",
           "color": "#ffffff",
           "defaultChannel": "default",
           "sounds": ["./assets/sound/reminder.wav","./assets/sound/simple.mp3"]
