@@ -103,19 +103,19 @@ export default function TabTwoScreen() {
               >
                 <View className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-4" >
                   {templates.filter(template => !template.public).length === 0 ? (
-                        <View className="h-36 sm:h-56 flex flex-col justify-center border border-gray-200 rounded-xl text-center p-4 md:p-5 dark:border-neutral-700">
+                    <View className="h-36 sm:h-56 flex flex-col justify-center border border-gray-200 rounded-xl text-center p-4 md:p-5 dark:border-neutral-700">
 
-                          <View className="flex justify-center items-center size-12 bg-gradient-to-br from-blue-600 to-violet-600 rounded-lg mx-auto">
+                      <View className="flex justify-center items-center size-12 bg-gradient-to-br from-blue-600 to-violet-600 rounded-lg mx-auto">
 
-                            <TabTaskIcon name="now-widgets" size={42} className="flex-shrink-0  dark:text-white" />
-                          </View>
+                        <TabTaskIcon name="now-widgets" size={42} className="flex-shrink-0  dark:text-white" />
+                      </View>
 
-                          <View className="mt-3">
-                            <Text className="text-sm sm:text-lg text-center font-semibold text-gray-800 dark:text-neutral-200">
-                             No Template Found
-                            </Text>
-                          </View>
-                        </View>
+                      <View className="mt-3">
+                        <Text className="text-sm sm:text-lg text-center font-semibold text-gray-800 dark:text-neutral-200">
+                          No Template Found
+                        </Text>
+                      </View>
+                    </View>
                   ) : (
                     templates.filter(template => !template.public).map((template, index) => (
                       <View key={`template-${template.id}-${index}`} className="sm:w-80 rounded-xl border-2 border-gray-100 dark:border-neutral-700 bg-white dark:bg-black  ">

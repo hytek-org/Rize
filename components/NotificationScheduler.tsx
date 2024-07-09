@@ -20,8 +20,9 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
-    shouldSetBadge: false,
-
+    shouldSetBadge: true,
+    AndroidAudioContentType:4,
+    
   }),
 });
 
@@ -112,11 +113,18 @@ const NotificationScheduler: React.FC<NotificationSchedulerProps> = ({
       } else {
         // For Mobile Notifications
         Notifications.scheduleNotificationAsync({
+
           content: {
-            sound: Platform.OS === 'ios' ? 'reminder.wav' : undefined,
+            sound: Platform.OS === 'android' ? 'reminder.wav' : undefined,
+           
             title: 'Daily Task Reminder',
             body: "Don't forget to check your tasks for this hour!",
+            subtitle: 'Rize Track Your Progress',
+            badge: 1,
+            priority: Notifications.AndroidNotificationPriority.MAX,
+            
           },
+
           trigger,
         });
       }
@@ -135,19 +143,19 @@ const NotificationScheduler: React.FC<NotificationSchedulerProps> = ({
           <Text className=' text-lg font-bold mb-5 dark:text-white' >Select Notification Times</Text>
           <ScrollView style={{ height: 400 }}>
             {hours.map((hour) => (
-             
-                <Pressable
-                  key={`hour-${hour}`} // Ensure each key is unique
-                  className='w-3/4 mx-auto p-2 mb-3 rounded flex flex-row justify-between items-center'
-                  style={{
-                    backgroundColor: selectedHours.includes(hour) ? '#0eab38' : '#f0f0f0',
-                  }}
-                  onPress={() => handleHourToggle(hour)}
-                >
-                  <TabTaskIcon name={selectedHours.includes(hour) ? 'alarm-on' : 'alarm-add'} style={{  color: selectedHours.includes(hour) ? 'white' : 'black' }} />
-                  <Text style={{ fontSize: 16,fontWeight:'600', color: selectedHours.includes(hour) ? 'white' : 'black' }}> {convertHourTo12HourFormat(String(hour))}</Text>
-                </Pressable>
-             
+
+              <Pressable
+                key={`hour-${hour}`} // Ensure each key is unique
+                className='w-3/4 mx-auto p-2 mb-3 rounded flex flex-row justify-between items-center'
+                style={{
+                  backgroundColor: selectedHours.includes(hour) ? '#0eab38' : '#f0f0f0',
+                }}
+                onPress={() => handleHourToggle(hour)}
+              >
+                <TabTaskIcon name={selectedHours.includes(hour) ? 'alarm-on' : 'alarm-add'} style={{ color: selectedHours.includes(hour) ? 'white' : 'black' }} />
+                <Text style={{ fontSize: 16, fontWeight: '600', color: selectedHours.includes(hour) ? 'white' : 'black' }}> {convertHourTo12HourFormat(String(hour))}</Text>
+              </Pressable>
+
 
             ))}
           </ScrollView>

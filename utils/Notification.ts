@@ -7,7 +7,7 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
-    shouldSetBadge: false,
+    shouldSetBadge: true,
    
   }),
 });
@@ -44,7 +44,8 @@ export const scheduleNotification = async () => {
     // Mobile notification handling
     await Notifications.scheduleNotificationAsync({
       content: {
-        sound: Platform.OS === 'ios' ? 'notifications.wav' : undefined, 
+        // sound: Platform.OS === 'ios' ? 'reminder.wav' : undefined, 
+        sound:'simple.mp3', 
         title: "Hello World",
         body: "This is a test notification.",
       },
