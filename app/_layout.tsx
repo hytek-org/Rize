@@ -5,7 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { initializeTemplates } from '@/utils/templateInitializer'; // Adjust the path as per your project structure
-
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -40,8 +40,9 @@ export default function RootLayout() {
   }
 
   return (
+    <SafeAreaProvider>
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="template" options={{ headerShown: false }} />
         
@@ -49,5 +50,6 @@ export default function RootLayout() {
       </Stack>
       
     </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

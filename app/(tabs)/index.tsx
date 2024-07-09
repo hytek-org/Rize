@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabProfileIcon } from "@/components/navigation/TabBarIcon";
 import { TabFontAwesomenew } from "@/components/navigation/TabBarIcon";
 import { ExternalLink } from '@/components/ExternalLink';
+import { Link, router } from 'expo-router';
+import TimeBlock from '@/components/TimeBlock';
 // import { requestPermissions, scheduleNotification } from '@/utils/Notification';
 
 
@@ -64,11 +66,11 @@ const HomeScreen = () => {
   //   })();
   // }, []);
 
-   const openModal = (task: Task) => {
-     setSelectedTask(task);
-     setEditedContent(task.content);
-     setModalVisible(true);
-   };
+  const openModal = (task: Task) => {
+    setSelectedTask(task);
+    setEditedContent(task.content);
+    setModalVisible(true);
+  };
   const saveEditedTask = async () => {
     if (selectedTask) {
       const updatedTasks = tasks.map(task =>
@@ -125,7 +127,7 @@ const HomeScreen = () => {
                   {convertHourTo12HourFormat(item.time)}
                 </Text>
                 {item.time == currentHourString && (
-                  <Pressable onPress={() => openModal(item)}>
+                  <Pressable onPress={() => openModal(item)} >
                     <TabProfileIcon name="edit" className="dark:text-white" />
                   </Pressable>
                 )}
@@ -137,11 +139,12 @@ const HomeScreen = () => {
               </View>
               <View className="p-2 md:p-5 ">
                 <Text className="text-base  text-gray-800 dark:text-white">
-                  {item.content} 
+                  {item.content}
                 </Text>
+                
               </View>
-
-
+              <TimeBlock item={item} currentHourString={currentHourString} />
+              
             </View>
           )}
         />
@@ -190,7 +193,7 @@ const HomeScreen = () => {
                   onPress={saveEditedTask}
                 >
                   <Text
-                   className="text-lg font-medium dark:text-white"
+                    className="text-lg font-medium dark:text-white"
                     style={
                       colorScheme === "dark"
                         ? stylesDark.modalButtonText
@@ -205,7 +208,7 @@ const HomeScreen = () => {
                   onPress={() => setModalVisible(false)}
                 >
                   <Text
-                  className="text-lg hover:underline font-medium dark:text-white" 
+                    className="text-lg hover:underline font-medium dark:text-white"
                   >
                     Cancel
                   </Text>
@@ -214,38 +217,49 @@ const HomeScreen = () => {
             </Modal>}
         </View>
       </View>
-      <View className='h-[25vh] sm:h-screen  md:pb-20 '>
+      <View className='h-[25vh] -mt-10 sm:h-screen  md:pb-20 '>
         <View className='  flex flex-col justify-center items-center space-y-2 px-2  md:mt-32'>
+          <View >
+            <Pressable
+              onPress={() =>
+                router.push(`/meditation/`)
+              }
+              className=" shadow-2xl shadow-green-500 py-2.5 px-6 bg-green-200 border border-green-500 rounded-full overflow-hidden"
+            >
+              <Text className='text-black text-2xl text-center '>Discover Peace</Text>
+            </Pressable>
+
+          </View>
           {/* <View> 
             <Button title="Show Notification" onPress={scheduleNotification} />
             </View> */}
-             <View className='hidden md:block'>
-                <ExternalLink className="flex-none text-xl font-semibold text-black dark:text-white" href="https://hytek.org.in" aria-label="Brand">HYTEK</ExternalLink>
-             </View>
-             
+          <View className='hidden md:block'>
+            <ExternalLink className="flex-none text-xl font-semibold text-black dark:text-white" href="https://hytek.org.in" aria-label="Brand">HYTEK</ExternalLink>
+          </View>
 
-             <View className="pt-2 md:mt-3 ">
-                <Text className="text-gray-500 dark:text-neutral-500 text-center">Boost productivity with <ExternalLink  className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400" href="https://play.google.com/store/apps/details?id=com.hytek.rize">Rize</ExternalLink> Todo.</Text>
-                <Text className="text-gray-500 dark:text-neutral-500"> © HYTEK. 2024 Rize. All rights reserved.</Text>
-             </View>
 
-            
-             <View className="flex flex-row space-x-4 pt-5  ">
-                <ExternalLink  className="  " href="https://x.com/hytek21">
-                  <TabFontAwesomenew className='dark:text-white'  name="x-twitter" />
-                </ExternalLink>
-                <ExternalLink  className=" " href="https://github.com/hytek-org">
-                <TabProfileIcon name="github" className='dark:text-white'/>
-                </ExternalLink>
-                <ExternalLink  className=" " href="https://www.linkedin.com/company/hytek21/">
-                <TabProfileIcon name="linkedin-in" className='dark:text-white' />
-                </ExternalLink>
-                <ExternalLink  className=" " href="https://hytek.org.in">
-                <TabProfileIcon name="globe" className='dark:text-white'/>
-                </ExternalLink>
-             </View>
-             
-          
+          <View className="pt-2 md:mt-3 ">
+            <Text className="text-gray-500 dark:text-neutral-500 text-center">Boost productivity with <ExternalLink className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400" href="https://play.google.com/store/apps/details?id=com.hytek.rize">Rize</ExternalLink> Todo.</Text>
+            <Text className="text-gray-500 dark:text-neutral-500"> © HYTEK. 2024 Rize. All rights reserved.</Text>
+          </View>
+
+
+          <View className="flex flex-row space-x-4 pt-5  ">
+            <ExternalLink className="  " href="https://x.com/hytek21">
+              <TabFontAwesomenew className='dark:text-white' name="x-twitter" />
+            </ExternalLink>
+            <ExternalLink className=" " href="https://github.com/hytek-org">
+              <TabProfileIcon name="github" className='dark:text-white' />
+            </ExternalLink>
+            <ExternalLink className=" " href="https://www.linkedin.com/company/hytek21/">
+              <TabProfileIcon name="linkedin-in" className='dark:text-white' />
+            </ExternalLink>
+            <ExternalLink className=" " href="https://hytek.org.in">
+              <TabProfileIcon name="globe" className='dark:text-white' />
+            </ExternalLink>
+          </View>
+
+
         </View>
       </View>
     </View>
@@ -351,7 +365,7 @@ const stylesDark = StyleSheet.create({
     color: "#fff"
   },
   modalButton: {
-   backgroundColor: "#0aaf1d",
+    backgroundColor: "#0aaf1d",
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
