@@ -1,17 +1,26 @@
-// FloatingButton.tsx
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { TabCreateIcon } from "@/components/navigation/TabBarIcon"; // Adjust the import according to your project structure
 
 interface FloatingButtonProps {
   onPress: () => void;
+  iconName?: string; // Optional icon name
 }
 
-const FloatingButton: React.FC<FloatingButtonProps> = ({ onPress }) => {
+const FloatingButton: React.FC<FloatingButtonProps> = ({ onPress, iconName }) => {
+  const colorScheme = useColorScheme(); // For handling light/dark themes
+
+  // Dynamically adjust the background color based on the theme
+  const buttonColor = colorScheme === 'dark' ? '#1db954' : '#0aaf1d'; // Green shades for light and dark mode
+  const icon: string = iconName ? iconName : "pluscircleo";
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
-      <TabCreateIcon name={"pluscircleo"} size={24} color="white" />
-    </TouchableOpacity>
+    <Pressable
+      style={[styles.button, { backgroundColor: buttonColor }]}
+      onPress={onPress}
+    >
+      {/* Icon rendered with a fallback to 'pluscircleo' */}
+      <TabCreateIcon name={icon} size={24} color="white" />
+    </Pressable>
   );
 };
 
@@ -21,7 +30,6 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#0aaf1d',
     justifyContent: 'center',
     alignItems: 'center',
     bottom: 30,

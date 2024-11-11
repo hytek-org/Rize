@@ -2,7 +2,7 @@
   "expo": {
     "name": "Rize",
     "slug": "rize",
-    "version": "2.1.3",
+    "version": "2.1.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rize",
@@ -22,28 +22,29 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-     
-      "permissions": ["RECEIVE_BOOT_COMPLETED"]
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED"
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
- 
     "plugins": [
       "expo-router",
       "expo-font",
       "expo-asset",
       [
         "expo-notifications",
-        
         {
           "icon": "./assets/images/notification.png",
           "color": "#ffffff",
           "defaultChannel": "default",
-          "sounds": ["./assets/sound/reminder.wav","./assets/sound/simple.mp3"]
-           
+          "sounds": [
+            "./assets/sound/reminder.wav",
+            "./assets/sound/simple.mp3"
+          ]
         }
       ]
     ],
@@ -57,7 +58,19 @@
       "eas": {
         "projectId": "1d476dbb-bd8f-42d0-b3a7-06b5023193b4"
       },
-      "permissions": ["NOTIFICATIONS"]
-    }
+      "permissions": [
+        "NOTIFICATIONS"
+      ],
+      "firebase": {
+        "apiKey": "AIzaSyDDastE9jHuTQq917IYfLRW4pzePdpOBx8",
+        "authDomain": "rize-e8d24.firebaseapp.com",
+        "projectId": "rize-e8d24",
+        "storageBucket": "rize-e8d24.appspot.com",
+        "messagingSenderId": "914179038403",
+        "appId": "1:914179038403:web:e5f8255db06dae41089676",
+        "measurementId": "G-KQ3HNQZGMR"
+      }
+    },
+    "owner": "k4kuldeep108"
   }
 }

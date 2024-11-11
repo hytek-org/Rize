@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Import JSON files statically
+
+// Import JSON files
 import artistData from "../assets/data/artist.json";
 import entrepreneursData from "../assets/data/entrepreneurs.json";
 import medicalData from "../assets/data/medical.json";
@@ -8,9 +9,9 @@ import studentData from "../assets/data/student.json";
 import softwareDevData from "../assets/data/software-dev.json";
 import teachersData from "../assets/data/teachers.json";
 
-// Create TemplateItem and Template interfaces
+// TemplateItem and Template interfaces
 interface TemplateItem {
-  id: number;
+  id: number; // ID as a number
   content: string;
   time: string;
 }
@@ -25,44 +26,56 @@ interface Template {
 
 const STORAGE_KEY = "Templates";
 
+// JSON file list with descriptions
+const files = [
+  { name: "Artist", desc: "Template for artists", data: artistData },
+  { name: "Entrepreneurs", desc: "Template for entrepreneurs", data: entrepreneursData },
+  { name: "Medical", desc: "Template for medical professionals", data: medicalData },
+  { name: "Student", desc: "Template for students", data: studentData },
+  { name: "Software-dev", desc: "Template for software developers", data: softwareDevData },
+  { name: "Teachers", desc: "Template for teachers", data: teachersData },
+];
+const generateNumericId = (): number => {
+  return Math.floor(Math.random() * 1000000000) + Date.now(); // A random number, with Date.now for added uniqueness
+};
+
+// Utility function to convert JSON data into Template format
+const mapToTemplate = (file: typeof files[number]): Template => ({
+  id: generateNumericId(), // Generate a unique number ID
+  title: file.name,
+  desc: file.desc,
+  public: true,
+  items: file.data.map(item => ({
+    ...item,
+    id: Number(item.id), // Ensure the `id` remains a number
+  })) as TemplateItem[],
+});
+
 export const initializeTemplates = async (): Promise<Template[]> => {
   try {
-    // Retrieve existing templates from AsyncStorage
+    // Fetch existing templates from AsyncStorage
     const storedTemplates = await AsyncStorage.getItem(STORAGE_KEY);
-    let existingTemplates: Template[] = storedTemplates ? JSON.parse(storedTemplates) : [];
+    const existingTemplates: Template[] = storedTemplates ? JSON.parse(storedTemplates) : [];
 
-    // List of JSON files with their descriptions
-    const files = [
-      { name: 'Artist', desc: 'Template for artists', data: artistData },
-      { name: 'Entrepreneurs', desc: 'Template for entrepreneurs', data: entrepreneursData },
-      { name: 'Medical', desc: 'Template for medical professionals', data: medicalData },
-      { name: 'Student', desc: 'Template for students', data: studentData },
-      { name: 'Software-dev', desc: 'Template for software developers', data: softwareDevData },
-      { name: 'Teachers', desc: 'Template for teachers', data: teachersData },
-    ];
+    // Create new templates from JSON files
+    const newTemplates = files.map(mapToTemplate);
 
-    // Process JSON data into Template format and add new templates
-    const newTemplates: Template[] = files.map((file, index) => ({
-      id: index + 1, // Generate ID based on index + 1 (to start from 1)
-      title: file.name, // Use file name as title
-      desc: file.desc, // Use provided description
-      public: true, // Set public to true
-      items: file.data as TemplateItem[], // Assign JSON data to items
-    }));
-
-    // Filter out templates that already exist
-    const templatesToAdd = newTemplates.filter(newTemplate => 
-      !existingTemplates.some(existingTemplate => existingTemplate.title === newTemplate.title)
+    // Filter out any templates that are already present in AsyncStorage
+    const templatesToAdd = newTemplates.filter(
+      newTemplate => !existingTemplates.some(existingTemplate => existingTemplate.title === newTemplate.title)
     );
 
-    // Combine existing templates with new templates to add
-    const allTemplates = [...existingTemplates, ...templatesToAdd];
-
-    // Save the combined templates to AsyncStorage
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allTemplates));
-
-    return allTemplates;
+    if (templatesToAdd.length > 0) {
+      // Update AsyncStorage with the new templates added to existing ones
+      const allTemplates = [...existingTemplates, ...templatesToAdd];
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(allTemplates));
+      return allTemplates;
+    } else {
+      // If no new templates were added, return existing templates
+      return existingTemplates;
+    }
   } catch (error) {
-    throw error; // Throw error for the component to handle
+    console.error("Failed to initialize templates:", error);
+    throw new Error("Template initialization failed");
   }
 };

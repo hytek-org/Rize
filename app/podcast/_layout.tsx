@@ -1,7 +1,7 @@
 
 import { Slot } from 'expo-router';
 
-export default function TemplateLayout() {
+export default function PodcastLayout() {
   return (
     <Slot
     />

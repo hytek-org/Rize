@@ -160,13 +160,13 @@ const NotificationScheduler: React.FC<NotificationSchedulerProps> = ({
             ))}
           </ScrollView>
           <Pressable
-            style={{ marginTop: 20, padding: 15, alignItems: 'center', borderRadius: 5, backgroundColor: '#0aaf1d' }}
+            style={{ marginTop: 20, padding: 15, alignItems: 'center', borderRadius: 100, backgroundColor: '#0aaf1d' }}
             onPress={handleSave}
           >
             <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>Save</Text>
           </Pressable>
           <Pressable
-            style={{ marginHorizontal: 50, marginTop: 20, padding: 15, alignItems: 'center', borderRadius: 5, backgroundColor: '#007bff' }}
+            style={{ marginHorizontal: 50, marginTop: 20, padding: 15, alignItems: 'center', borderRadius: 100, backgroundColor: '#007bff' }}
             onPress={onClose}
           >
             <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>Close</Text>

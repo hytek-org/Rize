@@ -25,7 +25,7 @@ const TimeBlock: React.FC<TimeBlockProps> = ({ item, currentHourString }) => {
   const colors = ["bg-green-500", "bg-green-400", "bg-green-300", "bg-green-200"];
 
   return (
-    <View className={`hidden ${item.time === currentHourString ? "flex flex-row space-x-1 rounded-full pt-10 mx-4" : ""}`}>
+    <View className={` ${item.time === currentHourString ? "flex flex-row gap-2 rounded-full pt-10 " : "hidden"}`}>
       {colors.map((color, index) => (
         <View key={index} className={`p-0.5 ${index >= minuteBlock ? color : 'bg-green-500'} w-1/4 rounded-full`}>
         </View>
