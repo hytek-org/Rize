@@ -108,7 +108,7 @@ export default function PlayEpisode() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} className='dark:bg-black'>
       <ThemedText type="title" style={styles.title}>{title}</ThemedText>
       
       <Pressable onPress={playAudio} disabled={loading} style={styles.playButton}>
