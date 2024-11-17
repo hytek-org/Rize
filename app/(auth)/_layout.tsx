@@ -1,7 +1,7 @@
 
 import Loader from "@/components/Loader";
 import { useAuth } from "@/contexts/AuthProvider";
-import { Redirect, Slot, Stack } from "expo-router";
+import { Redirect,  Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 
@@ -13,8 +13,8 @@ const AuthLayout = () => {
 
   return (
     <>
-    <Slot/>
-      {/* <Stack>
+  
+      <Stack>
         <Stack.Screen
           name="sign-in"
           options={{
@@ -37,7 +37,7 @@ const AuthLayout = () => {
       </Stack>
 
       <Loader isLoading={loading} />
-      <StatusBar backgroundColor="#161622" style="light" /> */}
+      <StatusBar backgroundColor="#161622" style="light" />
     </>
   );
 };

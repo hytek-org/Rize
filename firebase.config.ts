@@ -14,6 +14,7 @@ const firebaseConfig: FirebaseOptions = {
   measurementId: Constants.expoConfig?.extra?.firebase?.measurementId,
 };
 
+
 // Initialize Firebase app with explicit typing
 const app: FirebaseApp = initializeApp(firebaseConfig);
 
