@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { View, Text, Pressable, ScrollView, Switch, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable,Linking, ScrollView, Switch, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { useAuth } from "@/contexts/AuthProvider";
 import { updateProfile } from "firebase/auth";
 import { useColorScheme } from 'react-native';
@@ -40,7 +40,22 @@ export default function Settings() {
       }
     }
   };
-
+  const handleDeleteUser = () => {
+    Alert.alert(
+      "Account Deletion Request",
+      "To delete your account, please send an email request to support@hytek.org.in. We'll process your request as soon as possible.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Send Email",
+          onPress: () => Linking.openURL('mailto:support@hytek.org.in'),
+        },
+      ]
+    );
+  };
   return (
     <ScrollView className="flex-1 bg-white dark:bg-zinc-950">
       {user ? <View className="p-6 mt-4">
@@ -204,7 +219,7 @@ export default function Settings() {
                 Manage your account and preferences.
               </Text>
             </View>
-            <Pressable onPress={() => { Alert.alert("Not Available", `You can't do that in the app.`) }} disabled={loadingacmanage} className="bg-red-500 dark:bg-red-600 py-2 px-4 rounded-full">
+            <Pressable onPress={handleDeleteUser} disabled={loadingacmanage} className="bg-red-500 dark:bg-red-600 py-2 px-4 rounded-full">
               {loadingacmanage ? (
                 <ActivityIndicator color="#fff" />
               ) : (
