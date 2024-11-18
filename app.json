@@ -44,12 +44,13 @@
         "expo-notifications",
         {
           "icon": "./assets/images/notification.png",
-          "color": "#000000",
+          "color": "#1f1f1f",
           "defaultChannel": "default",
           "sounds": [
             "./assets/sound/reminder.wav",
             "./assets/sound/simple.mp3"
-          ]
+          ],
+          "enableBackgroundRemoteNotifications": false
         }
       ]
     ],
