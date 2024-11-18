@@ -5,8 +5,6 @@ import {
     Text,
     TextInput,
     Pressable,
-    Modal,
-    Alert,
     useColorScheme,
     ScrollView,
     ActivityIndicator
@@ -15,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TabTaskIcon } from "@/components/navigation/TabBarIcon";
 import { useTemplateContext } from "@/contexts/TemplateContext";
 import { ThemedText } from '@/components/ThemedText';
-
+import CustomAlert from '@/components/CustomAlert';
 const STORAGE_KEY = "Templates";
 
 interface TemplateItem {
@@ -43,6 +41,11 @@ export default function Edit() {
     const colorScheme = useColorScheme();
     const [showMore, setShowMore] = useState(false); // State to toggle showing more items
     const [loading, setLoading] = useState<boolean>(false);
+    // CustomAlert state management
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [alertTitle, setAlertTitle] = useState('');
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
     // Load the template based on the 'id' parameter when the component mounts
     useEffect(() => {
         if (id) {
@@ -52,7 +55,10 @@ export default function Edit() {
                 setTitle(templateToEdit.title);
                 setDesc(templateToEdit.desc);
             } else {
-                Alert.alert("Error", "Template not found");
+                setAlertTitle('Error');
+                setAlertMessage('Template not found');
+                setAlertType('error');
+                setAlertVisible(true);
             }
         }
     }, [id, templates]);
@@ -79,24 +85,36 @@ export default function Edit() {
             await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newTemplates));
         } catch (error) {
             console.error("Failed to save template to local storage", error);
-            Alert.alert("Error", "Failed to save template");
+            setAlertTitle('Error');
+            setAlertMessage('Failed to save template');
+            setAlertType('error');
+            setAlertVisible(true);
         }
     };
 
     const saveTemplate = async () => {
         setLoading(true);
         if (!title) {
-            Alert.alert("Error", "Title cannot be empty");
+            setAlertTitle('Error');
+            setAlertMessage('Title cannot be empty');
+            setAlertType('error');
+            setAlertVisible(true);
             return;
         }
         if (!desc) {
-            Alert.alert("Error", "Description cannot be empty");
+            setAlertTitle('Error');
+            setAlertMessage('Description cannot be empty');
+            setAlertType('error');
+            setAlertVisible(true);
             return;
         }
 
         // Ensure id is valid before saving
         if (!currentTemplate?.id) {
-            Alert.alert("Error", "Template id is missing");
+            setAlertTitle('Error');
+            setAlertMessage('Template id is missing');
+            setAlertType('error');
+            setAlertVisible(true);
             return;
         }
 
@@ -110,16 +128,22 @@ export default function Edit() {
 
         try {
             await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedTemplates));
-            Alert.alert("Success", "Template updated successfully");
+            setAlertTitle('Success');
+            setAlertMessage('Template updated successfully!');
+            setAlertType('success');
+            setAlertVisible(true);
         } catch (error) {
             console.error("Failed to update template to local storage", error);
-            Alert.alert("Error", "Failed to update template");
-        }finally{
+            setAlertTitle('Error');
+            setAlertMessage('Failed to update template');
+            setAlertType('error');
+            setAlertVisible(true);
+        } finally {
             setLoading(false)
         }
     };
 
-  
+
 
     const firstTwelve = currentTemplate ? currentTemplate.items.slice(0, 12) : [];
     const nextTwelve = currentTemplate ? currentTemplate.items.slice(12) : [];
@@ -196,7 +220,7 @@ export default function Edit() {
                             ) : (
                                 <TabTaskIcon style={{ color: 'white', marginRight: 2 }} name="update" />
                             )}
-                            
+
                             <Text className="text-white font-semibold text-base">Update Template</Text>
                         </Pressable>
                     </View>
@@ -222,6 +246,14 @@ export default function Edit() {
                     </Pressable>
                 </View>
             )}
+            {/* Display Custom Alert */}
+            <CustomAlert
+                visible={alertVisible}
+                title={alertTitle}
+                message={alertMessage}
+                onClose={() => setAlertVisible(false)}
+                type={alertType}
+            />
         </ScrollView>
     );
 }

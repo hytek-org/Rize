@@ -1,11 +1,12 @@
 
 import React, { useState } from "react";
-import { View, Text, Pressable,Linking, ScrollView, Switch, TextInput, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, Linking, ScrollView, Switch, TextInput, Alert, ActivityIndicator } from 'react-native';
 import { useAuth } from "@/contexts/AuthProvider";
 import { updateProfile } from "firebase/auth";
 import { useColorScheme } from 'react-native';
 import { auth } from '../../firebase.config';
 import { router } from "expo-router";
+import CustomAlert from "@/components/CustomAlert";
 
 export default function Settings() {
   const { user } = useAuth();
@@ -22,7 +23,11 @@ export default function Settings() {
   const [pushNotifications, setPushNotifications] = useState(true);
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [password, setPassword] = useState('');
-
+  // CustomAlert state management
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
   const handleSaveProfile = async () => {
     if (user) {
       try {
@@ -31,10 +36,17 @@ export default function Settings() {
           displayName: name,
 
         });
-        // Alert success message
-        Alert.alert("Success", "Profile updated!");
+        // Show success alert
+        setAlertTitle("Success");
+        setAlertMessage("Profile updated!");
+        setAlertType("success");
+        setAlertVisible(true);
       } catch (error) {
-        Alert.alert("Error", "Could not update profile.");
+        // Show error alert
+        setAlertTitle("Error");
+        setAlertMessage("Could not update profile.");
+        setAlertType("error");
+        setAlertVisible(true);
       } finally {
         setLoadingPersonal(false);
       }
@@ -90,7 +102,7 @@ export default function Settings() {
               />
             </View>
 
-          
+
 
             <View className="mb-4">
               <Text className="text-gray-800 dark:text-white mb-2">Email:</Text>
@@ -231,22 +243,29 @@ export default function Settings() {
         </View>
       </View> :
         <View className="flex-1 justify-center pt-96 px-20">
-        <Pressable
-          className='py-3 rounded-full items-center my-1 bg-green-500'
-          onPress={() => router.push('/(auth)/sign-up')}
-        >
-          <Text className='text-white font-semibold'>Sign Up</Text>
-        </Pressable>
-        <Pressable
-          className='py-3 rounded-full items-center my-1 bg-black/5 dark:bg-white/10'
-          onPress={() => router.push('/(auth)/sign-in')}
-        >
-          <Text className='text-black dark:text-white font-semibold'>Sign In</Text>
-        </Pressable>
-      </View>
-      
-        }
+          <Pressable
+            className='py-3 rounded-full items-center my-1 bg-green-500'
+            onPress={() => router.push('/(auth)/sign-up')}
+          >
+            <Text className='text-white font-semibold'>Sign Up</Text>
+          </Pressable>
+          <Pressable
+            className='py-3 rounded-full items-center my-1 bg-black/5 dark:bg-white/10'
+            onPress={() => router.push('/(auth)/sign-in')}
+          >
+            <Text className='text-black dark:text-white font-semibold'>Sign In</Text>
+          </Pressable>
+        </View>
 
+      }
+      {/* Display Custom Alert */}
+      <CustomAlert
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+        type={alertType}
+      />
     </ScrollView>
   );
 }

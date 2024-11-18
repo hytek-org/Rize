@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Pressable, Alert, Platform, ScrollView, Image } from 'react-native';
+import { View, Text, FlatList, Pressable, ScrollView, Image } from 'react-native';
 import { TabCreateIcon, TabTaskIcon } from '@/components/navigation/TabBarIcon';
 import MyModal from '@/components/MyModel';
 import FloatingButton from '@/components/FlotingButton';
 import { ExternalLink } from '@/components/ExternalLink';
 import { useNotes } from '@/contexts/NotesContext';
+import CustomAlert from '@/components/CustomAlert';  
 
 export default function TabTwoScreen() {
   const { notes, addNote, editNote, deleteNote } = useNotes();
@@ -13,13 +14,21 @@ export default function TabTwoScreen() {
   const [editMode, setEditMode] = useState(false);
   const [editNoteId, setEditNoteId] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+
+  // CustomAlert state management
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
+
   interface Note {
     id: string;
     content: string;
     tag: string;
     date: string;
   }
-  const startEditingNote = (note:Note) => {
+
+  const startEditingNote = (note: Note) => {
     setTag(note.tag || 'Default');
     setInput(note.content);
     setEditMode(true);
@@ -29,24 +38,38 @@ export default function TabTwoScreen() {
 
   const handleAddNote = () => {
     if (!input.trim()) {
-      Alert.alert('Error', 'Note cannot be empty.');
+      setAlertTitle('Error');
+      setAlertMessage('Note cannot be empty.');
+      setAlertType('error');
+      setAlertVisible(true);
       return;
     }
     addNote(input, tag);
     setInput('');
     setModalVisible(false);
+    setAlertTitle('Success');
+    setAlertMessage('Note added successfully!');
+    setAlertType('success');
+    setAlertVisible(true);
   };
 
   const handleEditNote = () => {
     if (!input.trim()) {
-      Alert.alert('Error', 'Note cannot be empty.');
+      setAlertTitle('Error');
+      setAlertMessage('Note cannot be empty.');
+      setAlertType('error');
+      setAlertVisible(true);
       return;
     }
-    editNote(editNoteId || "", input, tag);  
+    editNote(editNoteId || '', input, tag);
     setInput('');
     setEditMode(false);
     setEditNoteId(null);
     setModalVisible(false);
+    setAlertTitle('Success');
+    setAlertMessage('Note updated successfully!');
+    setAlertType('success');
+    setAlertVisible(true);
   };
 
   const closeModal = () => {
@@ -70,8 +93,7 @@ export default function TabTwoScreen() {
                 <Text className="text-lg ml-2 dark:text-white">
                   <TabCreateIcon name={'tago'} size={16} /> {item.tag ? item.tag : 'Default'}
                 </Text>
-              
-                <View className="flex flex-row rounded-lg bg-neutral-100 border border-neutral-700 dark:bg-neutral-700 py-1 sm:py-2 mr-2">
+               <View className="flex flex-row rounded-lg bg-neutral-100 border border-neutral-700 dark:bg-neutral-700 py-1 sm:py-2 mr-2">
                   <Pressable
                     className="rounded-md px-4 py-2 text-sm text-gray-500 hover:text-gray-700 focus:relative"
                     onPress={() => startEditingNote(item)}
@@ -116,6 +138,15 @@ export default function TabTwoScreen() {
           editNote={handleEditNote}
         />
       </View>
+
+      {/* Display Custom Alert */}
+      <CustomAlert
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+        type={alertType}
+      />
     </View>
   );
 }

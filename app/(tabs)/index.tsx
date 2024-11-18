@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, Text, useColorScheme, FlatList, StyleSheet, Modal, Pressable, ScrollView, Alert, SafeAreaView } from 'react-native';
+import { View, TextInput, Text, useColorScheme, FlatList, StyleSheet, Modal, Pressable, ScrollView, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabProfileIcon } from "@/components/navigation/TabBarIcon";
 import { Link } from 'expo-router';
@@ -9,7 +9,7 @@ import FloatingButton from '@/components/FlotingButton';
 import { useNotes } from '@/contexts/NotesContext';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
-
+import CustomAlert from '@/components/CustomAlert';
 interface Task {
   id: number;
   content: string;
@@ -35,15 +35,27 @@ const HomeScreen = () => {
     setInput('');
     setTag('');
   };
+  // CustomAlert state management
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
 
   const handleAddNote = () => {
     if (!input.trim()) {
-      Alert.alert('Error', 'Note cannot be empty.');
+      setAlertTitle('Error');
+      setAlertMessage('Note cannot be empty.');
+      setAlertType('error');
+      setAlertVisible(true);
       return;
     }
     addNote(input, tag);
     setInput('');
     setModalVisibleNotes(false);
+    setAlertTitle('Success');
+    setAlertMessage('Note added successfully!');
+    setAlertType('success');
+    setAlertVisible(true);
   };
 
   useEffect(() => {
@@ -193,12 +205,12 @@ const HomeScreen = () => {
           ) : isPlaying === false && currentUrl !== null ? (
             // If audio is not playing and there is a valid URL, show the Play button
             <View className='pb-10 ml-5'>
-            <Pressable
-              onPress={togglePlayPause}
-              className="bg-green-500 text-white py-2 px-4 rounded-full dark:bg-green-600 dark:text-white"
-            >
-              <IconSymbol size={28} color={'white'} name="play-arrow" />
-            </Pressable>
+              <Pressable
+                onPress={togglePlayPause}
+                className="bg-green-500 text-white py-2 px-4 rounded-full dark:bg-green-600 dark:text-white"
+              >
+                <IconSymbol size={28} color={'white'} name="play-arrow" />
+              </Pressable>
             </View>
           ) : <Link className='rounded-full p-4 mb-8 ml-4 bg-[#0aaf1d] inline w-16' href={'/podcast'}>
             <IconSymbol size={28} name="podcasts" color={'white'} />
@@ -261,6 +273,14 @@ const HomeScreen = () => {
           </View>
         </Modal>
       )}
+      {/* Display Custom Alert */}
+      <CustomAlert
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+        type={alertType}
+      />
     </SafeAreaView>
   );
 };

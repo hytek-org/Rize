@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, ActivityIndicator, useColorScheme } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useLocalSearchParams } from 'expo-router';

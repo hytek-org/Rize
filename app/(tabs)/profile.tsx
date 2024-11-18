@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, Alert, Pressable, ActivityIndicator, useColorScheme } from 'react-native';
+import { StyleSheet, View, Text,  Pressable, ActivityIndicator, useColorScheme } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthProvider';
@@ -12,6 +12,7 @@ import { TabTaskIcon } from '@/components/navigation/TabBarIcon';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import FloatingLink from '@/components/FlotingLink';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import CustomAlert from '@/components/CustomAlert';  
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -19,14 +20,25 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const { togglePlayPause, skipForward, skipBackward, isPlaying, currentUrl } = useAudioPlayer();
+   // CustomAlert state management
+   const [alertVisible, setAlertVisible] = useState(false);
+   const [alertTitle, setAlertTitle] = useState('');
+   const [alertMessage, setAlertMessage] = useState('');
+   const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
   const handleLogout = async () => {
     setLoadingLogout(true);
     try {
       await signOut(auth);
       await AsyncStorage.setItem('hasSeenGetStarted', 'false');
-      Alert.alert("Logged out", "You have been logged out.");
+      setAlertTitle('Logged out');
+      setAlertMessage('You have been logged out.');
+      setAlertType('success');
+      setAlertVisible(true);
     } catch (error) {
-      Alert.alert("Error", "Could not log out. Please try again.");
+      setAlertTitle('Error');
+      setAlertMessage('Could not log out. Please try again.');
+      setAlertType('error');
+      setAlertVisible(true);
     } finally {
       setLoadingLogout(false);
     }
@@ -136,6 +148,14 @@ export default function ProfileScreen() {
             </Pressable>
           ) : null}
         </View>
+          {/* Display Custom Alert */}
+      <CustomAlert
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+        type={alertType}
+      />
       </ParallaxScrollView>
       <FloatingLink route='/podcast' iconName='podcasts' />
     </>

@@ -5,7 +5,6 @@ import {
   TextInput,
   Pressable,
   Modal,
-  Alert,
   useColorScheme,
   ScrollView,
   Image,
@@ -21,7 +20,7 @@ import {
 import { Link } from "expo-router";
 import { useTemplateContext } from "@/contexts/TemplateContext";
 import { IconSymbol } from "@/components/ui/IconSymbol";
-
+import CustomAlert from '@/components/CustomAlert';
 const STORAGE_KEY = "Templates";
 
 interface TemplateItem {
@@ -73,7 +72,11 @@ export default function Create() {
   const [desc, setDesc] = useState("");
   const colorScheme = useColorScheme();
   const [loading, setLoading] = useState<boolean>(false);
-
+  // CustomAlert state management
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
 
   const updateTemplateItem = async (
     id: number,
@@ -97,17 +100,26 @@ export default function Create() {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newTemplates));
     } catch (error) {
       console.error("Failed to save template to local storage", error);
-      Alert.alert("Error", "Failed to save template");
+      setAlertTitle('Error');
+      setAlertMessage('Failed to save template');
+      setAlertType('error');
+      setAlertVisible(true);
     }
   };
   const saveTemplate = async () => {
     setLoading(true);
     if (!title) {
-      Alert.alert("Error", "Title cannot be empty");
+      setAlertTitle('Error');
+      setAlertMessage('Title cannot be empty');
+      setAlertType('error');
+      setAlertVisible(true);
       return;
     }
     if (!desc) {
-      Alert.alert("Error", "Description cannot be empty");
+      setAlertTitle('Error');
+      setAlertMessage('Description cannot be empty');
+      setAlertType('error');
+      setAlertVisible(true);
       return;
     }
 
@@ -124,10 +136,16 @@ export default function Create() {
 
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newTemplates));
-      Alert.alert("Success", "Template saved successfully");
+      setAlertTitle('Success');
+      setAlertMessage('Template saved successfully!');
+      setAlertType('success');
+      setAlertVisible(true);
     } catch (error) {
       console.error("Failed to save template to local storage", error);
-      Alert.alert("Error", "Failed to save template");
+      setAlertTitle('Error');
+      setAlertMessage('Failed to save template.');
+      setAlertType('error');
+      setAlertVisible(true);
     } finally {
       setLoading(false);
     }
@@ -148,10 +166,16 @@ export default function Create() {
 
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedTemplates));
-      Alert.alert("Success", "Template data saved successfully");
+      setAlertTitle('Success');
+      setAlertMessage('Template data saved successfully!');
+      setAlertType('success');
+      setAlertVisible(true);
     } catch (error) {
       console.error("Failed to save template data to local storage", error);
-      Alert.alert("Error", "Failed to save template data");
+      setAlertTitle('Error');
+      setAlertMessage('Failed to save template data');
+      setAlertType('error');
+      setAlertVisible(true);
     }
   };
 
@@ -360,7 +384,7 @@ export default function Create() {
                               } `}
                             onPress={() => setSelectedTab("morning")}
                           >
-                            <IconSymbol  name="wb-sunny" />
+                            <IconSymbol name="wb-sunny" />
                           </Pressable>
                           <Pressable
                             className={`inline-flex flex-row  p-2 md:py-4 rounded-full justify-center items-center  ${selectedTab == "afternoon"
@@ -370,7 +394,7 @@ export default function Create() {
                             onPress={() => setSelectedTab("afternoon")}
                           >
 
-                            <IconSymbol  name="nights-stay" />
+                            <IconSymbol name="nights-stay" />
 
                           </Pressable>
                         </View>
@@ -417,6 +441,14 @@ export default function Create() {
             </View>
           </Modal>
         </View>
+        {/* Display Custom Alert */}
+        <CustomAlert
+          visible={alertVisible}
+          title={alertTitle}
+          message={alertMessage}
+          onClose={() => setAlertVisible(false)}
+          type={alertType}
+        />
       </ScrollView>
     </>
   );

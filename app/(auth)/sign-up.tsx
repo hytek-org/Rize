@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, ActivityIndicator, Alert, Image } from 'react-native';
+import { View, Text, TextInput, Pressable, ActivityIndicator, Image } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from 'firebase/auth';
 import { auth } from '../../firebase.config';
 import { useRouter } from 'expo-router';
@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthProvider';
 import { ThemedText } from '@/components/ThemedText';
 import { useColorScheme } from 'react-native';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
+import CustomAlert from '@/components/CustomAlert';
 const getErrorMessage = (errorCode: string): string => {
   switch (errorCode) {
     case 'auth/email-already-in-use':
@@ -33,6 +34,11 @@ const Signup: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
+  // CustomAlert state management
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
 
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>) => (value: string) => {
     setter(value);
@@ -61,7 +67,10 @@ const Signup: React.FC = () => {
 
       await sendEmailVerification(user);
       setUser(user);
-      Alert.alert('Verification email sent! Please check your inbox.');
+      setAlertTitle('Success');
+      setAlertMessage('Verification email sent! Please check your inbox.');
+      setAlertType('success');
+      setAlertVisible(true);
       router.replace('/(tabs)/profile');
 
       // Clear the form fields
@@ -82,71 +91,79 @@ const Signup: React.FC = () => {
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#282C35' }}
       headerImage={
         <Image
-        source={require('../../assets/images/signup.png')}
-       className="w-52 h-72 mt-10 mx-auto "
-      />
+          source={require('../../assets/images/signup.png')}
+          className="w-52 h-72 mt-10 mx-auto "
+        />
       }
     >
-     <View className='flex-1 justify-center items-center '>
-    
-      <ThemedText type='title' className='mb-4' >Sign up</ThemedText>
+      <View className='flex-1 justify-center items-center '>
 
-      <TextInput
-        placeholderTextColor={colorScheme === 'dark' ? '#A3A3A3' : '#666666'}
-        placeholder="Full Name"
-        value={name}
-        onChangeText={handleInputChange(setName)}
-        className="w-full p-3 mb-2 text-black dark:text-white border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-600 "
-      />
+        <ThemedText type='title' className='mb-4' >Sign up</ThemedText>
 
-      <TextInput
-        placeholderTextColor={colorScheme === 'dark' ? '#A3A3A3' : '#666666'}
-        placeholder="Email"
-        value={email}
-        onChangeText={handleInputChange(setEmail)}
-        keyboardType="email-address"
-        className="w-full p-3 mb-2 text-black dark:text-white border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-600 "
-      />
+        <TextInput
+          placeholderTextColor={colorScheme === 'dark' ? '#A3A3A3' : '#666666'}
+          placeholder="Full Name"
+          value={name}
+          onChangeText={handleInputChange(setName)}
+          className="w-full p-3 mb-2 text-black dark:text-white border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-600 "
+        />
 
-      <TextInput
-        placeholderTextColor={colorScheme === 'dark' ? '#A3A3A3' : '#666666'}
-        placeholder="Password"
-        value={password}
-        onChangeText={handleInputChange(setPassword)}
-        secureTextEntry
-        className="w-full p-3 mb-2 text-black dark:text-white border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-600 "
-      />
+        <TextInput
+          placeholderTextColor={colorScheme === 'dark' ? '#A3A3A3' : '#666666'}
+          placeholder="Email"
+          value={email}
+          onChangeText={handleInputChange(setEmail)}
+          keyboardType="email-address"
+          className="w-full p-3 mb-2 text-black dark:text-white border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-600 "
+        />
 
-      <TextInput
-        placeholderTextColor={colorScheme === 'dark' ? '#A3A3A3' : '#666666'}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={handleInputChange(setConfirmPassword)}
-        secureTextEntry
-        className="w-full p-3 mb-2 text-black dark:text-white border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-600 "
-      />
+        <TextInput
+          placeholderTextColor={colorScheme === 'dark' ? '#A3A3A3' : '#666666'}
+          placeholder="Password"
+          value={password}
+          onChangeText={handleInputChange(setPassword)}
+          secureTextEntry
+          className="w-full p-3 mb-2 text-black dark:text-white border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-600 "
+        />
 
-      {errorMessage && (
-        <Text style={{ color: 'red', marginBottom: 8 }}>{errorMessage}</Text>
-      )}
+        <TextInput
+          placeholderTextColor={colorScheme === 'dark' ? '#A3A3A3' : '#666666'}
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChangeText={handleInputChange(setConfirmPassword)}
+          secureTextEntry
+          className="w-full p-3 mb-2 text-black dark:text-white border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-600 "
+        />
 
-      <Pressable onPress={handleSignup} disabled={loading} className='bg-green-500 py-4  rounded-full w-full'>
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text className='text-center text-xl text-white font-semibold'>Sign up</Text>
+        {errorMessage && (
+          <Text style={{ color: 'red', marginBottom: 8 }}>{errorMessage}</Text>
         )}
-      </Pressable>
 
-      <View style={{ marginTop: 16 }}>
-        <ThemedText>
-          Already have an account?{' '}
-          <Text style={{ color: '#007BFF', fontWeight: 'bold' }} onPress={() => router.replace('/(auth)/sign-in')}>Sign In</Text>
-        </ThemedText>
+        <Pressable onPress={handleSignup} disabled={loading} className='bg-green-500 py-4  rounded-full w-full'>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text className='text-center text-xl text-white font-semibold'>Sign up</Text>
+          )}
+        </Pressable>
+
+        <View style={{ marginTop: 16 }}>
+          <ThemedText>
+            Already have an account?{' '}
+            <Text style={{ color: '#007BFF', fontWeight: 'bold' }} onPress={() => router.replace('/(auth)/sign-in')}>Sign In</Text>
+          </ThemedText>
+        </View>
       </View>
-    </View>
+       {/* Display Custom Alert */}
+       <CustomAlert
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+        type={alertType}
+      />
     </ParallaxScrollView>
-  
+
   );
 };
 

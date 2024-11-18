@@ -6,13 +6,12 @@ import {
   Pressable,
   ActivityIndicator,
   FlatList,
-  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Parser from 'react-native-rss-parser';
 import { Link } from 'expo-router';
 import parseHTMLContent from '@/utils/parseHtml';
-
+import CustomAlert from '@/components/CustomAlert';  
 interface Rss {
   title: string;
   description?: string;
@@ -27,7 +26,11 @@ export default function Index() {
   const [inputUrl, setInputUrl] = useState<string>('');
   const [rssFeeds, setRssFeeds] = useState<Rss[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-
+ // CustomAlert state management
+ const [alertVisible, setAlertVisible] = useState(false);
+ const [alertTitle, setAlertTitle] = useState('');
+ const [alertMessage, setAlertMessage] = useState('');
+ const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
   const defaultFeeds = [
     {
       url: 'https://feeds.buzzsprout.com/1882267.rss',
@@ -96,7 +99,10 @@ export default function Index() {
       };
     } catch (err) {
       console.error('Error fetching RSS feed:', err);
-      Alert.alert('Error', 'Failed to fetch RSS feed.');
+      setAlertTitle('Error');
+      setAlertMessage('Failed to fetch RSS feed.');
+      setAlertType('error');
+      setAlertVisible(true);
       return null;
     } finally {
       setLoading(false);
@@ -188,6 +194,14 @@ export default function Index() {
             </View>
           </View>
         )}
+      />
+       {/* Display Custom Alert */}
+       <CustomAlert
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+        type={alertType}
       />
     </View>
   );

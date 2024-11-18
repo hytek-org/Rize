@@ -7,7 +7,6 @@ import {
   FlatList,
   Modal,
   TextInput,
-  Alert,
   useColorScheme,
   Image,
 } from "react-native";
@@ -16,7 +15,7 @@ import { TabProfileIcon, TabTaskIcon } from "@/components/navigation/TabBarIcon"
 import { useTemplateContext } from "@/contexts/TemplateContext";
 import { ThemedText } from "@/components/ThemedText";
 import { Link } from "expo-router";
-
+import CustomAlert from '@/components/CustomAlert'; 
 interface Task {
   id: number;
   content: string;
@@ -39,7 +38,11 @@ export default function TabTwoScreen() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const colorScheme = useColorScheme();
   const [selectedTab, setSelectedTab] = useState("morning");
-
+  // CustomAlert state management
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
   // Load daily tasks from AsyncStorage when the app initializes
   useEffect(() => {
     const loadDailyTasks = async () => {
@@ -50,7 +53,11 @@ export default function TabTwoScreen() {
         }
       } catch (error) {
         console.error("Failed to load daily tasks", error);
-        Alert.alert("Error", "Failed to load tasks.");
+        setAlertTitle('Error');
+        setAlertMessage('Failed to load tasks.');
+        setAlertType('error');
+        setAlertVisible(true);
+      
       }
     };
 
@@ -64,7 +71,10 @@ export default function TabTwoScreen() {
         await AsyncStorage.setItem(DAILY_TASKS_STORAGE_KEY, JSON.stringify(dailyTasks));
       } catch (error) {
         console.error("Failed to save daily tasks", error);
-        Alert.alert("Error", "Failed to save tasks.");
+        setAlertTitle('Error');
+        setAlertMessage('Failed to save tasks.');
+        setAlertType('error');
+        setAlertVisible(true);
       }
     };
 
@@ -85,6 +95,10 @@ export default function TabTwoScreen() {
     );
     setDailyTasks(updatedTasks);
     setModalVisible(false);
+    setAlertTitle('Success');
+    setAlertMessage('Tasks updated successfully!');
+    setAlertType('success');
+    setAlertVisible(true);
   };
 
   const saveHistory = async (history: HistoryItem[]) => {
@@ -219,6 +233,14 @@ export default function TabTwoScreen() {
           </View>
         </Modal>
       )}
+        {/* Display Custom Alert */}
+        <CustomAlert
+        visible={alertVisible}
+        title={alertTitle}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+        type={alertType}
+      />
     </View>
   );
 }

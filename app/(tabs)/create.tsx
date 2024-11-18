@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import {
   Image,
   useColorScheme,
@@ -153,13 +153,14 @@ const TabTwoScreen = () => {
             </View>
           </View>
         </View>
+        <NotificationScheduler
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          templateId={activeTemplateId ?? 0}
+        />
       </ParallaxScrollView>
 
-      <NotificationScheduler
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        templateId={activeTemplateId ?? 0}
-      />
+
       <FloatingLink route="template" />
     </View>
   );
