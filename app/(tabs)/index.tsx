@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, Text, useColorScheme, FlatList, StyleSheet, Modal, Pressable, ScrollView, SafeAreaView } from 'react-native';
+import { View, TextInput, Text, useColorScheme, FlatList, StyleSheet, Modal, Pressable, ScrollView, SafeAreaView, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabProfileIcon } from "@/components/navigation/TabBarIcon";
 import { Link } from 'expo-router';
@@ -10,6 +10,8 @@ import { useNotes } from '@/contexts/NotesContext';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import CustomAlert from '@/components/CustomAlert';
+import { ExternalLink } from '@/components/ExternalLink';
+import { ThemedText } from '@/components/ThemedText';
 interface Task {
   id: number;
   content: string;
@@ -111,6 +113,10 @@ const HomeScreen = () => {
       }));
       await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
       setModalVisible(false);
+      setAlertTitle('Success');
+      setAlertMessage('Task updated successfully!');
+      setAlertType('success');
+      setAlertVisible(true);
     }
   };
 
@@ -171,6 +177,19 @@ const HomeScreen = () => {
             <View className='pr-8'>
               <TimeBlock item={item} currentHourString={currentHourString} />
             </View>
+          </View>
+        )}
+        ListEmptyComponent={() => (
+          <View className="flex flex-col items-center justify-between  pt-32">
+            <Image
+              source={require("../../assets/images/icon.png")}
+              className="rounded-xl w-32 h-32 mb-10"
+            />
+            <ThemedText type="title" >No Template </ThemedText>
+            <ThemedText type="subtitle">Select a template to continue</ThemedText>
+            <Link href={'/(tabs)/create'} className="py-3 mt-2  px-4 bg-green-600 mx-auto rounded-full ">
+              <Text className="text-white text-lg font-medium">Select Template</Text>
+            </Link>
           </View>
         )}
       />
