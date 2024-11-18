@@ -3,6 +3,7 @@ import { View, Text, Button, StyleSheet, Pressable, ActivityIndicator } from 're
 import { Audio } from 'expo-av';
 import { useLocalSearchParams } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 interface RSSEpisode {
   title: string;
@@ -13,7 +14,7 @@ interface RSSEpisode {
 export default function PlayEpisode() {
   const { audioUrl, title } = useLocalSearchParams();
   const url = audioUrl as string;
-  
+
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -30,7 +31,7 @@ export default function PlayEpisode() {
       staysActiveInBackground: true,
       shouldDuckAndroid: true,
     });
-    
+
     return () => {
       stopAndUnloadCurrentSound();
     };
@@ -110,7 +111,7 @@ export default function PlayEpisode() {
   return (
     <View style={styles.container} className='dark:bg-black'>
       <ThemedText type="title" style={styles.title}>{title}</ThemedText>
-      
+
       <Pressable onPress={playAudio} disabled={loading} style={styles.playButton}>
         {loading ? (
           <ActivityIndicator color="#fff" />
@@ -123,9 +124,68 @@ export default function PlayEpisode() {
         <>
           <ProgressBar progress={calculateProgress()} />
           <View style={styles.controlsContainer}>
-            <Button title="⏪ 30s" onPress={skipBackward} disabled={loading} />
-            <Button title={isPlaying ? 'Pause' : 'Play'} onPress={togglePlayPause} disabled={loading} />
-            <Button title="⏩ 30s" onPress={skipForward} disabled={loading} />
+
+            <Pressable
+              onPress={skipBackward}
+              disabled={loading}
+              style={({ pressed }) => [
+                styles.button,
+                pressed && styles.buttonPressed, // Optional: Styling when pressed
+              ]}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#999" /> // Show loader when loading
+              ) : (
+                <IconSymbol size={28} name="replay-30" />
+              )}
+            </Pressable>
+            {/* Play or Pause */}
+            {isPlaying ? (
+              <Pressable
+                onPress={togglePlayPause}
+                disabled={loading}
+                style={({ pressed }) => [
+                  styles.button,
+                  pressed && styles.buttonPressed, // Optional: Styling when pressed
+                ]}
+              >
+                {loading ? (
+                  <ActivityIndicator size="small" color="#999" /> // Show loader when loading
+                ) : (
+                  <IconSymbol size={28} name="pause" />
+                )}
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={togglePlayPause}
+                disabled={loading}
+                style={({ pressed }) => [
+                  styles.button,
+                  pressed && styles.buttonPressed, // Optional: Styling when pressed
+                ]}
+              >
+                {loading ? (
+                  <ActivityIndicator size="small" color="#999" /> // Show loader when loading
+                ) : (
+                  <IconSymbol size={28} name="play-arrow" />
+                )}
+              </Pressable>
+
+            )}
+            <Pressable
+              onPress={skipForward}
+              disabled={loading}
+              style={({ pressed }) => [
+                styles.button,
+                pressed && styles.buttonPressed, // Optional: Styling when pressed
+              ]}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#999" /> // Show loader when loading
+              ) : (
+                <IconSymbol size={28} name="forward-30" />
+              )}
+            </Pressable>
           </View>
         </>
       )}
@@ -181,5 +241,15 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#3b82f6',
     borderRadius: 5,
+  },
+  button: {
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f0f0f0', // Default button background
+  },
+  buttonPressed: {
+    backgroundColor: '#ddd', // Background when pressed
   },
 });
