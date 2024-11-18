@@ -75,7 +75,7 @@ const ForgotPassword: React.FC = () => {
                     value={email}
                     onChangeText={handleInputChange(setEmail)}
                     keyboardType="email-address"
-                    className="w-full p-3 mb-2 text-white border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-600 "
+                    className="w-full p-3 mb-2 text-black dark:text-white border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-600 "
                 />
 
                 {errorMessage && (

@@ -42,7 +42,7 @@ export default function ProfileScreen() {
       <View style={styles.container} className='pt-32'>
         {/* Profile Card */}
 
-        <View className="bg-white dark:bg-black  p-10 rounded-xl items-center shadow-md shadow-black mt-[-10]"
+        <View className="bg-white dark:bg-black py-10 rounded-xl items-center shadow-md shadow-black mt-[-10]"
         >
           <ThemedText style={
             colorScheme === "dark"
@@ -71,7 +71,7 @@ export default function ProfileScreen() {
         <View style={styles.actionContainer}>
           {user ? (
             <Pressable
-              className='py-3 rounded-full items-center my-1 bg-red-600'
+              className='py-3 rounded-full w-52 mx-auto items-center my-1 bg-red-600'
               onPress={handleLogout}
               disabled={loadingLogout}
             >
@@ -84,14 +84,14 @@ export default function ProfileScreen() {
           ) : (
             <>
 
-              <Pressable className='py-3 rounded-full items-center my-1 bg-green-500'
+              <Pressable className='py-3 rounded-full w-52 mx-auto items-center my-1 bg-green-500'
 
                 onPress={() => router.push('/(auth)/sign-up')}
               >
                 <Text className='text-white font-semibold'>Sign Up</Text>
               </Pressable>
               <Pressable
-                className='py-3 rounded-full items-center my-1 bg-black/5 dark:bg-white/10 '
+                className='py-3 rounded-full items-center w-52 mx-auto my-1 bg-black/5 dark:bg-white/10 '
                 onPress={() => router.push('/(auth)/sign-in')}
               >
                 <Text className='text-black dark:text-white font-semibold'>Sign In</Text>
@@ -111,7 +111,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 5,
   },
   headerImage: {
     alignSelf: 'center',
@@ -120,9 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: 90,
     padding: 10,
     color: 'white'
-
   },
-
   userName: {
     fontSize: 24,
     fontWeight: '600',
@@ -148,7 +146,7 @@ const styles = StyleSheet.create({
     right: 10,
   },
   actionContainer: {
-    marginTop: 20,
+    marginTop:20,
     width: '100%',
   }
 
