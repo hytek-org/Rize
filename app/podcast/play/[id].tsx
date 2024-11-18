@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { Audio } from 'expo-av';
 import { useLocalSearchParams } from 'expo-router';
+import Slider from '@react-native-community/slider'; // Import Slider
+
 import { ThemedText } from '@/components/ThemedText';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-
-interface RSSEpisode {
-  title: string;
-  audioUrl: string;
-  description: string;
-}
 
 export default function PlayEpisode() {
   const { audioUrl, title } = useLocalSearchParams();
@@ -24,7 +20,6 @@ export default function PlayEpisode() {
   });
 
   useEffect(() => {
-    // Configure audio mode
     Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
       playsInSilentModeIOS: true,
@@ -64,6 +59,7 @@ export default function PlayEpisode() {
     setLoading(true);
     try {
       await stopAndUnloadCurrentSound();
+
       const { sound: newSound } = await Audio.Sound.createAsync({ uri: url });
       setSound(newSound);
       setIsPlaying(true);
@@ -103,13 +99,22 @@ export default function PlayEpisode() {
     }
   };
 
-  const calculateProgress = () => {
-    const { positionMillis, durationMillis } = playbackStatus;
-    return durationMillis > 0 ? (positionMillis / durationMillis) * 100 : 0;
+  const handleSliderChange = async (value) => {
+    if (sound) {
+      const newPosition = playbackStatus.durationMillis * value;
+      await sound.setPositionAsync(newPosition);
+    }
+  };
+
+  // Function to format time as mm:ss
+  const formatTime = (millis) => {
+    const minutes = Math.floor(millis / 60000);
+    const seconds = Math.floor((millis % 60000) / 1000);
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
   return (
-    <View style={styles.container} className='dark:bg-black'>
+    <View style={styles.container}>
       <ThemedText type="title" style={styles.title}>{title}</ThemedText>
 
       <Pressable onPress={playAudio} disabled={loading} style={styles.playButton}>
@@ -122,69 +127,36 @@ export default function PlayEpisode() {
 
       {sound && (
         <>
-          <ProgressBar progress={calculateProgress()} />
+          <View style={styles.progressBarContainer}>
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={1}
+              value={playbackStatus.positionMillis / playbackStatus.durationMillis}
+              onSlidingComplete={handleSliderChange}
+              minimumTrackTintColor="#3b82f6"
+              maximumTrackTintColor="#e0e0e0"
+              thumbTintColor="#3b82f6"
+            />
+          </View>
+
+          <View style={styles.timeContainer}>
+            <Text style={styles.timeText}>
+              {formatTime(playbackStatus.positionMillis)} / {formatTime(playbackStatus.durationMillis)}
+            </Text>
+          </View>
+
           <View style={styles.controlsContainer}>
-
-            <Pressable
-              onPress={skipBackward}
-              disabled={loading}
-              style={({ pressed }) => [
-                styles.button,
-                pressed && styles.buttonPressed, // Optional: Styling when pressed
-              ]}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#999" /> // Show loader when loading
-              ) : (
-                <IconSymbol size={28} name="replay-30" />
-              )}
+            <Pressable onPress={skipBackward} style={styles.button}>
+              <IconSymbol size={28} name="replay-30" />
             </Pressable>
-            {/* Play or Pause */}
-            {isPlaying ? (
-              <Pressable
-                onPress={togglePlayPause}
-                disabled={loading}
-                style={({ pressed }) => [
-                  styles.button,
-                  pressed && styles.buttonPressed, // Optional: Styling when pressed
-                ]}
-              >
-                {loading ? (
-                  <ActivityIndicator size="small" color="#999" /> // Show loader when loading
-                ) : (
-                  <IconSymbol size={28} name="pause" />
-                )}
-              </Pressable>
-            ) : (
-              <Pressable
-                onPress={togglePlayPause}
-                disabled={loading}
-                style={({ pressed }) => [
-                  styles.button,
-                  pressed && styles.buttonPressed, // Optional: Styling when pressed
-                ]}
-              >
-                {loading ? (
-                  <ActivityIndicator size="small" color="#999" /> // Show loader when loading
-                ) : (
-                  <IconSymbol size={28} name="play-arrow" />
-                )}
-              </Pressable>
 
-            )}
-            <Pressable
-              onPress={skipForward}
-              disabled={loading}
-              style={({ pressed }) => [
-                styles.button,
-                pressed && styles.buttonPressed, // Optional: Styling when pressed
-              ]}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#999" /> // Show loader when loading
-              ) : (
-                <IconSymbol size={28} name="forward-30" />
-              )}
+            <Pressable onPress={togglePlayPause} style={styles.button}>
+              <IconSymbol size={28} name={isPlaying ? 'pause' : 'play-arrow'} />
+            </Pressable>
+
+            <Pressable onPress={skipForward} style={styles.button}>
+              <IconSymbol size={28} name="forward-30" />
             </Pressable>
           </View>
         </>
@@ -192,12 +164,6 @@ export default function PlayEpisode() {
     </View>
   );
 }
-
-const ProgressBar = ({ progress }: { progress: number }) => (
-  <View style={styles.progressBarContainer}>
-    <View style={[styles.progressBar, { width: `${progress}%` }]} />
-  </View>
-);
 
 const styles = StyleSheet.create({
   container: {
@@ -224,32 +190,35 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  progressBarContainer: {
+    width: '90%',
+    marginVertical: 10,
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+  },
+  timeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '90%',
+    marginVertical: 10,
+  },
+  timeText: {
+    fontSize: 14,
+    color: '#888',
+  },
   controlsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '80%',
     marginTop: 10,
   },
-  progressBarContainer: {
-    width: '90%',
-    height: 5,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 5,
-    marginVertical: 10,
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: '#3b82f6',
-    borderRadius: 5,
-  },
   button: {
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f0f0f0', // Default button background
-  },
-  buttonPressed: {
-    backgroundColor: '#ddd', // Background when pressed
+    backgroundColor: '#f0f0f0',
   },
 });
