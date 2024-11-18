@@ -2,6 +2,9 @@ export default ({ config }) => {
     return {
       ...config,
       extra: {
+        eas: {
+          projectId: process.env.PROJECT_ID
+        },
         firebase: {
           apiKey: process.env.FIREBASE_API_KEY,
           authDomain: process.env.FIREBASE_AUTH_DOMAIN,
