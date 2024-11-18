@@ -92,10 +92,10 @@ const MyModal: React.FC<MyModalProps> = ({
                 </Text>
                 {/* Input for Tag */}
                 <TextInput
-                  className="xl:mt-20 p-2 dark:text-white dark:bg-zinc-700 border mx-2 my-2 rounded-lg text-lg xl:text-2xl px-2 focus:border-green-500 focus:ring-green-500"
+                  className="xl:mt-20 p-12 dark:text-white dark:bg-zinc-700 border mx-2 my-2 rounded-lg text-lg xl:text-2xl px-2 focus:border-green-500 focus:ring-green-500"
                   value={tag}
                   maxLength={15}
-                  numberOfLines={3}
+                  numberOfLines={30}
                   onChangeText={setTag}
                   placeholder="Enter a new Label"
                   placeholderTextColor={isDarkMode ? "#fff" : "#b2aeae"}
@@ -104,7 +104,7 @@ const MyModal: React.FC<MyModalProps> = ({
 
                 {/* Input for Note */}
                 <TextInput
-                  className="pt-4 dark:text-white dark:bg-zinc-700 border mx-2 my-2 rounded-lg text-lg xl:text-2xl px-2 focus:border-green-500 focus:ring-green-500"
+                  className="pt-4 h-52 dark:text-white dark:bg-zinc-700 border mx-2 my-2 rounded-lg text-lg xl:text-2xl px-2 focus:border-green-500 focus:ring-green-500"
                   value={input}
                   onChangeText={setInput}
                   placeholder="Enter a new note"

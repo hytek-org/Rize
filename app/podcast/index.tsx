@@ -125,13 +125,13 @@ export default function Index() {
 
   return (
     <View className="flex-1 px-5 py-5 dark:bg-zinc-900 bg-zinc-100">
-      <Text className="text-2xl my-10 text-center font-bold text-zinc-800 dark:text-zinc-200">
+      <Text className="text-2xl mt-10 mb-5 text-center font-bold text-zinc-800 dark:text-zinc-200">
         Podcast Feeds
       </Text>
 
       <View className="flex-row mb-5">
         <TextInput
-          className="flex-1 h-10 border border-zinc-300 dark:border-zinc-600 rounded-md px-3 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
+          className="flex-1 h-12 border border-zinc-300 dark:border-zinc-600 rounded-md px-3 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
           placeholder="Enter RSS Feed URL"
           placeholderTextColor="#888"
           value={inputUrl}

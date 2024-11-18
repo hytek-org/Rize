@@ -7,6 +7,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { TabCreateIcon, TabProfileIcon } from '@/components/navigation/TabBarIcon';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -34,10 +35,31 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="tasks"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Tasks',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="checklist" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+       name="create"
+        options={{
+          title: 'Create',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="add-circle-outline" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+       name="notes"
+        options={{
+          title: 'Notes',
+          tabBarIcon: ({ color }) =>  <TabCreateIcon name="filetext1" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <TabProfileIcon name='user' color={color} />,
         }}
       />
     </Tabs>
