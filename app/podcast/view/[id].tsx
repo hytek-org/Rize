@@ -74,7 +74,7 @@ export default function PodcastDetail() {
               <Text className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
                 {item.title}
               </Text>
-              <Text className="text-sm text-zinc-700 dark:text-zinc-400 mt-1">
+              <Text className="text-sm  text-zinc-700 dark:text-zinc-400 mt-1">
                 {parseHTMLContent(item.description)}
               </Text>
               <Link

@@ -153,10 +153,10 @@ export default function Index() {
         renderItem={({ item }) => (
           <View className="mb-5 p-5 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800">
             <View>
-              <Text className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              <Text selectable={true} className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
                 {item.title}
               </Text>
-              <Text className="text-sm text-zinc-700 dark:text-zinc-400">
+              <Text selectable={true} className="text-sm text-zinc-700 dark:text-zinc-400">
                 {parseHTMLContent(item.description || '')}
               </Text>
               <Text className="text-xs text-zinc-600 dark:text-zinc-500">
