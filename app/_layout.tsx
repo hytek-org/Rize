@@ -11,6 +11,7 @@ import { initializeTemplates } from '@/utils/templateInitializer';
 import { NotesProvider } from '@/contexts/NotesContext';
 import { TemplateProvider } from '@/contexts/TemplateContext';
 import { AuthProvider } from '@/contexts/AuthProvider';
+import { AudioPlayerProvider } from '@/contexts/AudioPlayerContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -48,10 +49,12 @@ export default function RootLayout() {
       <AuthProvider>
         <TemplateProvider>
           <NotesProvider>
-            <Stack screenOptions={{ headerShown: false }}>
-             <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> 
-              <Stack.Screen name="+not-found" />
-            </Stack>
+            <AudioPlayerProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+            </AudioPlayerProvider>
           </NotesProvider>
         </TemplateProvider>
       </AuthProvider>

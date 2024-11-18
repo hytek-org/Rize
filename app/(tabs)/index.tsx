@@ -8,6 +8,7 @@ import MyModal from '@/components/MyModel';
 import FloatingButton from '@/components/FlotingButton';
 import { useNotes } from '@/contexts/NotesContext';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 
 interface Task {
   id: number;
@@ -28,7 +29,7 @@ const HomeScreen = () => {
   const [input, setInput] = useState('');
   const [tag, setTag] = useState('');
   const [modalVisibleNotes, setModalVisibleNotes] = useState(false);
-
+  const { togglePlayPause, skipForward, skipBackward, isPlaying, currentUrl } = useAudioPlayer();
   const closeModal = () => {
     setModalVisibleNotes(false);
     setInput('');
@@ -164,9 +165,46 @@ const HomeScreen = () => {
 
       {/* Floating Button */}
       <View className=' '>
-        <Link className='rounded-full p-4 mb-8 ml-4 bg-[#0aaf1d] inline w-16' href={'/podcast'}>
-          <IconSymbol size={28} name="podcasts" color={'white'} />
-        </Link>
+        <View className="flex flex-row items-start justify-start  ">
+          {isPlaying !== null && isPlaying ? (
+            <View className="flex flex-row gap-2 pb-10 ml-5">
+              <Pressable
+                onPress={skipBackward}
+                className="bg-blue-500 text-white py-2 px-4 rounded-full dark:bg-blue-700 dark:text-white"
+              >
+                <IconSymbol size={28} color={'white'} name="replay-30" />
+              </Pressable>
+
+              <Pressable
+                onPress={togglePlayPause}
+                className="bg-green-500 text-white py-2 px-4 rounded-full dark:bg-green-600 dark:text-white"
+              >
+
+                <IconSymbol color={'white'} size={28} name="pause" />
+              </Pressable>
+
+              <Pressable
+                onPress={skipForward}
+                className="bg-blue-500 text-white py-2 px-4 rounded-full dark:bg-blue-700 dark:text-white"
+              >
+                <IconSymbol size={28} color={'white'} name="forward-30" />
+              </Pressable>
+            </View>
+          ) : isPlaying === false && currentUrl !== null ? (
+            // If audio is not playing and there is a valid URL, show the Play button
+            <View className='pb-10 ml-5'>
+            <Pressable
+              onPress={togglePlayPause}
+              className="bg-green-500 text-white py-2 px-4 rounded-full dark:bg-green-600 dark:text-white"
+            >
+              <IconSymbol size={28} color={'white'} name="play-arrow" />
+            </Pressable>
+            </View>
+          ) : <Link className='rounded-full p-4 mb-8 ml-4 bg-[#0aaf1d] inline w-16' href={'/podcast'}>
+            <IconSymbol size={28} name="podcasts" color={'white'} />
+          </Link>}
+        </View>
+
         <FloatingButton
           iconName='edit'
           onPress={() => setModalVisibleNotes(true)}

@@ -11,13 +11,14 @@ import { ThemedText } from '@/components/ThemedText';
 import { TabTaskIcon } from '@/components/navigation/TabBarIcon';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import FloatingLink from '@/components/FlotingLink';
+import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const [loadingLogout, setLoadingLogout] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
-
+  const { togglePlayPause, skipForward, skipBackward, isPlaying, currentUrl } = useAudioPlayer();
   const handleLogout = async () => {
     setLoadingLogout(true);
     try {
@@ -33,77 +34,110 @@ export default function ProfileScreen() {
 
   return (
     <>
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <Ionicons name="person-circle-outline" size={150} style={styles.headerImage} />
-      }
-    >
-      <View style={styles.container} className='pt-32'>
-        {/* Profile Card */}
+      <ParallaxScrollView
+        headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
+        headerImage={
+          <Ionicons name="person-circle-outline" size={150} style={styles.headerImage} />
+        }
+      >
+        <View style={styles.container} className='pt-32'>
+          {/* Profile Card */}
 
-        <View className="bg-white dark:bg-black py-10 rounded-xl items-center shadow-md shadow-black mt-[-10]"
-        >
-          <ThemedText style={
-            colorScheme === "dark"
-              ? stylesDark.userName
-              : styles.userName
-          }>{user ? user.displayName || 'User' : 'Guest User'}</ThemedText>
-          <View style={styles.infoContainer}>
+          <View className="bg-white dark:bg-black py-10 rounded-xl items-center shadow-md shadow-black mt-[-10]"
+          >
             <ThemedText style={
               colorScheme === "dark"
-                ? stylesDark.infoText
-                : styles.infoText
-            } >Email: {user?.email || 'Not Available'}</ThemedText>
-            {user?.emailVerified && <TabTaskIcon name="verified-user" size={20} style={
-              styles.verifiedIcon
-            } />}
+                ? stylesDark.userName
+                : styles.userName
+            }>{user ? user.displayName || 'User' : 'Guest User'}</ThemedText>
+            <View style={styles.infoContainer}>
+              <ThemedText style={
+                colorScheme === "dark"
+                  ? stylesDark.infoText
+                  : styles.infoText
+              } >Email: {user?.email || 'Not Available'}</ThemedText>
+              {user?.emailVerified && <TabTaskIcon name="verified-user" size={20} style={
+                styles.verifiedIcon
+              } />}
+            </View>
+
+            <Link href="/settings" style={styles.settingsLink}>
+              <Ionicons name="settings-outline" size={24} color={colorScheme === "dark"
+                ? '#fff'
+                : '#555'} />
+            </Link>
           </View>
 
-          <Link href="/settings" style={styles.settingsLink}>
-            <Ionicons name="settings-outline" size={24} color={colorScheme === "dark"
-              ? '#fff'
-              : '#555'} />
-          </Link>
-        </View>
-
-        {/* Action Buttons */}
-        <View style={styles.actionContainer}>
-          {user ? (
-            <Pressable
-              className='py-3 rounded-full w-52 mx-auto items-center my-1 bg-red-600'
-              onPress={handleLogout}
-              disabled={loadingLogout}
-            >
-              {loadingLogout ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <Text className='text-white font-semibold'>Logout</Text>
-              )}
-            </Pressable>
-          ) : (
-            <>
-
-              <Pressable className='py-3 rounded-full w-52 mx-auto items-center my-1 bg-green-500'
-
-                onPress={() => router.push('/(auth)/sign-up')}
-              >
-                <Text className='text-white font-semibold'>Sign Up</Text>
-              </Pressable>
+          {/* Action Buttons */}
+          <View style={styles.actionContainer}>
+            {user ? (
               <Pressable
-                className='py-3 rounded-full items-center w-52 mx-auto my-1 bg-black/5 dark:bg-white/10 '
-                onPress={() => router.push('/(auth)/sign-in')}
+                className='py-3 rounded-full w-52 mx-auto items-center my-1 bg-red-600'
+                onPress={handleLogout}
+                disabled={loadingLogout}
               >
-                <Text className='text-black dark:text-white font-semibold'>Sign In</Text>
+                {loadingLogout ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <Text className='text-white font-semibold'>Logout</Text>
+                )}
               </Pressable>
-            </>
-          )}
+            ) : (
+              <>
+
+                <Pressable className='py-3 rounded-full w-52 mx-auto items-center my-1 bg-green-500'
+
+                  onPress={() => router.push('/(auth)/sign-up')}
+                >
+                  <Text className='text-white font-semibold'>Sign Up</Text>
+                </Pressable>
+                <Pressable
+                  className='py-3 rounded-full items-center w-52 mx-auto my-1 bg-black/5 dark:bg-white/10 '
+                  onPress={() => router.push('/(auth)/sign-in')}
+                >
+                  <Text className='text-black dark:text-white font-semibold'>Sign In</Text>
+                </Pressable>
+              </>
+            )}
+          </View>
         </View>
-      </View>
-  
-      
-    </ParallaxScrollView>
-    <FloatingLink route='/podcast' iconName='podcasts' />
+        <View className="flex flex-row items-start justify-start mt-16">
+          {isPlaying !== null && isPlaying ? (
+            <View className="flex flex-row gap-2">
+              <Pressable
+                onPress={skipBackward}
+                className="bg-blue-500 text-white py-2 px-4 rounded-full dark:bg-blue-700 dark:text-white"
+              >
+               <IconSymbol size={28} color={'white'}  name="replay-30" />
+              </Pressable>
+
+              <Pressable
+                onPress={togglePlayPause}
+                className="bg-green-500 text-white py-2 px-4 rounded-full dark:bg-green-600 dark:text-white"
+              >
+             
+                <IconSymbol color={'white'} size={28}  name="pause" />
+              </Pressable>
+
+              <Pressable
+                onPress={skipForward}
+                className="bg-blue-500 text-white py-2 px-4 rounded-full dark:bg-blue-700 dark:text-white"
+              >
+                <IconSymbol size={28} color={'white'}  name="forward-30" />
+              </Pressable>
+            </View>
+          ) : isPlaying === false && currentUrl !== null ? (
+            // If audio is not playing and there is a valid URL, show the Play button
+            <Pressable
+              onPress={togglePlayPause}
+              className="bg-green-500 text-white py-2 px-4 rounded-full dark:bg-green-600 dark:text-white"
+            >
+              <IconSymbol size={28} color={'white'} name="play-arrow" />
+            </Pressable>
+          ) : null}
+        </View>
+      </ParallaxScrollView>
+      <FloatingLink route='/podcast' iconName='podcasts' />
     </>
   );
 }
@@ -146,7 +180,7 @@ const styles = StyleSheet.create({
     right: 10,
   },
   actionContainer: {
-    marginTop:20,
+    marginTop: 20,
     width: '100%',
   }
 
