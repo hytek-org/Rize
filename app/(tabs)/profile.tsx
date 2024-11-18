@@ -40,7 +40,7 @@ export default function ProfileScreen() {
           <Ionicons name="person-circle-outline" size={150} style={styles.headerImage} />
         }
       >
-        <View style={styles.container} className='pt-32'>
+        <View style={styles.container} className='pt-20'>
           {/* Profile Card */}
 
           <View className="bg-white dark:bg-black py-10 rounded-xl items-center shadow-md shadow-black mt-[-10]"
@@ -72,7 +72,7 @@ export default function ProfileScreen() {
           <View style={styles.actionContainer}>
             {user ? (
               <Pressable
-                className='py-3 rounded-full w-52 mx-auto items-center my-1 bg-red-600'
+                className='py-3 rounded-full w-52 mx-auto mb-12 items-center my-1 bg-red-600'
                 onPress={handleLogout}
                 disabled={loadingLogout}
               >
@@ -101,7 +101,7 @@ export default function ProfileScreen() {
             )}
           </View>
         </View>
-        <View className="flex flex-row items-start justify-start mt-16">
+        <View className="flex flex-row items-start justify-start pt-12 mt-16">
           {isPlaying !== null && isPlaying ? (
             <View className="flex flex-row gap-2">
               <Pressable
@@ -198,7 +198,4 @@ const stylesDark = StyleSheet.create({
     fontSize: 16,
     color: '#f1f1f1',
   },
-
-
-
 })
