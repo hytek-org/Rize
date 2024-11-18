@@ -34,13 +34,13 @@ const CustomAlert: React.FC<CustomAlertProps> = ({ visible, title, message, onCl
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View className="flex-1 justify-center items-center bg-black/50">
-        <View className={`w-72 p-5 rounded-xl ${backgroundColor} shadow-lg`}>
+        <View className={`w-80 p-5 rounded-xl ${backgroundColor} shadow-lg`}>
           <View className={`w-full p-2 rounded-md flex flex-row items-center justify-center mb-4 ${textColor}`}>
             {icon && <Image source={icon} className="w-5 h-5 mr-2 rounded-full" />}
             <Text className={`text-xl font-bold ${textColor}`}>{title}</Text>
           </View>
-          <Text className="text-lg text-gray-800 dark:text-gray-200 text-center mb-5">{message}</Text>
-          <Pressable onPress={onClose} className="py-2 px-5  rounded-full bg-green-600 ">
+          <Text className="text-lg text-gray-800  text-center mb-5">{message}</Text>
+          <Pressable onPress={onClose} className="py-2 px-5 w-32 mx-auto rounded-full bg-green-600 ">
             <Text className="text-white font-bold text-center text-lg">Close</Text>
           </Pressable>
         </View>
