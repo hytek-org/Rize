@@ -28,10 +28,11 @@ interface HistoryItem {
   tasks: Task[];
 }
 
+const DAILY_TASKS_STORAGE_KEY = "dailyTasks";
 const LAST_DATE_KEY = "lastDate";
-
 export default function TabTwoScreen() {
-  const { dailyTasks, activeTemplateId, addTemplateToDailyTasks, loading } = useTemplateContext();
+  const { activeTemplateId, loading } = useTemplateContext(); // You can add context functions if needed
+  const [dailyTasks, setDailyTasks] = useState<Task[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [editedContent, setEditedContent] = useState("");
@@ -39,17 +40,35 @@ export default function TabTwoScreen() {
   const colorScheme = useColorScheme();
   const [selectedTab, setSelectedTab] = useState("morning");
 
+  // Load daily tasks from AsyncStorage when the app initializes
   useEffect(() => {
-    const initializeTasks = async () => {
-      const today = new Date().toLocaleDateString();
-      const lastDate = await AsyncStorage.getItem(LAST_DATE_KEY);
-
-      if (lastDate !== today) {
-        await AsyncStorage.setItem(LAST_DATE_KEY, today);
+    const loadDailyTasks = async () => {
+      try {
+        const storedTasks = await AsyncStorage.getItem(DAILY_TASKS_STORAGE_KEY);
+        if (storedTasks) {
+          setDailyTasks(JSON.parse(storedTasks));
+        }
+      } catch (error) {
+        console.error("Failed to load daily tasks", error);
+        Alert.alert("Error", "Failed to load tasks.");
       }
     };
-    initializeTasks();
-    checkDayEnd();
+
+    loadDailyTasks();
+  }, []);
+
+  // Save daily tasks to AsyncStorage whenever they change
+  useEffect(() => {
+    const saveDailyTasks = async () => {
+      try {
+        await AsyncStorage.setItem(DAILY_TASKS_STORAGE_KEY, JSON.stringify(dailyTasks));
+      } catch (error) {
+        console.error("Failed to save daily tasks", error);
+        Alert.alert("Error", "Failed to save tasks.");
+      }
+    };
+
+    saveDailyTasks();
   }, [dailyTasks]);
 
   const openModal = (task: Task) => {
@@ -58,18 +77,14 @@ export default function TabTwoScreen() {
     setModalVisible(true);
   };
 
-  const saveEditedTask = async () => {
+  const saveEditedTask = () => {
     if (!selectedTask) return;
-    const newTasks = dailyTasks.map((item) =>
-      item.id === selectedTask.id ? { ...item, content: editedContent, time: item.time } : item
+
+    const updatedTasks = dailyTasks.map((task) =>
+      task.id === selectedTask.id ? { ...task, content: editedContent } : task
     );
-    try {
-      await AsyncStorage.setItem("dailyTasks", JSON.stringify(newTasks));
-      setModalVisible(false);
-    } catch (error) {
-      console.error("Failed to save tasks to local storage", error);
-      Alert.alert("Error", "Failed to save tasks");
-    }
+    setDailyTasks(updatedTasks);
+    setModalVisible(false);
   };
 
   const saveHistory = async (history: HistoryItem[]) => {
@@ -180,15 +195,18 @@ export default function TabTwoScreen() {
         <Modal visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
           <View style={colorScheme === "dark" ? stylesDark.modalContainer : styles.modalContainer}>
             <Text style={colorScheme === "dark" ? stylesDark.modalTitle : styles.modalTitle}>Edit Task</Text>
+          
             <TextInput
-              style={colorScheme === "dark" ? stylesDark.modalInput : styles.modalInput}
+              style={[
+                colorScheme === "dark" ? stylesDark.modalInput : styles.modalInput,
+                { height: 100, textAlignVertical: 'top' }, // Ensure textarea-like behavior
+              ]}
               maxLength={200}
               multiline
-              className="text-xl"
-              numberOfLines={3}
               value={editedContent}
               onChangeText={setEditedContent}
             />
+
 
             <Pressable onPress={saveEditedTask}
               className='bg-green-500 py-4  rounded-full w-full'

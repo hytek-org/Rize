@@ -144,7 +144,6 @@ export default function Edit() {
                     maxLength={200}
                     value={item.content}
                     multiline
-                    numberOfLines={3}
                     onChangeText={(text) => updateTemplateItem(item.id, text, item.time)}
                     placeholder="Task Name and short info"
                     placeholderTextColor={colorScheme === "dark" ? "#888" : "#ccc"}

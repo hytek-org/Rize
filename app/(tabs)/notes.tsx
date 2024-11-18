@@ -87,7 +87,7 @@ export default function TabTwoScreen() {
                 </View>
               </View>
               <ScrollView>
-                <Text className="dark:text-white text-xl ml-4 font-medium xl:text-2xl">{item.content}</Text>
+                <Text selectable={true} className="dark:text-white text-xl ml-4 font-medium xl:text-2xl">{item.content}</Text>
               </ScrollView>
               <Text className="dark:text-white ml-4 text-xs">Note added on {item.date}</Text>
             </View>

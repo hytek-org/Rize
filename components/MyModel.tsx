@@ -92,31 +92,32 @@ const MyModal: React.FC<MyModalProps> = ({
                 </Text>
                 {/* Input for Tag */}
                 <TextInput
-                  className="xl:mt-20 p-12 dark:text-white dark:bg-zinc-700 border mx-2 my-2 rounded-lg text-lg xl:text-2xl px-2 focus:border-green-500 focus:ring-green-500"
+                  className="xl:mt-20 dark:text-white dark:bg-zinc-700 border mx-2 my-2 rounded-lg text-lg xl:text-2xl px-4 focus:border-green-500 focus:ring-2 focus:ring-green-500"
                   value={tag}
                   maxLength={15}
-                  numberOfLines={30}
                   onChangeText={setTag}
                   placeholder="Enter a new Label"
-                  placeholderTextColor={isDarkMode ? "#fff" : "#b2aeae"}
-                  textAlignVertical="top"
+                  placeholderTextColor={isDarkMode ? "#b2b2b2" : "#7d7d7d"} // More subtle placeholder color
+                  style={{
+                    height: 50, // Uniform height for label input
+                  }}
                 />
-
                 {/* Input for Note */}
                 <TextInput
-                  className="pt-4 h-52 dark:text-white dark:bg-zinc-700 border mx-2 my-2 rounded-lg text-lg xl:text-2xl px-2 focus:border-green-500 focus:ring-green-500"
+                  className="dark:text-white p-2 dark:bg-zinc-700 border mx-2 my-2 rounded-lg text-lg xl:text-2xl px-4 focus:border-green-500 focus:ring-2 focus:ring-green-500"
                   value={input}
                   onChangeText={setInput}
                   placeholder="Enter a new note"
-                  multiline={true}
-                  numberOfLines={7}
-                  placeholderTextColor={isDarkMode ? "#fff" : "#b2aeae"}
-                  textAlignVertical="top" // Ensure the text starts from the top
+                  multiline
+                  placeholderTextColor={isDarkMode ? "#b2b2b2" : "#7d7d7d"}
                   style={{
-                    maxHeight: 250, // Allow for larger text height while being scrollable
-                    paddingTop: 10,
+                    minHeight: 100, // Ensures it looks like a textarea
+                    maxHeight: 250, // Prevents overflow
+                    textAlignVertical: "top", // Text starts at the top
+                    padding: 8,
                   }}
                 />
+
 
                 {/* Buttons */}
                 <View className='flex flex-col justify-center items-center'>

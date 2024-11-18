@@ -11,6 +11,8 @@ const MAPPING = {
   // See SF Symbols in the SF Symbols app on Mac.
   'house.fill': 'home',
   'checklist': 'checklist',
+  'wb-sunny': 'wb-sunny',
+  'nights-stay': 'nights-stay',
   'create': 'create',
   'add-circle-outline': 'add-circle-outline',
   'paperplane.fill': 'send',

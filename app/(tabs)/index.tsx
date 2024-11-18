@@ -107,9 +107,9 @@ const HomeScreen = () => {
   const nextHour: string = ((currentHour + 1) % 24).toString().padStart(2, '0');
 
   function convertHourTo12HourFormat(hourStr: string): string {
-    const hour = parseInt(hourStr, 10); 
+    const hour = parseInt(hourStr, 10);
     const period = hour >= 12 ? 'PM' : 'AM';
-    const twelveHour = hour % 12 || 12; 
+    const twelveHour = hour % 12 || 12;
     return `${twelveHour} ${period}`;
   }
 
@@ -132,10 +132,10 @@ const HomeScreen = () => {
               ? "border-t-green-600 dark:border-t-green-500"
               : " "}
               ${item.time == nextHour
-              ? "border-t-red-600 dark:border-t-red-500"
-              : " "}  ${item.time == prevHour
-              ? "border-t-yellow-600 dark:border-t-yellow-500"
-              : " "}
+                ? "border-t-red-600 dark:border-t-red-500"
+                : " "}  ${item.time == prevHour
+                  ? "border-t-yellow-600 dark:border-t-yellow-500"
+                  : " "}
             shadow-sm rounded-[32px] dark:bg-neutral-900 dark:shadow-neutral-700/70
             mb-5 px-4 py-4 mx-4`}
           >
@@ -160,7 +160,7 @@ const HomeScreen = () => {
           </View>
         )}
       />
-      
+
       {/* Floating Button */}
       <FloatingButton
         iconName='edit'
@@ -194,14 +194,16 @@ const HomeScreen = () => {
               Edit Task
             </Text>
             <TextInput
-              style={colorScheme === "dark" ? stylesDark.modalInput : styles.modalInput}
+              style={[
+                colorScheme === "dark" ? stylesDark.modalInput : styles.modalInput,
+                { height: 100, textAlignVertical: 'top' }, // Ensure textarea-like behavior
+              ]}
               maxLength={200}
               multiline
-              className="text-xl"
-              numberOfLines={3}
               value={editedContent}
               onChangeText={setEditedContent}
             />
+
             <Pressable
               onPress={saveEditedTask}
               className='bg-green-500 py-4  rounded-full w-full'

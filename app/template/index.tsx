@@ -20,6 +20,7 @@ import {
 } from "@/components/navigation/TabBarIcon";
 import { Link } from "expo-router";
 import { useTemplateContext } from "@/contexts/TemplateContext";
+import { IconSymbol } from "@/components/ui/IconSymbol";
 
 const STORAGE_KEY = "Templates";
 
@@ -228,7 +229,9 @@ export default function Create() {
                   />
                   <TextInput
                     multiline
-                    numberOfLines={3}
+                    style={[
+                      { height: 100, textAlignVertical: 'top' },
+                    ]}
                     className="py-3 px-4 block w-full border my-4 border-gray-200 rounded-lg text-sm focus:border-green-500 focus:ring-green-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                     placeholder="Enter template Description"
                     placeholderTextColor={colorScheme === "dark" ? "#888" : "#ccc"}
@@ -236,6 +239,8 @@ export default function Create() {
                     maxLength={160}
                     onChangeText={setDesc}
                   />
+
+
                 </View>
 
                 <Pressable
@@ -355,11 +360,7 @@ export default function Create() {
                               } `}
                             onPress={() => setSelectedTab("morning")}
                           >
-                            <TabTaskIcon
-                              name="wb-sunny"
-
-                            />
-
+                            <IconSymbol  name="wb-sunny" />
                           </Pressable>
                           <Pressable
                             className={`inline-flex flex-row  p-2 md:py-4 rounded-full justify-center items-center  ${selectedTab == "afternoon"
@@ -368,16 +369,14 @@ export default function Create() {
                               } `}
                             onPress={() => setSelectedTab("afternoon")}
                           >
-                            <TabTaskIcon
-                              name="nights-stay"
-                            />
 
+                            <IconSymbol  name="nights-stay" />
 
                           </Pressable>
                         </View>
                         <View>
                           <Pressable
-                            className="bg-green-500  w-full rounded-full p-2 px-6 border-2  border-zinc-200  dark:border-zinc-50   text-center   "
+                            className="bg-green-500  w-28 p-2 rounded-full border-2  border-zinc-200  dark:border-zinc-50   text-center   "
                             onPress={() => {
                               if (currentTemplate) {
                                 saveTemplateData(currentTemplate.id, currentTemplate.items);
@@ -386,7 +385,7 @@ export default function Create() {
                             }}
                           >
 
-                            <Text className="text-white text-xl font-semibold  ">
+                            <Text className="text-white text-center text-xl font-semibold  ">
                               Save
                             </Text>
                           </Pressable>
