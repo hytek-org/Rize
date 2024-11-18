@@ -9,6 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { TabTaskIcon } from '@/components/navigation/TabBarIcon';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+import FloatingLink from '@/components/FlotingLink';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
@@ -30,6 +32,7 @@ export default function ProfileScreen() {
   };
 
   return (
+    <>
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
       headerImage={
@@ -56,7 +59,7 @@ export default function ProfileScreen() {
               styles.verifiedIcon
             } />}
           </View>
-         
+
           <Link href="/settings" style={styles.settingsLink}>
             <Ionicons name="settings-outline" size={24} color={colorScheme === "dark"
               ? '#fff'
@@ -97,10 +100,11 @@ export default function ProfileScreen() {
           )}
         </View>
       </View>
-      <View>
-      <Link href={'/podcast'} className='text-center text-black dark:text-white pt-20'>Go to podcast</Link>
-    </View>
+  
+      
     </ParallaxScrollView>
+    <FloatingLink route='/podcast' iconName='podcasts' />
+    </>
   );
 }
 

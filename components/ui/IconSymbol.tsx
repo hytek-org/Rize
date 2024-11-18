@@ -11,6 +11,7 @@ const MAPPING = {
   // See SF Symbols in the SF Symbols app on Mac.
   'house.fill': 'home',
   'checklist': 'checklist',
+  'podcasts': 'podcasts',
   'wb-sunny': 'wb-sunny',
   'nights-stay': 'nights-stay',
   'create': 'create',

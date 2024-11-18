@@ -7,7 +7,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { TabCreateIcon, TabProfileIcon } from '@/components/navigation/TabBarIcon';
+import { TabBarIcon, TabCreateIcon, TabProfileIcon } from '@/components/navigation/TabBarIcon';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -31,7 +31,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) =>  <TabBarIcon name={'home-outline'} color={color} />,
         }}
       />
       <Tabs.Screen

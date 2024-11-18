@@ -1,18 +1,19 @@
 // FloatingLink.tsx
 import React from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
-import { TabCreateIcon } from "@/components/navigation/TabBarIcon"; // Adjust the import according to your project structure
+import { TabCreateIcon, TabTaskIcon } from "@/components/navigation/TabBarIcon"; // Adjust the import according to your project structure
 import { Link } from 'expo-router';
 
 interface FloatingLinkProps {
   route: string; // Route to navigate to when the button is pressed
+  iconName?: string; // Optional icon name
 }
 
-const FloatingLink: React.FC<FloatingLinkProps> = ({ route }) => {
+const FloatingLink: React.FC<FloatingLinkProps> = ({ route,iconName }) => {
   return (
     <Link href={route} asChild>
       <TouchableOpacity style={styles.button}>
-        <TabCreateIcon name={"pluscircleo"} size={24} color="white" />
+        <TabTaskIcon name={iconName?iconName:'add-circle-outline'} size={28} color="white" />
       </TouchableOpacity>
     </Link>
   );

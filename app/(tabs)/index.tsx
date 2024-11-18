@@ -7,6 +7,7 @@ import TimeBlock from '@/components/TimeBlock';
 import MyModal from '@/components/MyModel';
 import FloatingButton from '@/components/FlotingButton';
 import { useNotes } from '@/contexts/NotesContext';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 interface Task {
   id: number;
@@ -162,10 +163,16 @@ const HomeScreen = () => {
       />
 
       {/* Floating Button */}
-      <FloatingButton
-        iconName='edit'
-        onPress={() => setModalVisibleNotes(true)}
-      />
+      <View className=' '>
+        <Link className='rounded-full p-4 mb-8 ml-4 bg-[#0aaf1d] inline w-16' href={'/podcast'}>
+          <IconSymbol size={28} name="podcasts" color={'white'} />
+        </Link>
+        <FloatingButton
+          iconName='edit'
+          onPress={() => setModalVisibleNotes(true)}
+        />
+      </View>
+
 
       {/* Modal for Notes */}
       <MyModal
