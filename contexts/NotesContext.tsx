@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Note {
   id: string;
+  contentPreview: string;
   content: string;
   tag: string;
   date: string;
@@ -65,6 +66,7 @@ export const NotesProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const addNote = (content: string, tag: string) => {
     const newNote: Note = {
       id: Date.now().toString(),
+      contentPreview: content.substring(0, 150),
       content,
       tag,
       date: formatDateToIndian(new Date()),
