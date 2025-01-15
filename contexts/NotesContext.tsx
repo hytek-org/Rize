@@ -5,14 +5,14 @@ interface Note {
   id: string;
   contentPreview: string;
   content: string;
-  tag: string;
+  tag: string; // Make tag required but allow empty string
   date: string;
 }
 
 interface NotesContextType {
   notes: Note[];
-  addNote: (content: string, tag: string) => void;
-  editNote: (id: string, content: string, tag: string) => void;
+  addNote: (content: string, tag?: string) => void;
+  editNote: (id: string, content: string, tag?: string) => void;
   deleteNote: (id: string) => void;
 }
 
@@ -63,21 +63,27 @@ export const NotesProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const addNote = (content: string, tag: string) => {
+  const addNote = (content: string, tag: string = '') => {
     const newNote: Note = {
       id: Date.now().toString(),
       contentPreview: content.substring(0, 150),
       content,
-      tag,
+      tag: tag.trim() || 'Untagged',
       date: formatDateToIndian(new Date()),
     };
     const updatedNotes = [...notes, newNote];
     saveNotes(updatedNotes);
   };
 
-  const editNote = (id: string, content: string, tag: string) => {
+  const editNote = (id: string, content: string, tag: string = '') => {
     const updatedNotes = notes.map(note =>
-      note.id === id ? { ...note, content, tag, date: formatDateToIndian(new Date()) } : note
+      note.id === id ? { 
+        ...note, 
+        content,
+        contentPreview: content.substring(0, 150), // Add preview update
+        tag: tag.trim() || 'Untagged',
+        date: formatDateToIndian(new Date()) 
+      } : note
     );
     saveNotes(updatedNotes);
   };

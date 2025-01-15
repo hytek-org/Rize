@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   useColorScheme,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   Pressable,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
@@ -30,13 +31,59 @@ interface Template {
   items: TemplateItem[];
 }
 
-const TabTwoScreen = () => {
-  const { templates, dailyTasks, activeTemplateId, addTemplateToDailyTasks, loading } = useTemplateContext();
+const CreateScreen = () => {
+  const { 
+    templates, 
+    dailyTasks, 
+    activeTemplateId, 
+    addTemplateToDailyTasks, 
+    loading,
+    updateRoutine 
+  } = useTemplateContext();
   const colorScheme = useColorScheme();
   const [modalVisible, setModalVisible] = useState(false);
+  const [isChanging, setIsChanging] = useState(false);
 
   const handleNotificationSetup = (templateId: number) => {
+    if (!templateId) {
+      Alert.alert("Error", "Invalid template");
+      return;
+    }
     setModalVisible(true);
+  };
+
+  const handleTemplateChange = async (template: Template) => {
+    setIsChanging(true);
+    try {
+      // Show confirmation if there's already an active template
+      if (activeTemplateId && activeTemplateId !== template.id) {
+        Alert.alert(
+          "Change Template",
+          "Changing template will replace your current routines. Continue?",
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+              onPress: () => setIsChanging(false)
+            },
+            {
+              text: "Continue",
+              onPress: async () => {
+                await addTemplateToDailyTasks(template);
+                setModalVisible(true); // Show notification setup modal
+              }
+            }
+          ]
+        );
+      } else {
+        await addTemplateToDailyTasks(template);
+        setModalVisible(true);
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to change template");
+    } finally {
+      setIsChanging(false);
+    }
   };
 
   const renderTemplate = (template: Template) => (
@@ -90,15 +137,25 @@ const TabTwoScreen = () => {
             <Text className="text-xl font-medium text-white">Active</Text>
           </View>
         ) : (
-          <Pressable disabled={loading} className="inline-flex flex-row items-center gap-1 rounded-l-full bg-transparent px-3 py-1.5 text-black dark:text-white border-l-2 border-t-2 hover:border-green-500 border-gray-100 dark:border-neutral-700" onPress={() => addTemplateToDailyTasks(template)}>
-
-            <TabTaskIcon name="add-circle" size={32} />
-            {loading ? (
-              <ActivityIndicator color="#ff0000/" />
+          <Pressable 
+            disabled={loading || isChanging} 
+            className={`inline-flex flex-row items-center gap-1 rounded-l-full 
+              ${isChanging ? 'opacity-50' : ''} 
+              bg-transparent px-3 py-1.5 text-black dark:text-white 
+              border-l-2 border-t-2 hover:border-green-500 
+              border-gray-100 dark:border-neutral-700`}
+            onPress={() => handleTemplateChange(template)}
+          >
+            {isChanging || loading ? (
+              <ActivityIndicator color={colorScheme === 'dark' ? '#fff' : '#000'} />
             ) : (
-              <Text className="text-xl font-medium text-black dark:text-white">Add to Daily Tasks</Text>
+              <>
+                <TabTaskIcon name="add-circle" size={32} />
+                <Text className="text-xl font-medium text-black dark:text-white">
+                  Set as Daily Routine
+                </Text>
+              </>
             )}
-
           </Pressable>
         )}
 
@@ -166,4 +223,4 @@ const TabTwoScreen = () => {
   );
 };
 
-export default TabTwoScreen;
+export default CreateScreen;

@@ -10,7 +10,6 @@ import { useNotes } from '@/contexts/NotesContext';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import CustomAlert from '@/components/CustomAlert';
-import { ExternalLink } from '@/components/ExternalLink';
 import { ThemedText } from '@/components/ThemedText';
 interface Task {
   id: number;
@@ -142,7 +141,7 @@ const HomeScreen = () => {
         ListHeaderComponent={() => (
           <View>
             <Text className='text-2xl sm:text-4xl pt-12 pb-4 text-center dark:text-neutral-100'>
-              Manage Tasks
+              Manage Routines
             </Text>
           </View>
         )}

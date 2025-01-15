@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
+import { globalEmitter } from '@/utils/eventEmitter';
 
 interface TemplateItem {
   id: number;
@@ -27,6 +28,8 @@ interface TemplateContextProps {
   setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
   deleteTemplate: (templateId: number) => void;
   editTemplate: (updatedTemplate: Template) => void; // New function to edit the template
+  updateRoutine: (taskId: number, content: string) => Promise<void>;
+  getCurrentTemplate: () => Template | null;
 }
 
 const TemplateContext = createContext<TemplateContextProps | undefined>(undefined);
@@ -79,24 +82,32 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
 
   const addTemplateToDailyTasks = async (template: Template) => {
     setLoading(true);
-    if (!template || !template.items || !template.id) {
-      Alert.alert("Error", "Invalid template data.");
-      setLoading(false);
-      return;
-    }
-
-    setDailyTasks(template.items);
-    setActiveTemplateId(template.id);
-
     try {
+      if (!template || !template.items || !template.id) {
+        throw new Error("Invalid template data.");
+      }
+
+      // Clear existing tasks first
+      await AsyncStorage.removeItem(TASKS_KEY);
+      
+      // Set new tasks and template ID
+      setDailyTasks(template.items);
+      setActiveTemplateId(template.id);
+
       await Promise.all([
         AsyncStorage.setItem(TASKS_KEY, JSON.stringify(template.items)),
         AsyncStorage.setItem(TASKS_KEY_ID, JSON.stringify(template.id)),
       ]);
+
+      // Emit event using our custom event emitter
+      globalEmitter.emit('TEMPLATE_CHANGED', template.items);
       Alert.alert("Success", "Template added to daily tasks successfully");
+      
+      return true;
     } catch (error) {
-      console.error("Failed to save daily tasks to local storage", error);
+      console.error("Failed to save daily tasks", error);
       Alert.alert("Error", "Failed to save daily tasks to local storage. Please try again.");
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -150,6 +161,25 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
     }
   };
 
+  const updateRoutine = async (taskId: number, content: string) => {
+    try {
+      const updatedTasks = dailyTasks.map(task =>
+        task.id === taskId ? { ...task, content } : task
+      );
+
+      setDailyTasks(updatedTasks);
+      await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Failed to update routine", error);
+      return Promise.reject(error);
+    }
+  };
+
+  const getCurrentTemplate = () => {
+    return templates.find(template => template.id === activeTemplateId) || null;
+  };
+
   return (
     <TemplateContext.Provider
       value={{
@@ -163,6 +193,8 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
         setTemplates,
         deleteTemplate,
         editTemplate, // Expose the editTemplate function
+        updateRoutine,
+        getCurrentTemplate,
       }}
     >
       {children}

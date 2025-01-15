@@ -1,178 +1,221 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, FlatList, Pressable, ScrollView, Image, TextInput, useColorScheme } from 'react-native';
 import { TabCreateIcon, TabTaskIcon } from '@/components/navigation/TabBarIcon';
 import MyModal from '@/components/MyModel';
 import FloatingButton from '@/components/FlotingButton';
-import { ExternalLink } from '@/components/ExternalLink';
 import { useNotes } from '@/contexts/NotesContext';
 import CustomAlert from '@/components/CustomAlert';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Link } from 'expo-router';
+import { AlertState, AlertType, Note } from '@/types/notes';
 
+interface TagOption{
+tagOption:string;
+}
 
-export default function TabTwoScreen() {
+export default function NotesScreen() {
   const colorScheme = useColorScheme();
   const color = colorScheme === 'dark' ? 'white' : 'black';
-  const { notes, addNote,  } = useNotes();
+  const { notes, addNote } = useNotes();
   const [input, setInput] = useState('');
   const [tag, setTag] = useState('');
-  const [editMode, setEditMode] = useState(false);
-  const [editNoteId, setEditNoteId] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-
-  // CustomAlert state management
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertTitle, setAlertTitle] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
-
-  // Search and filter states
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'date' | 'title'>('date');
 
-  interface Note {
-    id: string;
-    contentPreview: string;
-    content: string;
-    tag: string;
-    date: string;
-  }
-
-
-
-  const handleAddNote = () => {
-    if (!input.trim()) {
-      setAlertTitle('Error');
-      setAlertMessage('Note cannot be empty.');
-      setAlertType('error');
-      setAlertVisible(true);
-      return;
-    }
-    addNote(input, tag);
-    setInput('');
-    setModalVisible(false);
-    setAlertTitle('Success');
-    setAlertMessage('Note added successfully!');
-    setAlertType('success');
-    setAlertVisible(true);
-  };
-
- 
-
-  const closeModal = () => {
-    setModalVisible(false);
-    setEditMode(false);
-    setEditNoteId(null);
-    setInput('');
-    setTag('');
-  };
-
-  // Filtered notes based on search query and selected tag
-  const filteredNotes = notes.filter((note) => {
-    const matchesSearchQuery = note.content.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTagFilter = selectedTag ? note.tag === selectedTag : true;
-    return matchesSearchQuery && matchesTagFilter;
+  // Fix alert state with proper typing
+  const [alertState, setAlertState] = useState<AlertState>({
+    visible: false,
+    title: '',
+    message: '',
+    type: 'info'
   });
 
-  // Extract all unique tags from the notes for filtering purposes
-  const uniqueTags = Array.from(new Set(notes.map((note) => note.tag)));
+  // Memoized unique tags - fixed type assertion
+  const uniqueTags = useMemo(() => 
+    Array.from(new Set(notes.map((note) => note.tag))).filter((tag): tag is string => Boolean(tag)),
+    [notes]
+  );
+
+  // Memoized filtered and sorted notes
+  const filteredAndSortedNotes = useMemo(() => {
+    return notes
+      .filter((note) => {
+        const matchesSearch = note.content.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesTag = selectedTag ? note.tag === selectedTag : true;
+        return matchesSearch && matchesTag;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'date') {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        }
+        return a.content.localeCompare(b.content);
+      });
+  }, [notes, searchQuery, selectedTag, sortBy]);
+
+  const showAlert = useCallback((title: string, message: string, type: AlertType) => {
+    setAlertState({
+      visible: true,
+      title,
+      message,
+      type
+    });
+  }, []);
+
+  const handleAddNote = useCallback(() => {
+    if (!input.trim()) {
+      showAlert('Error', 'Note content cannot be empty.', 'error');
+      return;
+    }
+
+    addNote(input, tag || undefined); // Pass undefined if tag is empty
+    setInput('');
+    setTag('');
+    setModalVisible(false);
+    showAlert('Success', 'Note added successfully!', 'success');
+  }, [input, tag, addNote, showAlert]);
+
+  const closeModal = useCallback(() => {
+    setModalVisible(false);
+    setInput('');
+    setTag('');
+  }, []);
+
+  const renderNoteItem = useCallback(({ item }: { item: Note }) => (
+    <Pressable 
+      className="bg-white dark:bg-neutral-800 rounded-lg mx-2 mb-4 p-4 shadow-sm"
+      style={{ elevation: 2 }}
+    >
+      <View className="flex-row justify-between items-center mb-2">
+        <View className="flex-row items-center">
+          <TabCreateIcon name="tago" size={16} />
+          <Text className="text-sm ml-2 dark:text-white font-medium">
+            {item.tag || 'Default'}
+          </Text>
+        </View>
+        <Link
+          href={{
+            pathname: '/notesdetails/[id]',
+            params: { id: item.id },
+          }}
+          className="bg-blue-500 px-4 py-2 rounded-lg"
+        >
+          <Text className="text-white font-medium">View</Text>
+        </Link>
+      </View>
+
+      <Text 
+        numberOfLines={3}
+        className="dark:text-white text-lg font-medium mb-2"
+      >
+        {item.contentPreview}
+      </Text>
+
+      <Text className="text-gray-500 dark:text-gray-400 text-xs">
+        {item.date}
+      </Text>
+    </Pressable>
+  ), []);
 
   return (
-    <View className="grid grid-cols-1 xl:grid-cols-2">
-      <View className="bg-slate-200 dark:bg-neutral-900 xl:pb-20 h-screen pb-10 xl:h-[100vh]">
-        <Text className="text-4xl ml-4 mt-12 text-zinc-800 font-bold dark:text-zinc-50 mb-4">View Notes</Text>
+    <View className="flex-1 bg-slate-100 dark:bg-neutral-900">
+      <View className="pt-12 px-4">
+        <Text className="text-3xl font-bold dark:text-white mb-4">
+          My Notes
+        </Text>
 
-        {/* Search Bar */}
-        <View className="flex flex-row items-center mx-4 mb-4">
+        {/* Search and Sort Controls */}
+        <View className="flex-row items-center mb-4 gap-2">
           <TextInput
-            className="border rounded-full px-4 py-2 w-full text-xl font-medium dark:bg-white"
+            className="flex-1 bg-white dark:bg-neutral-800 rounded-lg px-4 py-2 text-base dark:text-white"
             placeholder="Search notes..."
+            placeholderTextColor={colorScheme === 'dark' ? '#9CA3AF' : '#6B7280'}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          <Pressable
+            onPress={() => setSortBy(sortBy === 'date' ? 'title' : 'date')}
+            className="p-2"
+          >
+            <TabTaskIcon 
+              size={24} 
+              name={sortBy === 'date' ? 'sort' : 'sort-by-alpha'} 
+              color={color} 
+            />
+          </Pressable>
         </View>
 
-        {/* Tag Filter Dropdown */}
-        <View className="flex flex-row items-center mx-4 mb-4 overflow-x-scroll z-50">
-          <Pressable className='mr-4' onPress={() => setSelectedTag(null)}><Text> {selectedTag ? <IconSymbol size={28} name="filter-list-off" color={color} /> : <IconSymbol size={28} name="filter-list" color={color} />}</Text></Pressable>
-
-          <ScrollView horizontal
-            showsHorizontalScrollIndicator={false}  // Hide horizontal scroll indicator
-            contentContainerStyle={{
-              paddingVertical: 2,  // Add vertical padding for better spacing
-              flexDirection: 'row',
-              gap: 5  // Ensure tags are laid out horizontally
-            }} >
-            {uniqueTags.map((tagOption) => (
-              <Pressable
-                key={tagOption}
-                onPress={() => setSelectedTag(tagOption)}
-                className={`border rounded-md px-4 py-2 ${selectedTag === tagOption ? 'bg-blue-500' : 'bg-gray-200'}`}
-              >
-                <Text className={`text-lg ${selectedTag === tagOption ? 'text-white' : 'text-black'}`}>
-                  {tagOption}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* Notes List */}
-        <FlatList
-          data={filteredNotes}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View className="flex flex-col bg-white dark:bg-neutral-800 border rounded mx-2 mb-4 py-4">
-              <View className="flex flex-row justify-between">
-                <Text className="text-lg ml-2 dark:text-white">
-                  <TabCreateIcon name={'tago'} size={16} /> {item.tag ? item.tag : 'Default'}
-                </Text>
-                <View className="flex flex-row rounded-lg bg-neutral-100 border border-neutral-700 dark:bg-neutral-700 py-1 sm:py-2 mr-2">
-
-                  <Link href={{
-                    pathname: '/notesdetails/[id]',
-                    params: { id: item.id },
-                  }} className='text-xl text-white'>View</Link>
-                </View>
-              </View>
-              <ScrollView>
-                <Text selectable={true} className="dark:text-white text-xl ml-4 font-medium xl:text-2xl">{item.contentPreview}</Text>
-              </ScrollView>
-              <Text className="dark:text-white ml-4 text-xs">Note added on {item.date}</Text>
-            </View>
-          )}
-          ListEmptyComponent={() => (
-            <View className="flex-1 items-center justify-center h-full mt-[30vh] ">
-              <Image source={require('../../assets/images/empty-note.png')} style={{ width: 200, height: 200 }} />
-              <Text className="dark:text-white text-lg mt-4">No notes available</Text>
-              <ExternalLink href="https://storyset.com/people">People illustrations by Storyset</ExternalLink>
-            </View>
-          )}
-        />
+        {/* Tags ScrollView */}
+        <ScrollView 
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="mb-4"
+        >
+          <Pressable
+            onPress={() => setSelectedTag(null)}
+            className={`mr-2 px-4 py-2 rounded-full ${
+              selectedTag === null ? 'bg-blue-500' : 'bg-gray-200 dark:bg-neutral-700'
+            }`}
+          >
+            <Text className={selectedTag === null ? 'text-white' : 'text-black dark:text-white'}>
+              All
+            </Text>
+          </Pressable>
+          {uniqueTags.map((tag) => (
+            <Pressable
+              key={tag}
+              onPress={() => setSelectedTag(tag)}
+              className={`mr-2 px-4 py-2 rounded-full ${
+                selectedTag === tag ? 'bg-blue-500' : 'bg-gray-200 dark:bg-neutral-700'
+              }`}
+            >
+              <Text className={`${
+                selectedTag === tag ? 'text-white' : 'text-black dark:text-white'
+              }`}>
+                {tag}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
       </View>
 
-      <View>
-        <FloatingButton onPress={() => setModalVisible(true)} />
-        <MyModal
-          visible={modalVisible}
-          onClose={closeModal}
-          input={input}
-          setInput={setInput}
-          tag={tag}
-          setTag={setTag}
-          editMode={editMode}
-          addNote={handleAddNote}
-          editNote={() => {}}
-        />
-      </View>
+      <FlatList
+        data={filteredAndSortedNotes}
+        renderItem={renderNoteItem}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingVertical: 8 }}
+        ListEmptyComponent={() => (
+          <View className="items-center justify-center py-20">
+            <Image 
+              source={require('../../assets/images/empty-note.png')} 
+              style={{ width: 200, height: 200 }} 
+              resizeMode="contain"
+            />
+            <Text className="dark:text-white text-lg mt-4">No notes found</Text>
+          </View>
+        )}
+      />
 
-      {/* Display Custom Alert */}
+      <FloatingButton onPress={() => setModalVisible(true)} />
+      
+      <MyModal
+        visible={modalVisible}
+        onClose={closeModal}
+        input={input}
+        setInput={setInput}
+        tag={tag}
+        setTag={setTag}
+        editMode={false}
+        addNote={handleAddNote}
+        editNote={() => {}}
+      />
+
       <CustomAlert
-        visible={alertVisible}
-        title={alertTitle}
-        message={alertMessage}
-        onClose={() => setAlertVisible(false)}
-        type={alertType}
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        onClose={() => setAlertState(prev => ({ ...prev, visible: false }))}
+        type={alertState.type}
       />
     </View>
   );

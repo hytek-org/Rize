@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  FlatList,
-  Modal,
-  TextInput,
-  useColorScheme,
-  Image,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { View, Text, Pressable, FlatList, Image, useColorScheme } from "react-native";
 import { TabProfileIcon, TabTaskIcon } from "@/components/navigation/TabBarIcon";
 import { useTemplateContext } from "@/contexts/TemplateContext";
 import { ThemedText } from "@/components/ThemedText";
 import { Link } from "expo-router";
-import CustomAlert from '@/components/CustomAlert'; 
+import CustomAlert from '@/components/CustomAlert';
+import RoutineModal from '@/components/RoutineModal';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { globalEmitter } from '@/utils/eventEmitter';
+
 interface Task {
   id: number;
   content: string;
@@ -29,8 +22,9 @@ interface HistoryItem {
 
 const DAILY_TASKS_STORAGE_KEY = "dailyTasks";
 const LAST_DATE_KEY = "lastDate";
-export default function TabTwoScreen() {
-  const { activeTemplateId, loading } = useTemplateContext(); // You can add context functions if needed
+
+export default function RoutinesScreen() {
+  const { activeTemplateId, loading } = useTemplateContext(); 
   const [dailyTasks, setDailyTasks] = useState<Task[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -45,6 +39,12 @@ export default function TabTwoScreen() {
   const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
   // Load daily tasks from AsyncStorage when the app initializes
   useEffect(() => {
+    // Listen for template changes
+    const unsubscribe = globalEmitter.on('TEMPLATE_CHANGED', (newTasks: Task[]) => {
+      setDailyTasks(newTasks);
+    });
+
+    // Load initial tasks
     const loadDailyTasks = async () => {
       try {
         const storedTasks = await AsyncStorage.getItem(DAILY_TASKS_STORAGE_KEY);
@@ -62,6 +62,11 @@ export default function TabTwoScreen() {
     };
 
     loadDailyTasks();
+
+    // Cleanup subscription
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   // Save daily tasks to AsyncStorage whenever they change
@@ -87,18 +92,27 @@ export default function TabTwoScreen() {
     setModalVisible(true);
   };
 
-  const saveEditedTask = () => {
+  const saveEditedTask = async () => {
     if (!selectedTask) return;
 
-    const updatedTasks = dailyTasks.map((task) =>
-      task.id === selectedTask.id ? { ...task, content: editedContent } : task
-    );
-    setDailyTasks(updatedTasks);
-    setModalVisible(false);
-    setAlertTitle('Success');
-    setAlertMessage('Tasks updated successfully!');
-    setAlertType('success');
-    setAlertVisible(true);
+    try {
+      const updatedTasks = dailyTasks.map((task) =>
+        task.id === selectedTask.id ? { ...task, content: editedContent } : task
+      );
+      
+      setDailyTasks(updatedTasks);
+      await AsyncStorage.setItem(DAILY_TASKS_STORAGE_KEY, JSON.stringify(updatedTasks));
+      setModalVisible(false);
+      setAlertTitle('Success');
+      setAlertMessage('Routine updated successfully!');
+      setAlertType('success');
+      setAlertVisible(true);
+    } catch (error) {
+      setAlertTitle('Error');
+      setAlertMessage('Failed to update routine');
+      setAlertType('error');
+      setAlertVisible(true);
+    }
   };
 
   const saveHistory = async (history: HistoryItem[]) => {
@@ -134,24 +148,32 @@ export default function TabTwoScreen() {
 
   const renderItem = ({ item }: { item: Task }) => {
     const currentHourString = new Date().getHours().toString().padStart(2, "0");
+    const isCurrentHour = item.time === currentHourString;
+
     return (
-      <View
-        className={`bg-white border border-t-4 border-neutral-500 dark:border-neutral-700
-          ${item.time === currentHourString ? "border-t-green-600 dark:border-t-green-500" : ""}
-          shadow-sm rounded-[32px] dark:bg-neutral-900 mb-5 px-4 py-4 mx-4`}
+      <Pressable 
+        onPress={() => openModal(item)}
+        className={`bg-white dark:bg-neutral-900 border border-l-4 
+          ${isCurrentHour ? "border-l-green-600" : "border-l-neutral-300 dark:border-l-neutral-700"}
+          rounded-xl mx-4 mb-4 shadow-sm overflow-hidden`}
       >
-        <View className="flex flex-row justify-between ">
-          <Text className="text-xs sm:text-sm text-gray-800 dark:text-white">
-            {convertHourTo12HourFormat(item.time)}
+        <View className="p-4">
+          <View className="flex-row justify-between items-center mb-2">
+            <Text className="text-sm text-gray-800 dark:text-gray-200">
+              {convertHourTo12HourFormat(item.time)}
+            </Text>
+            <TabProfileIcon 
+              name="edit" 
+              size={20}
+              color={colorScheme === 'dark' ? '#fff' : '#000'} 
+            />
+          </View>
+          
+          <Text className="text-base text-gray-800 dark:text-white">
+            {item.content}
           </Text>
-          <Pressable onPress={() => openModal(item)}>
-            <TabProfileIcon name="edit" className="dark:text-white" />
-          </Pressable>
         </View>
-        <View className="p-2 md:p-5">
-          <Text className="text-base text-gray-800 dark:text-white">{item.content}</Text>
-        </View>
-      </View>
+      </Pressable>
     );
   };
 
@@ -159,8 +181,8 @@ export default function TabTwoScreen() {
   const secondHalf = dailyTasks.slice(12, 24);
 
   return (
-    <View>
-      <Text className="dark:text-white text-4xl text-center pt-10 pb-2">Daily Tasks</Text>
+    <View className="flex-1 bg-gray-50 dark:bg-black">
+      <Text className="dark:text-white text-4xl text-center pt-10 pb-2">Daily Routines</Text>
       <View className="flex flex-col md:flex-row">
         <View className="flex flex-row justify-center items-center mb-4 md:w-1/4 md:flex-col">
           <Pressable
@@ -205,36 +227,16 @@ export default function TabTwoScreen() {
         </View>
       </View>
 
-      {selectedTask && (
-        <Modal visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
-          <View style={colorScheme === "dark" ? stylesDark.modalContainer : styles.modalContainer}>
-            <Text style={colorScheme === "dark" ? stylesDark.modalTitle : styles.modalTitle}>Edit Task</Text>
-          
-            <TextInput
-              style={[
-                colorScheme === "dark" ? stylesDark.modalInput : styles.modalInput,
-                { height: 100, textAlignVertical: 'top' }, // Ensure textarea-like behavior
-              ]}
-              maxLength={200}
-              multiline
-              value={editedContent}
-              onChangeText={setEditedContent}
-            />
+      <RoutineModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        content={editedContent}
+        setContent={setEditedContent}
+        onSave={saveEditedTask}
+        time={selectedTask?.time || "00"}
+      />
 
-
-            <Pressable onPress={saveEditedTask}
-              className='bg-green-500 py-4  rounded-full w-full'
-            >
-              <Text className='text-center text-xl text-white font-semibold'>Save</Text>
-            </Pressable>
-            <Pressable onPress={() => setModalVisible(false)}>
-              <Text className="text-xl text-center p-2 font-medium dark:text-white">Cancel</Text>
-            </Pressable>
-          </View>
-        </Modal>
-      )}
-        {/* Display Custom Alert */}
-        <CustomAlert
+      <CustomAlert
         visible={alertVisible}
         title={alertTitle}
         message={alertMessage}
@@ -244,47 +246,3 @@ export default function TabTwoScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 20,
-  }
-
-});
-
-const stylesDark = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#000",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#fff",
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: "#444",
-    padding: 10,
-    marginBottom: 20,
-    color: "#fff",
-  },
-
-});

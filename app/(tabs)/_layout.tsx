@@ -35,10 +35,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="tasks"
+        name="routines"
         options={{
-          title: 'Tasks',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="checklist" color={color} />,
+          title: 'Routines',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="lock-clock" color={color} />,
         }}
       />
       <Tabs.Screen

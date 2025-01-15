@@ -10,6 +10,8 @@ const MAPPING = {
   // See MaterialIcons here: https://icons.expo.fyi
   // See SF Symbols in the SF Symbols app on Mac.
   'house.fill': 'home',
+  'sort-by-alpha': 'sort-by-alpha',
+  'sort': 'sort',
   'checklist': 'checklist',
   'podcasts': 'podcasts',
   'forward-30': 'forward-30',
@@ -18,6 +20,7 @@ const MAPPING = {
   'pause': 'pause',
   'wb-sunny': 'wb-sunny',
   'nights-stay': 'nights-stay',
+  'lock-clock': 'lock-clock',
   'create': 'create',
   'add-circle-outline': 'add-circle-outline',
   'paperplane.fill': 'send',

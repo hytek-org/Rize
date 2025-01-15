@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   View,
@@ -12,6 +12,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   BackHandler,
+  ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { TabCreateIcon } from "@/components/navigation/TabBarIcon";
 
@@ -32,7 +34,7 @@ const MyModal: React.FC<MyModalProps> = ({
   onClose,
   input,
   setInput,
-  tag,
+  tag = '',
   setTag,
   editMode = false,  // Default to false if editMode is not passed
   addNote,
@@ -40,6 +42,8 @@ const MyModal: React.FC<MyModalProps> = ({
 }) => {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
+  const [isLoading, setIsLoading] = useState(false);
+  const [fadeAnim] = useState(new Animated.Value(0));
 
   // Handle back button press for Android
   useEffect(() => {
@@ -55,6 +59,27 @@ const MyModal: React.FC<MyModalProps> = ({
     return () => backHandler.remove();
   }, [visible, onClose]);
 
+  const handleSubmit = async () => {
+    if (!input.trim()) {
+      // Only validate input, tag is optional
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (editMode && editNote) {
+        await editNote();
+      } else {
+        await addNote();
+      }
+      onClose();
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Modal
       visible={visible}
@@ -64,16 +89,11 @@ const MyModal: React.FC<MyModalProps> = ({
     >
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+          <Animated.View 
+            className='absolute w-full h-full bg-black/50'
+            style={{ opacity: fadeAnim }}
+          />
 
-          {/* Semi-transparent background */}
-          <TouchableWithoutFeedback onPress={() => { /* Prevent closing modal when clicking inside */ }}>
-            <View
-              className='flex-1 justify-end bg-black opacity-50'
-              style={{ position: 'absolute', width: '100%', height: '100%' }}
-            />
-          </TouchableWithoutFeedback>
-
-          {/* Main Modal Content */}
           <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -83,60 +103,75 @@ const MyModal: React.FC<MyModalProps> = ({
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false} // Hide the scroll indicator for better UX
             >
-              <View
-                className='flex flex-col space-y-4 h-full  justify-center bg-zinc-50 dark:bg-zinc-900 rounded-t-lg p-4'
-                style={{ width: '100%' }}
-              >
-                <Text className="text-4xl ml-4 mt-12 text-zinc-800 font-bold dark:text-zinc-50 mb-4">
-                  {editMode ? "Update Your Note" : "Create a new Note"}
-                </Text>
-                {/* Input for Tag */}
-                <TextInput
-                  className="xl:mt-20 dark:text-white dark:bg-zinc-700 border mx-2 my-2 rounded-lg text-lg xl:text-2xl px-4 focus:border-green-500 focus:ring-2 focus:ring-green-500"
-                  value={tag}
-                  maxLength={15}
-                  onChangeText={setTag}
-                  placeholder="Enter a new Label"
-                  placeholderTextColor={isDarkMode ? "#b2b2b2" : "#7d7d7d"} // More subtle placeholder color
-                  style={{
-                    height: 50, // Uniform height for label input
-                  }}
-                />
-                {/* Input for Note */}
-                <TextInput
-                  className="dark:text-white p-2 dark:bg-zinc-700 border mx-2 my-2 rounded-lg text-lg xl:text-2xl px-4 focus:border-green-500 focus:ring-2 focus:ring-green-500"
-                  value={input}
-                  onChangeText={setInput}
-                  placeholder="Enter a new note"
-                  multiline
-                  placeholderTextColor={isDarkMode ? "#b2b2b2" : "#7d7d7d"}
-                  style={{
-                    minHeight: 100, // Ensures it looks like a textarea
-                    maxHeight: 250, // Prevents overflow
-                    textAlignVertical: "top", // Text starts at the top
-                    padding: 8,
-                  }}
-                />
+              <View className='flex-1 justify-end'>
+                <View className='bg-zinc-50 dark:bg-zinc-900 rounded-t-3xl p-6 space-y-6'>
+                  {/* Drag indicator */}
+                  <View className='w-12 h-1 bg-zinc-200 dark:bg-zinc-700 rounded-full self-center' />
 
+                  <Text className="text-2xl font-bold text-zinc-800 dark:text-zinc-50">
+                    {editMode ? "Update Note" : "New Note"}
+                  </Text>
 
-                {/* Buttons */}
-                <View className='flex flex-col justify-center items-center'>
-                  <TouchableOpacity
-                    className='py-3 px-4 inline-flex flex-row gap-x-4 text-sm font-medium rounded-full items-center border border-zinc-200 bg-white text-zinc-800 shadow-sm hover:bg-zinc-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-800'
-                    onPress={editMode ? editNote : addNote}
-                  >
-                    <Text className='dark:text-white text-lg font-medium'>
-                      {editMode ? "Update Note" : "Add Note"}
+                  <View className='space-y-2'>
+                    <Text className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                      Label ({tag?.length}/15)
                     </Text>
-                    <TabCreateIcon name={"pluscircleo"} size={24} />
-                  </TouchableOpacity>
+                    <TextInput
+                      className="bg-white dark:text-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3"
+                      value={tag}
+                      maxLength={15}
+                      onChangeText={setTag}
+                      placeholder="Enter label"
+                      placeholderTextColor={isDarkMode ? "#666" : "#999"}
+                    />
+                  </View>
 
-                  <TouchableOpacity
-                    className='mt-4 text-xl'
-                    onPress={onClose}
-                  >
-                    <Text className='text-xl text-green-600'>Close</Text>
-                  </TouchableOpacity>
+                  <View className='space-y-2'>
+                    <Text className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                      Note Content
+                    </Text>
+                    <TextInput
+                      className="bg-white dark:text-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl p-4"
+                      value={input}
+                      onChangeText={setInput}
+                      placeholder="What's on your mind?"
+                      multiline
+                      placeholderTextColor={isDarkMode ? "#666" : "#999"}
+                      style={{ minHeight: 120, textAlignVertical: 'top' }}
+                    />
+                  </View>
+
+                  <View className='space-y-4 pt-4'>
+                    <TouchableOpacity
+                      className='bg-green-600 active:bg-green-700 rounded-xl p-4 flex-row justify-center items-center space-x-2'
+                      onPress={handleSubmit}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <ActivityIndicator color="white" />
+                      ) : (
+                        <>
+                          <Text className='text-white font-medium'>
+                            {editMode ? "Update Note" : "Create Note"}
+                          </Text>
+                          <TabCreateIcon 
+                            name={editMode ? "check" : "pluscircleo"} 
+                            size={20} 
+                            color="white" 
+                          />
+                        </>
+                      )}
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      className='p-4'
+                      onPress={onClose}
+                    >
+                      <Text className='text-center text-zinc-600 dark:text-zinc-400'>
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             </ScrollView>
