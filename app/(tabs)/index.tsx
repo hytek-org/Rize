@@ -11,6 +11,7 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import CustomAlert from '@/components/CustomAlert';
 import { ThemedText } from '@/components/ThemedText';
+
 interface Task {
   id: number;
   content: string;
@@ -193,7 +194,7 @@ const HomeScreen = () => {
         )}
       />
 
-      {/* Floating Button */}
+      {/* Floating player Button and note adding floating button */}
       <View className=' '>
         <View className="flex flex-row items-start justify-start  ">
           {isPlaying !== null && isPlaying ? (

@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": ["audio"]
+      }
     },
     "android": {
       "package": "com.hytek.rize",
@@ -18,7 +21,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "permissions": ["RECEIVE_BOOT_COMPLETED", "NOTIFICATIONS"]
+      "permissions": ["RECEIVE_BOOT_COMPLETED", "NOTIFICATIONS", "android.permission.FOREGROUND_SERVICE"]
     },
     "web": {
       "bundler": "metro",
@@ -52,6 +55,12 @@
             "./assets/sound/simple.mp3"
           ],
           "enableBackgroundRemoteNotifications": false
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": false
         }
       ]
     ],

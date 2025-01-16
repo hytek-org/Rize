@@ -12,12 +12,16 @@ type AudioPlayerContextType = {
   loading: boolean;
   currentUrl: string | null;
   playbackStatus: PlaybackStatus;
-  playAudio: (url: string) => Promise<void>;
+  playAudio: (url: string, id: string) => Promise<void>;
   togglePlayPause: () => Promise<void>;
   skipForward: () => Promise<void>;
   skipBackward: () => Promise<void>;
   handleSliderChange: (value: number) => Promise<void>;
-  stopAndUnloadCurrentSound: () => Promise<void>;
+  stopAndUnloadCurrentSound: (force?: boolean) => Promise<void>;
+  currentId: string | null;
+  setCurrentId: (id: string | null) => void;
+  shouldPersist: boolean;
+  setShouldPersist: (persist: boolean) => void;
 };
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined);
@@ -31,6 +35,8 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     positionMillis: 0,
     durationMillis: 1, // Avoid division by 0
   });
+  const [currentId, setCurrentId] = useState<string | null>(null);
+  const [shouldPersist, setShouldPersist] = useState(false);
 
   useEffect(() => {
     const setupAudioMode = async () => {
@@ -47,13 +53,11 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     };
 
     setupAudioMode();
-
-    return () => {
-      stopAndUnloadCurrentSound();
-    };
   }, []);
 
-  const stopAndUnloadCurrentSound = async () => {
+  const stopAndUnloadCurrentSound = async (force: boolean = false) => {
+    if (!force && shouldPersist) return; // Don't stop if persisting
+
     if (sound) {
       try {
         const status = await sound.getStatusAsync();
@@ -69,48 +73,51 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         setSound(null);
         setIsPlaying(false);
         setCurrentUrl(null);
+        setCurrentId(null);
+        setShouldPersist(false);
       }
     }
   };
-  
 
-  const playAudio = async (url: string) => {
+  const playAudio = async (url: string, id: string) => {
     setLoading(true);
-  
+    setShouldPersist(true); // Enable persistence when starting playback
+
     try {
       if (sound) {
         // If there is a currently playing sound, stop and unload it
         await stopAndUnloadCurrentSound();
       }
-  
+
       // Load and play the new audio
       const { sound: newSound } = await Audio.Sound.createAsync({ uri: url });
       setSound(newSound);
       setCurrentUrl(url);
+      setCurrentId(id);
       setIsPlaying(true);
-  
+
       // Attach playback status updates
       newSound.setOnPlaybackStatusUpdate((status) => {
         if (!status.isLoaded) return;
-  
+
         setPlaybackStatus({
           positionMillis: status.positionMillis || 0,
           durationMillis: status.durationMillis || 1, // Avoid 0 for duration
         });
-  
+
         if (status.didJustFinish) {
           stopAndUnloadCurrentSound(); // Auto-stop after playback finishes
         }
       });
-  
+
       await newSound.playAsync();
     } catch (error) {
       console.error('Error playing audio:', error);
+      setShouldPersist(false);
     } finally {
       setLoading(false);
     }
   };
-  
 
   const togglePlayPause = async () => {
     if (!sound) return;
@@ -178,6 +185,10 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         skipBackward,
         handleSliderChange,
         stopAndUnloadCurrentSound,
+        currentId,
+        setCurrentId,
+        shouldPersist,
+        setShouldPersist,
       }}
     >
       {children}

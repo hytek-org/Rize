@@ -67,7 +67,7 @@ export default function ProfileScreen() {
                 colorScheme === "dark"
                   ? stylesDark.infoText
                   : styles.infoText
-              } >Email: {user?.email || 'Not Available'}</ThemedText>
+              } >{user?.email || 'Not Available'}</ThemedText>
               {user?.emailVerified && <TabTaskIcon name="verified-user" size={20} style={
                 styles.verifiedIcon
               } />}
