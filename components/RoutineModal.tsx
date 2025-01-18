@@ -62,6 +62,7 @@ const RoutineModal: React.FC<RoutineModalProps> = ({
                   value={content}
                   onChangeText={setContent}
                   multiline
+                  maxLength={100}
                   placeholder="Enter routine details..."
                   placeholderTextColor={isDarkMode ? "#666" : "#999"}
                   style={{ minHeight: 120, textAlignVertical: 'top' }}

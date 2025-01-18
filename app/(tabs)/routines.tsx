@@ -9,7 +9,7 @@ import RoutineModal from '@/components/RoutineModal';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { globalEmitter } from '@/utils/eventEmitter';
 
-interface Task {
+interface Routine {
   id: number;
   content: string;
   time: string;
@@ -17,17 +17,17 @@ interface Task {
 
 interface HistoryItem {
   date: string;
-  tasks: Task[];
+  routines: Routine[];
 }
 
-const DAILY_TASKS_STORAGE_KEY = "dailyTasks";
+const DAILY_TASKS_STORAGE_KEY = "dailyRoutines";
 const LAST_DATE_KEY = "lastDate";
 
 export default function RoutinesScreen() {
   const { activeTemplateId, loading } = useTemplateContext(); 
-  const [dailyTasks, setDailyTasks] = useState<Task[]>([]);
+  const [dailyTasks, setDailyTasks] = useState<Routine[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Routine | null>(null);
   const [editedContent, setEditedContent] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const colorScheme = useColorScheme();
@@ -40,7 +40,7 @@ export default function RoutinesScreen() {
   // Load daily tasks from AsyncStorage when the app initializes
   useEffect(() => {
     // Listen for template changes
-    const unsubscribe = globalEmitter.on('TEMPLATE_CHANGED', (newTasks: Task[]) => {
+    const unsubscribe = globalEmitter.on('TEMPLATE_CHANGED', (newTasks: Routine[]) => {
       setDailyTasks(newTasks);
     });
 
@@ -86,7 +86,7 @@ export default function RoutinesScreen() {
     saveDailyTasks();
   }, [dailyTasks]);
 
-  const openModal = (task: Task) => {
+  const openModal = (task: Routine) => {
     setSelectedTask(task);
     setEditedContent(task.content);
     setModalVisible(true);
@@ -134,7 +134,7 @@ export default function RoutinesScreen() {
   };
 
   const moveTasksToHistory = async () => {
-    const newHistory = [...history, { date: new Date().toLocaleDateString(), tasks: dailyTasks }];
+    const newHistory = [...history, { date: new Date().toLocaleDateString(), routines: dailyTasks }];
     setHistory(newHistory);
     await saveHistory(newHistory);
   };
@@ -146,7 +146,7 @@ export default function RoutinesScreen() {
     return `${twelveHour} ${period}`;
   };
 
-  const renderItem = ({ item }: { item: Task }) => {
+  const renderItem = ({ item }: { item: Routine }) => {
     const currentHourString = new Date().getHours().toString().padStart(2, "0");
     const isCurrentHour = item.time === currentHourString;
 

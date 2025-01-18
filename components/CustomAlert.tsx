@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, Pressable, Modal, Image } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, Modal, Animated, StatusBar } from 'react-native';
+import { IconSymbol } from './ui/IconSymbol';
 
-// Define the possible alert types
 type AlertType = 'error' | 'success' | 'info' | 'warning';
 
 interface CustomAlertProps {
@@ -9,41 +9,92 @@ interface CustomAlertProps {
   title: string;
   message: string;
   onClose: () => void;
-  type: AlertType; // Alert type can be 'error', 'success', 'info', or 'warning'
+  type: AlertType;
 }
 
 const CustomAlert: React.FC<CustomAlertProps> = ({ visible, title, message, onClose, type }) => {
-  // Define styles based on alert type
-  const getAlertStyles = (type: AlertType) => {
+  const translateY = new Animated.Value(-100); // Changed from 100 to -100
+  const opacity = new Animated.Value(0);
+
+  useEffect(() => {
+    if (visible) {
+      // Show toast from top
+      Animated.parallel([
+        Animated.spring(translateY, {
+          toValue: 0,
+          damping: 15,
+          mass: 1,
+          stiffness: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        })
+      ]).start();
+
+      const timer = setTimeout(() => {
+        hideToast();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [visible]);
+
+  const hideToast = () => {
+    Animated.parallel([
+      Animated.timing(translateY, {
+        toValue: -100, // Changed from 100 to -100
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      })
+    ]).start(() => onClose());
+  };
+
+  const getToastStyles = (type: AlertType) => {
     switch (type) {
       case 'error':
-        return { backgroundColor: 'bg-red-100', textColor: 'text-red-800', icon: require('../assets/images/icon.png') };
+        return { bgColor: 'bg-red-600', icon: 'error' };
       case 'success':
-        return { backgroundColor: 'bg-green-100', textColor: 'text-green-800', icon: require('../assets/images/icon.png') };
+        return { bgColor: 'bg-green-600', icon: 'check-circle' };
       case 'info':
-        return { backgroundColor: 'bg-blue-100', textColor: 'text-blue-800', icon: require('../assets/images/icon.png') };
+        return { bgColor: 'bg-blue-500', icon: 'info' };
       case 'warning':
-        return { backgroundColor: 'bg-yellow-100', textColor: 'text-yellow-800', icon: require('../assets/images/icon.png') };
+        return { bgColor: 'bg-yellow-500', icon: 'warning' };
       default:
-        return { backgroundColor: 'bg-white', textColor: 'text-black', icon: require('../assets/images/icon.png') };
+        return { bgColor: 'bg-zinc-800', icon: 'info' };
     }
   };
 
-  const { backgroundColor, textColor, icon } = getAlertStyles(type);
+  const { bgColor, icon } = getToastStyles(type);
+
+  if (!visible) return null;
 
   return (
-    <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
-      <View className="flex-1 justify-center items-center bg-black/50">
-        <View className={`w-80 p-5 rounded-xl ${backgroundColor} shadow-lg`}>
-          <View className={`w-full p-2 rounded-md flex flex-row items-center justify-center mb-4 ${textColor}`}>
-            {icon && <Image source={icon} className="w-5 h-5 mr-2 rounded-full" />}
-            <Text className={`text-xl font-bold ${textColor}`}>{title}</Text>
+    <Modal transparent visible={visible} animationType="none">
+      <View className="flex-1 items-center pointer-events-none">
+        <StatusBar backgroundColor="rgba(0,0,0,0.3)" />
+        <Animated.View 
+          style={{ 
+            transform: [{ translateY }],
+            opacity,
+          }}
+          className={`${bgColor} px-4 py-3 rounded-lg mx-4 flex-row items-center shadow-lg w-[90%] max-w-md mt-8`}
+        >
+          <IconSymbol  name={icon} size={24} color="white"  />
+          <View className="ml-3 flex-1">
+            <Text className="text-white font-medium">{title}</Text>
+            {message && (
+              <Text className="text-white/90 text-sm mt-1">{message}</Text>
+            )}
           </View>
-          <Text className="text-lg text-gray-800  text-center mb-5">{message}</Text>
-          <Pressable onPress={onClose} className="py-2 px-5 w-32 mx-auto rounded-full bg-green-600 ">
-            <Text className="text-white font-bold text-center text-lg">Close</Text>
-          </Pressable>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

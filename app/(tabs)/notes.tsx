@@ -5,7 +5,7 @@ import MyModal from '@/components/MyModel';
 import FloatingButton from '@/components/FlotingButton';
 import { useNotes } from '@/contexts/NotesContext';
 import CustomAlert from '@/components/CustomAlert';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { AlertState, AlertType, Note } from '@/types/notes';
 
 interface TagOption{
@@ -82,10 +82,14 @@ export default function NotesScreen() {
   }, []);
 
   const renderNoteItem = useCallback(({ item }: { item: Note }) => (
-    <Pressable 
+    <Pressable    onPress={() => router.push({
+      pathname: '/notesdetails/[id]',
+      params: { id: item.id },
+    })}
       className="bg-white dark:bg-neutral-800 rounded-lg mx-2 mb-4 p-4 shadow-sm"
       style={{ elevation: 2 }}
     >
+      
       <View className="flex-row justify-between items-center mb-2">
         <View className="flex-row items-center">
           <TabCreateIcon name="tago" size={16} />
@@ -93,15 +97,11 @@ export default function NotesScreen() {
             {item.tag || 'Default'}
           </Text>
         </View>
-        <Link
-          href={{
-            pathname: '/notesdetails/[id]',
-            params: { id: item.id },
-          }}
-          className="bg-blue-500 px-4 py-2 rounded-lg"
+        <View
+          className="bg-green-500 opacity-75 px-4 py-2 rounded-full"
         >
           <Text className="text-white font-medium">View</Text>
-        </Link>
+        </View>
       </View>
 
       <Text 

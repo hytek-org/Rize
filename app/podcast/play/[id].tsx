@@ -216,7 +216,13 @@ export default function PlayEpisode() {
             <Pressable
               onPress={() => {
                 if (!isPlaying && url !== currentUrl) {
-                  playAudio(url, id as string);
+                  playAudio(
+                    url,
+                    id as string,
+                    imageUrl as string,
+                    episodeDetails?.title || title as string,
+                    feedUrl as string
+                  );
                 } else {
                   togglePlayPause();
                 }

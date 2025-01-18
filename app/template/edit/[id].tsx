@@ -165,7 +165,7 @@ export default function Edit() {
             <View className="mb-4">
                 <TextInput
                     className="text-base overflow-y-auto h-auto text-gray-800 dark:text-white"
-                    maxLength={200}
+                    maxLength={100}
                     value={item.content}
                     multiline
                     onChangeText={(text) => updateTemplateItem(item.id, text, item.time)}

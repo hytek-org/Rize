@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text,  Pressable, ActivityIndicator, useColorScheme } from 'react-native';
+import { StyleSheet, View, Text, Pressable, ActivityIndicator, useColorScheme } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link, useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthProvider';
@@ -11,20 +11,19 @@ import { ThemedText } from '@/components/ThemedText';
 import { TabTaskIcon } from '@/components/navigation/TabBarIcon';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import FloatingLink from '@/components/FlotingLink';
-import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
-import CustomAlert from '@/components/CustomAlert';  
+import CustomAlert from '@/components/CustomAlert';
 
 export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const [loadingLogout, setLoadingLogout] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
-  const { togglePlayPause, skipForward, skipBackward, isPlaying, currentUrl } = useAudioPlayer();
-   // CustomAlert state management
-   const [alertVisible, setAlertVisible] = useState(false);
-   const [alertTitle, setAlertTitle] = useState('');
-   const [alertMessage, setAlertMessage] = useState('');
-   const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
+
+  // CustomAlert state management
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
   const handleLogout = async () => {
     setLoadingLogout(true);
     try {
@@ -113,49 +112,15 @@ export default function ProfileScreen() {
             )}
           </View>
         </View>
-        <View className="flex flex-row items-start justify-start pt-12 mt-16">
-          {isPlaying !== null && isPlaying ? (
-            <View className="flex flex-row gap-2">
-              <Pressable
-                onPress={skipBackward}
-                className="bg-blue-500 text-white py-2 px-4 rounded-full dark:bg-blue-700 dark:text-white"
-              >
-               <IconSymbol size={28} color={'white'}  name="replay-30" />
-              </Pressable>
 
-              <Pressable
-                onPress={togglePlayPause}
-                className="bg-green-500 text-white py-2 px-4 rounded-full dark:bg-green-600 dark:text-white"
-              >
-             
-                <IconSymbol color={'white'} size={28}  name="pause" />
-              </Pressable>
-
-              <Pressable
-                onPress={skipForward}
-                className="bg-blue-500 text-white py-2 px-4 rounded-full dark:bg-blue-700 dark:text-white"
-              >
-                <IconSymbol size={28} color={'white'}  name="forward-30" />
-              </Pressable>
-            </View>
-          ) : isPlaying === false && currentUrl !== null ? (
-            // If audio is not playing and there is a valid URL, show the Play button
-            <Pressable
-              onPress={togglePlayPause}
-              className="bg-green-500 text-white py-2 px-4 rounded-full dark:bg-green-600 dark:text-white"
-            >
-              <IconSymbol size={28} color={'white'} name="play-arrow" />
-            </Pressable>
-          ) : null}
-        </View>
-          {/* Display Custom Alert */}
-      <CustomAlert
-        visible={alertVisible}
-        title={alertTitle}
-        message={alertMessage}
-        onClose={() => setAlertVisible(false)}
-        type={alertType}
-      />
+        {/* Display Custom Alert */}
+        <CustomAlert
+          visible={alertVisible}
+          title={alertTitle}
+          message={alertMessage}
+          onClose={() => setAlertVisible(false)}
+          type={alertType}
+        />
       </ParallaxScrollView>
       <FloatingLink route='/podcast' iconName='podcasts' />
     </>

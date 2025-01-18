@@ -88,7 +88,7 @@ const MyModal: React.FC<MyModalProps> = ({
       onRequestClose={onClose} // Handle Android hardware back press
     >
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+        <View style={{ flex: 1, justifyContent: 'flex-start', }}>
           <Animated.View 
             className='absolute w-full h-full bg-black/50'
             style={{ opacity: fadeAnim }}
@@ -103,17 +103,17 @@ const MyModal: React.FC<MyModalProps> = ({
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false} // Hide the scroll indicator for better UX
             >
-              <View className='flex-1 justify-end'>
-                <View className='bg-zinc-50 dark:bg-zinc-900 rounded-t-3xl p-6 space-y-6'>
+              <View className='flex-1 justify-end '>
+                <View className='bg-zinc-50 dark:bg-zinc-900 rounded-t-3xl p-6 space-y-6 '>
                   {/* Drag indicator */}
                   <View className='w-12 h-1 bg-zinc-200 dark:bg-zinc-700 rounded-full self-center' />
 
-                  <Text className="text-2xl font-bold text-zinc-800 dark:text-zinc-50">
+                  <Text className="text-2xl font-bold text-zinc-800 dark:text-zinc-50 py-4">
                     {editMode ? "Update Note" : "New Note"}
                   </Text>
 
                   <View className='space-y-2'>
-                    <Text className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                    <Text className="text-sm py-1 font-medium text-zinc-600 dark:text-zinc-400">
                       Label ({tag?.length}/15)
                     </Text>
                     <TextInput
@@ -127,7 +127,7 @@ const MyModal: React.FC<MyModalProps> = ({
                   </View>
 
                   <View className='space-y-2'>
-                    <Text className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                    <Text className="text-sm py-1 font-medium text-zinc-600 dark:text-zinc-400">
                       Note Content
                     </Text>
                     <TextInput
@@ -141,7 +141,7 @@ const MyModal: React.FC<MyModalProps> = ({
                     />
                   </View>
 
-                  <View className='space-y-4 pt-4'>
+                  <View className='space-y-4 pt-4 '>
                     <TouchableOpacity
                       className='bg-green-600 active:bg-green-700 rounded-xl p-4 flex-row justify-center items-center space-x-2'
                       onPress={handleSubmit}
@@ -158,6 +158,7 @@ const MyModal: React.FC<MyModalProps> = ({
                             name={editMode ? "check" : "pluscircleo"} 
                             size={20} 
                             color="white" 
+                            className='pl-2'
                           />
                         </>
                       )}

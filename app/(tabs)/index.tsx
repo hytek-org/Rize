@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, TextInput, Text, useColorScheme, FlatList, StyleSheet, Modal, Pressable, ScrollView, SafeAreaView, Image } from 'react-native';
+import { View, Text, useColorScheme, FlatList, Pressable, SafeAreaView, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabProfileIcon } from "@/components/navigation/TabBarIcon";
 import { Link } from 'expo-router';
@@ -12,26 +12,26 @@ import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import CustomAlert from '@/components/CustomAlert';
 import { ThemedText } from '@/components/ThemedText';
 
-interface Task {
+interface Routine {
   id: number;
   content: string;
   time: string;
 }
 
-const TASKS_KEY = "dailyTasks";
+const ROUTINES_KEY = "dailyRoutines";
 
 const HomeScreen = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [latestTasks, setLatestTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Routine[]>([]);
+  const [latestTasks, setLatestTasks] = useState<Routine[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Routine | null>(null);
   const [editedContent, setEditedContent] = useState("");
   const colorScheme = useColorScheme();
   const { notes, addNote } = useNotes();
   const [input, setInput] = useState('');
   const [tag, setTag] = useState('');
   const [modalVisibleNotes, setModalVisibleNotes] = useState(false);
-  const { togglePlayPause, skipForward, skipBackward, isPlaying, currentUrl } = useAudioPlayer();
+  const { togglePlayPause, skipForward, skipBackward, isPlaying, currentUrl, albumArt } = useAudioPlayer();
   const closeModal = () => {
     setModalVisibleNotes(false);
     setInput('');
@@ -63,9 +63,9 @@ const HomeScreen = () => {
   useEffect(() => {
     const fetchLatestTasks = async () => {
       try {
-        const tasksJson = await AsyncStorage.getItem(TASKS_KEY);
+        const tasksJson = await AsyncStorage.getItem(ROUTINES_KEY);
         if (tasksJson) {
-          const tasks: Task[] = JSON.parse(tasksJson);
+          const tasks: Routine[] = JSON.parse(tasksJson);
 
           const currentHour = new Date().getHours();
           const previousHour = (currentHour - 1 + 24) % 24;
@@ -92,33 +92,13 @@ const HomeScreen = () => {
     fetchLatestTasks();
   }, [latestTasks]);
 
-  const openModal = (task: Task) => {
+  const openModal = (task: Routine) => {
     setSelectedTask(task);
     setEditedContent(task.content);
     setModalVisible(true);
   };
 
-  const saveEditedTask = async () => {
-    if (selectedTask) {
-      const updatedTasks = tasks.map(task =>
-        task.id === selectedTask.id ? { ...task, content: editedContent } : task
-      );
-      setTasks(updatedTasks);
-      setLatestTasks(updatedTasks.filter(task => {
-        const taskHour = parseInt(task.time, 10);
-        const currentHour = new Date().getHours();
-        const previousHour = (currentHour - 1 + 24) % 24;
-        const nextHour = (currentHour + 1) % 24;
-        return taskHour === previousHour || taskHour === currentHour || taskHour === nextHour;
-      }));
-      await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
-      setModalVisible(false);
-      setAlertTitle('Success');
-      setAlertMessage('Task updated successfully!');
-      setAlertType('success');
-      setAlertVisible(true);
-    }
-  };
+
 
   const now: Date = new Date();
   const currentHour: number = now.getHours();
@@ -164,8 +144,8 @@ const HomeScreen = () => {
                 {convertHourTo12HourFormat(item.time)}
               </Text>
               {(item.time == currentHourString || item.time == nextHour) && (
-                <Pressable onPress={() => openModal(item)}>
-                  <TabProfileIcon name="edit" className="dark:text-white" />
+                <Pressable >
+                  <TabProfileIcon name="plus-circle" className="dark:text-white" />
                 </Pressable>
               )}
             </View>
@@ -194,54 +174,11 @@ const HomeScreen = () => {
         )}
       />
 
-      {/* Floating player Button and note adding floating button */}
-      <View className=' '>
-        <View className="flex flex-row items-start justify-start  ">
-          {isPlaying !== null && isPlaying ? (
-            <View className="flex flex-row gap-2 pb-10 ml-5">
-              <Pressable
-                onPress={skipBackward}
-                className="bg-blue-500 text-white py-2 px-4 rounded-full dark:bg-blue-700 dark:text-white"
-              >
-                <IconSymbol size={28} color={'white'} name="replay-30" />
-              </Pressable>
 
-              <Pressable
-                onPress={togglePlayPause}
-                className="bg-green-500 text-white py-2 px-4 rounded-full dark:bg-green-600 dark:text-white"
-              >
-
-                <IconSymbol color={'white'} size={28} name="pause" />
-              </Pressable>
-
-              <Pressable
-                onPress={skipForward}
-                className="bg-blue-500 text-white py-2 px-4 rounded-full dark:bg-blue-700 dark:text-white"
-              >
-                <IconSymbol size={28} color={'white'} name="forward-30" />
-              </Pressable>
-            </View>
-          ) : isPlaying === false && currentUrl !== null ? (
-            // If audio is not playing and there is a valid URL, show the Play button
-            <View className='pb-10 ml-5'>
-              <Pressable
-                onPress={togglePlayPause}
-                className="bg-green-500 text-white py-2 px-4 rounded-full dark:bg-green-600 dark:text-white"
-              >
-                <IconSymbol size={28} color={'white'} name="play-arrow" />
-              </Pressable>
-            </View>
-          ) : <Link className='rounded-full p-4 mb-8 ml-4 bg-[#0aaf1d] inline w-16' href={'/podcast'}>
-            <IconSymbol size={28} name="podcasts" color={'white'} />
-          </Link>}
-        </View>
-
-        <FloatingButton
-          iconName='edit'
-          onPress={() => setModalVisibleNotes(true)}
-        />
-      </View>
-
+      <FloatingButton
+        iconName='edit'
+        onPress={() => setModalVisibleNotes(true)}
+      />
 
       {/* Modal for Notes */}
       <MyModal
@@ -254,44 +191,7 @@ const HomeScreen = () => {
         addNote={handleAddNote}
       />
 
-      {/* Modal for Task Editing */}
-      {selectedTask && (
-        <Modal
-          visible={modalVisible}
-          animationType="slide"
-          onRequestClose={() => setModalVisible(false)}
-        >
-          <View
-            style={colorScheme === "dark" ? stylesDark.modalContainer : styles.modalContainer}
-          >
-            <Text
-              style={colorScheme === "dark" ? stylesDark.modalTitle : styles.modalTitle}
-            >
-              Edit Task
-            </Text>
-            <TextInput
-              style={[
-                colorScheme === "dark" ? stylesDark.modalInput : styles.modalInput,
-                { height: 100, textAlignVertical: 'top' }, // Ensure textarea-like behavior
-              ]}
-              maxLength={200}
-              multiline
-              value={editedContent}
-              onChangeText={setEditedContent}
-            />
 
-            <Pressable
-              onPress={saveEditedTask}
-              className='bg-green-500 py-4  rounded-full w-full'
-            >
-              <Text className='text-center text-xl text-white font-semibold'>Save</Text>
-            </Pressable>
-            <Pressable onPress={() => setModalVisible(false)}>
-              <Text className="text-xl text-center p-2 font-medium dark:text-white">Cancel</Text>
-            </Pressable>
-          </View>
-        </Modal>
-      )}
       {/* Display Custom Alert */}
       <CustomAlert
         visible={alertVisible}
@@ -300,63 +200,11 @@ const HomeScreen = () => {
         onClose={() => setAlertVisible(false)}
         type={alertType}
       />
+
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#000',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#fff"
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 20
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 20
-  },
-});
 
-const stylesDark = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#000"
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: "#fff"
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: "#444",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 20,
-    color: "#fff"
-  },
-});
 
 export default HomeScreen;

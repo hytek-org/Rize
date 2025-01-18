@@ -18,6 +18,7 @@ const MAPPING = {
   'replay-30': 'replay-30',
   'play-arrow': 'play-arrow',
   'pause': 'pause',
+  'close': 'close',
   'wb-sunny': 'wb-sunny',
   'nights-stay': 'nights-stay',
   'lock-clock': 'lock-clock',
@@ -28,6 +29,12 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'filter-list': 'filter-list',
   'filter-list-off': 'filter-list-off',
+  
+  // Alert icons
+  'error': 'error',
+  'check-circle': 'check-circle',
+  'info': 'info',
+  'warning': 'warning',
 } as Partial<
   Record<
     import('expo-symbols').SymbolViewProps['name'],
@@ -46,7 +53,6 @@ export function IconSymbol({
   name,
   size = 24,
   color,
-  style,
 }: {
   name: IconSymbolName;
   size?: number;
@@ -54,5 +60,5 @@ export function IconSymbol({
   style?: StyleProp<ViewStyle>;
   weight?: SymbolWeight;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  return <MaterialIcons color={color} size={size} name={MAPPING[name]}    />;
 }

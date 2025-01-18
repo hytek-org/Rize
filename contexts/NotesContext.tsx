@@ -66,8 +66,8 @@ export const NotesProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const addNote = (content: string, tag: string = '') => {
     const newNote: Note = {
       id: Date.now().toString(),
-      contentPreview: content.substring(0, 150),
-      content,
+      contentPreview: content.trim().substring(0, 150),
+      content:content.trim(),
       tag: tag.trim() || 'Untagged',
       date: formatDateToIndian(new Date()),
     };

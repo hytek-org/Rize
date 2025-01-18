@@ -11,8 +11,10 @@ type AudioPlayerContextType = {
   isPlaying: boolean;
   loading: boolean;
   currentUrl: string | null;
+  albumArt: string | null;
+  setAlbumArt: (art: string | null) => void;  // Fixed type definition
   playbackStatus: PlaybackStatus;
-  playAudio: (url: string, id: string) => Promise<void>;
+  playAudio: (url: string, id: string, artUrl?: string, title?: string, feedUrl?: string) => Promise<void>;
   togglePlayPause: () => Promise<void>;
   skipForward: () => Promise<void>;
   skipBackward: () => Promise<void>;
@@ -22,12 +24,19 @@ type AudioPlayerContextType = {
   setCurrentId: (id: string | null) => void;
   shouldPersist: boolean;
   setShouldPersist: (persist: boolean) => void;
+  currentTitle: string | null;
+  setCurrentTitle: (title: string | null) => void;
+  currentFeedUrl: string | null;
+  setCurrentFeedUrl: (url: string | null) => void;
+  currentAudioUrl: string | null;
+  setCurrentAudioUrl: (url: string | null) => void;
 };
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined);
 
 export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
+  const [albumArt, setAlbumArt] = useState<string | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -37,6 +46,9 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   });
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [shouldPersist, setShouldPersist] = useState(false);
+  const [currentTitle, setCurrentTitle] = useState<string | null>(null);
+  const [currentFeedUrl, setCurrentFeedUrl] = useState<string | null>(null);
+  const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const setupAudioMode = async () => {
@@ -74,12 +86,16 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         setIsPlaying(false);
         setCurrentUrl(null);
         setCurrentId(null);
+        setAlbumArt(null);  // Clear album art when stopping
+        setCurrentTitle(null);
+        setCurrentFeedUrl(null);
+        setCurrentAudioUrl(null);
         setShouldPersist(false);
       }
     }
   };
 
-  const playAudio = async (url: string, id: string) => {
+  const playAudio = async (url: string, id: string, artUrl?: string, title?: string, feedUrl?: string) => {
     setLoading(true);
     setShouldPersist(true); // Enable persistence when starting playback
 
@@ -94,6 +110,16 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       setSound(newSound);
       setCurrentUrl(url);
       setCurrentId(id);
+      setCurrentAudioUrl(url);
+      if (artUrl) {
+        setAlbumArt(artUrl);  // Set the album art from passed URL
+      }
+      if (title) {
+        setCurrentTitle(title);
+      }
+      if (feedUrl) {
+        setCurrentFeedUrl(feedUrl);
+      }
       setIsPlaying(true);
 
       // Attach playback status updates
@@ -174,6 +200,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AudioPlayerContext.Provider
       value={{
+        albumArt,
         sound,
         currentUrl,
         isPlaying,
@@ -186,9 +213,16 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         handleSliderChange,
         stopAndUnloadCurrentSound,
         currentId,
+        setAlbumArt,
         setCurrentId,
         shouldPersist,
         setShouldPersist,
+        currentTitle,
+        setCurrentTitle,
+        currentFeedUrl,
+        setCurrentFeedUrl,
+        currentAudioUrl,
+        setCurrentAudioUrl,
       }}
     >
       {children}
