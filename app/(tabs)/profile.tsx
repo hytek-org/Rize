@@ -51,7 +51,7 @@ export default function ProfileScreen() {
           <Ionicons name="person-circle-outline" size={150} style={styles.headerImage} />
         }
       >
-        <View style={styles.container} className='pt-20'>
+        <View style={styles.container} className='pt-20 '>
           {/* Profile Card */}
 
           <View className="bg-white dark:bg-black py-10 rounded-xl items-center shadow-md shadow-black mt-[-10]"

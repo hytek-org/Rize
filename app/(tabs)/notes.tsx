@@ -118,7 +118,7 @@ export default function NotesScreen() {
   ), []);
 
   return (
-    <View className="flex-1 bg-slate-100 dark:bg-neutral-900">
+    <View className="flex-1 bg-slate-100 dark:bg-neutral-900 pb-20">
       <View className="pt-12 px-4">
         <Text className="text-3xl font-bold dark:text-white mb-4">
           My Notes

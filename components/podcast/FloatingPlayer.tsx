@@ -1,11 +1,12 @@
-import { View, Text, Pressable, Image, StyleSheet, Dimensions } from 'react-native'
+import { View, Text, Pressable, Image, StyleSheet, } from 'react-native'
 import React from 'react'
 import { IconSymbol } from '../ui/IconSymbol'
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext'
-import { Link, usePathname, useRouter } from 'expo-router'
+import { usePathname, useRouter } from 'expo-router'
 import { BlurView } from 'expo-blur'
-
+import { useColorScheme } from '@/hooks/useColorScheme';
 export default function FloatingPlayer() {
+    const colorScheme = useColorScheme();
     const {
         isPlaying,
         albumArt,
@@ -23,14 +24,14 @@ export default function FloatingPlayer() {
 
     const pathname = usePathname()
     const router = useRouter()
-    
+
     if (!currentUrl || pathname.includes('/podcast')) return null
 
     const progress = (playbackStatus.positionMillis / playbackStatus.durationMillis) * 100
 
     const handleNavigation = () => {
         if (!currentId) return;
-        
+
         router.push({
             pathname: '/podcast/play/[id]',
             params: {
@@ -44,19 +45,19 @@ export default function FloatingPlayer() {
     };
 
     return (
-        <View className="absolute bottom-12 left-0 right-0">
+        <View className="absolute  bottom-12  left-0 right-0 ">
             {/* Progress Bar */}
-            <View className="h-[2px] bg-zinc-700">
-                <View 
+            <View className="h-[2px] bg-black dark:bg-zinc-700">
+                <View
                     className="h-full bg-green-500"
-                    style={{ width: `${progress}%` }} 
+                    style={{ width: `${progress}%` }}
                 />
             </View>
 
             <BlurView intensity={95} tint="dark" className="overflow-hidden">
-                <View className="flex-row items-center p-2 px-4 bg-black/50">
+                <View className="flex-row items-center  p-2 px-4 bg-white dark:bg-black/50">
                     {/* Left section with album art and title */}
-                    <Pressable 
+                    <Pressable
                         className="flex-row items-center flex-1"
                         onPress={handleNavigation}
                     >
@@ -67,9 +68,9 @@ export default function FloatingPlayer() {
                                 style={styles.albumArt}
                             />
                         )}
-                        <Text 
-                            numberOfLines={1} 
-                            className="text-sm font-medium text-white ml-3 flex-1"
+                        <Text
+                            numberOfLines={1}
+                            className="text-sm dark:text-white font-medium  ml-3 flex-1"
                         >
                             {currentTitle || 'Now Playing'}
                         </Text>
@@ -81,23 +82,28 @@ export default function FloatingPlayer() {
                             <>
                                 <Pressable
                                     onPress={skipBackward}
-                                    className="p-2"
+                                    className="p-2  "
                                 >
-                                    <IconSymbol size={24} color="white" name="replay-30" />
+                                    <IconSymbol
+                                        color={colorScheme === "dark" ? "#f1f1f1" : "#121212"}
+                                        size={24}
+                                        name="replay-30"
+                                    />
+
                                 </Pressable>
 
                                 <Pressable
                                     onPress={togglePlayPause}
                                     className="p-2"
                                 >
-                                    <IconSymbol color="white" size={28} name="pause" />
+                                    <IconSymbol  color={colorScheme === "dark" ? "#f1f1f1" : "#121212"} size={28} name="pause" />
                                 </Pressable>
 
                                 <Pressable
                                     onPress={skipForward}
                                     className="p-2"
                                 >
-                                    <IconSymbol size={24} color="white" name="forward-30" />
+                                    <IconSymbol  color={colorScheme === "dark" ? "#f1f1f1" : "#121212"} size={24} name="forward-30" />
                                 </Pressable>
                             </>
                         ) : (
@@ -106,14 +112,14 @@ export default function FloatingPlayer() {
                                     onPress={togglePlayPause}
                                     className="p-2"
                                 >
-                                    <IconSymbol color="white" size={28} name="play-arrow" />
+                                    <IconSymbol  color={colorScheme === "dark" ? "#f1f1f1" : "#121212"} size={28} name="play-arrow" />
                                 </Pressable>
 
                                 <Pressable
                                     onPress={() => stopAndUnloadCurrentSound(true)}
                                     className="p-2"
                                 >
-                                    <IconSymbol color="white" size={24} name="close" />
+                                    <IconSymbol  color={colorScheme === "dark" ? "#f1f1f1" : "#121212"} size={24} name="close" />
                                 </Pressable>
                             </>
                         )}

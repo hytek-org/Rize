@@ -181,7 +181,7 @@ export default function RoutinesScreen() {
   const secondHalf = dailyTasks.slice(12, 24);
 
   return (
-    <View className="flex-1 bg-gray-50 dark:bg-black">
+    <View className="flex-1  bg-gray-50 dark:bg-black ">
       <Text className="dark:text-white text-4xl text-center pt-10 pb-2">Daily Routines</Text>
       <View className="flex flex-col md:flex-row">
         <View className="flex flex-row justify-center items-center mb-4 md:w-1/4 md:flex-col">
@@ -203,7 +203,7 @@ export default function RoutinesScreen() {
           </Pressable>
         </View>
 
-        <View className="h-screen pb-40 md:w-3/4">
+        <View className=" pb-60 md:w-3/4 ">
           <FlatList
             data={selectedTab === "morning" ? firstHalf : secondHalf}
             keyExtractor={(item) => item.id.toString()}

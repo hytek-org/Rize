@@ -12,7 +12,7 @@ import { NotesProvider } from '@/contexts/NotesContext';
 import { TemplateProvider } from '@/contexts/TemplateContext';
 import { AuthProvider } from '@/contexts/AuthProvider';
 import { AudioPlayerProvider } from '@/contexts/AudioPlayerContext';
-import FloatingPlayer from '@/components/podcast/FloatingPlayer';
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -55,10 +55,10 @@ export default function RootLayout() {
           <NotesProvider>
             <AudioPlayerProvider>
               <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false,  }} />
                 <Stack.Screen name="+not-found" />
               </Stack>
-              <FloatingPlayer />
+    
             </AudioPlayerProvider>
           </NotesProvider>
         </TemplateProvider>

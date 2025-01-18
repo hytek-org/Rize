@@ -114,7 +114,7 @@ const HomeScreen = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView  style={{ flex: 1,  }}>
       <FlatList
         data={latestTasks}
         keyExtractor={(item) => item.id.toString()}
