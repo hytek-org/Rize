@@ -32,13 +32,13 @@ interface Template {
 }
 
 const CreateScreen = () => {
-  const { 
-    templates, 
-    dailyTasks, 
-    activeTemplateId, 
-    addTemplateToDailyTasks, 
+  const {
+    templates,
+    dailyTasks,
+    activeTemplateId,
+    addTemplateToDailyTasks,
     loading,
-    updateRoutine 
+    updateRoutine
   } = useTemplateContext();
   const colorScheme = useColorScheme();
   const [modalVisible, setModalVisible] = useState(false);
@@ -137,8 +137,8 @@ const CreateScreen = () => {
             <Text className="text-xl font-medium text-white">Active</Text>
           </View>
         ) : (
-          <Pressable 
-            disabled={loading || isChanging} 
+          <Pressable
+            disabled={loading || isChanging}
             className={`inline-flex flex-row items-center gap-1 rounded-l-full 
               ${isChanging ? 'opacity-50' : ''} 
               bg-transparent px-3 py-1.5 text-black dark:text-white 
@@ -168,48 +168,60 @@ const CreateScreen = () => {
       <ParallaxScrollView
         headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
         headerImage={
-          <Image
-            source={require("../../assets/images/createHeader.png")}
-            className="w-[400px] sm:w-auto h-full mx-auto"
-          />
-        }
-      >
-        <View>
-          <View className="flex flex-col space-y-10 lg:grid lg:grid-cols-2 lg:gap-2 lg:space-y-0">
-            {/* Private Templates */}
-            <View>
-              <ThemedText type="title">My Templates</ThemedText>
-              <ScrollView>
-                <View className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-4">
-                  {templates.filter(template => !template.public).length === 0 ? (
-                    <View className="h-36 sm:h-56 flex flex-col justify-center border border-gray-200 rounded-xl text-center p-4 md:p-5 dark:border-neutral-700">
-                      <View className="flex justify-center items-center size-12 bg-gradient-to-br from-blue-600 to-violet-600 rounded-lg mx-auto">
-                        <TabTaskIcon name="now-widgets" size={42} />
-                      </View>
-                      <View className="mt-3">
-                        <Text className="text-sm sm:text-lg text-center font-semibold text-gray-800 dark:text-neutral-200">
-                          No Template Found
-                        </Text>
-                      </View>
-                    </View>
-                  ) : (
-                    templates.filter(template => !template.public).map(renderTemplate)
-                  )}
-                </View>
-              </ScrollView>
-            </View>
+          <View className="relative w-full h-full">
+            <Image
+              source={require("../../assets/images/createHeader.png")}
+              className="w-[400px] sm:w-auto h-full mx-auto object-cover"
+            />
+            {/* Overlay Text */}
+            <View className="absolute inset-0 flex items-center justify-center bg-black/40 dark:bg-black/50 px-8 py-12">
+              <Text className="text-4xl font-bold text-white text-center leading-tight">
+                Manage Your Routines
+              </Text>
+              <Text className="text-base max-w-sm pt-5 font-semibold text-white text-center">
+                Create, track, and optimize your daily routines to boost productivity and achieve your goals.
+              </Text>
 
-            {/* Public Templates */}
-            <View className="py-10">
-              <ThemedText type="title">Public Templates</ThemedText>
-              <ScrollView>
-                <View className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-4">
-                  {templates.filter(template => template.public).map(renderTemplate)}
-                </View>
-              </ScrollView>
             </View>
           </View>
+        }
+      >
+
+        <View className="flex flex-col space-y-10 lg:grid lg:grid-cols-2 lg:gap-2 lg:space-y-0  ">
+          {/* Private Templates */}
+          <View>
+            <ThemedText type="subtitle">My Templates</ThemedText>
+            <ScrollView>
+              <View className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-4">
+                {templates.filter(template => !template.public).length === 0 ? (
+                  <View className="h-36 sm:h-56 flex flex-col justify-center border border-gray-200 rounded-xl text-center p-4 md:p-5 dark:border-neutral-700">
+                    <View className="flex justify-center items-center size-12 bg-gradient-to-br from-blue-600 to-violet-600 rounded-lg mx-auto">
+                      <TabTaskIcon name="now-widgets" size={42} />
+                    </View>
+                    <View className="mt-3">
+                      <Text className="text-sm sm:text-lg text-center font-semibold text-gray-800 dark:text-neutral-200">
+                        No Template Found
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  templates.filter(template => !template.public).map(renderTemplate)
+                )}
+              </View>
+            </ScrollView>
+          </View>
+
+          {/* Public Templates */}
+          <View className="py-10">
+            <ThemedText type="subtitle">Public Templates</ThemedText>
+            <ScrollView>
+              <View className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-4">
+                {templates.filter(template => template.public).map(renderTemplate)}
+              </View>
+            </ScrollView>
+          </View>
         </View>
+
         <NotificationScheduler
           visible={modalVisible}
           onClose={() => setModalVisible(false)}

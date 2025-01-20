@@ -214,11 +214,11 @@ export default function RoutinesScreen() {
                   source={require("../../assets/images/icon.png")}
                   className="rounded-xl w-52 h-56 mb-10"
                 />
-                <ThemedText type="title" >No Template </ThemedText>
-                <ThemedText type="subtitle">Select a template to continue</ThemedText>
+                <ThemedText type="title" >No Routine </ThemedText>
+                <ThemedText type="subtitle">Select a routine to continue</ThemedText>
                 <Link href={'/(tabs)/create'} className="py-6">
                   <View className="py-3 px-4 bg-green-600 rounded-full flex items-center">
-                    <Text className="text-white text-lg font-medium">Select Template</Text>
+                    <Text className="text-white text-lg font-medium">Select Routine Template</Text>
                   </View>
                 </Link>
               </View>

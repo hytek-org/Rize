@@ -5,6 +5,7 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import parseHTMLContent from '@/utils/parseHtml';
 import * as FileSystem from 'expo-file-system';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface RSSEpisode {
   title: string;
@@ -125,29 +126,54 @@ export default function PodcastDetail() {
     await stopAndUnloadCurrentSound(true);
   };
 
+  const EpisodeSkeleton = () => (
+    <View className="mb-4 bg-white dark:bg-zinc-800 rounded-2xl p-4 shadow-sm">
+      <View className="flex-row gap-4">
+        <Skeleton width={80} height={80} className="rounded-lg" />
+        <View className="flex-1 justify-center">
+          <Skeleton height={20} className="mb-2" />
+          <Skeleton height={16} width="40%" />
+        </View>
+      </View>
+      <Skeleton height={32} className="mt-3" />
+      <Skeleton height={40} className="mt-3 rounded-xl" />
+    </View>
+  );
+
+  const HeaderSkeleton = () => (
+    <View className="w-full">
+      <Skeleton height={224} className="rounded-none" />
+      <View className="absolute bottom-0 w-full h-20 bg-gradient-to-t from-zinc-900/60 to-transparent" />
+    </View>
+  );
+
   return (
     <View className="flex-1 bg-zinc-100 dark:bg-zinc-900">
       {/* Header Image Section */}
-      {podcastImage && (
-        <View className="w-full h-56 bg-zinc-200 dark:bg-zinc-800">
-          <Image
-            source={{ 
-              uri: podcastImage,
-              headers: {
-                'Accept': 'image/jpeg,image/png,image/*',
-                'User-Agent': 'Mozilla/5.0',
-              }
-            }}
-            className="w-full h-full"
-            resizeMode="contain"
-            onError={(e) => {
-              console.log('Error loading podcast image:', e.nativeEvent.error);
-              setPodcastImage(null);
-            }}
-          />
-          {/* Dark Overlay */}
-          <View className="absolute bottom-0 w-full h-20 bg-gradient-to-t from-zinc-900/60 to-transparent" />
-        </View>
+      {loading ? (
+        <HeaderSkeleton />
+      ) : (
+        podcastImage && (
+          <View className="w-full h-56 bg-zinc-200 dark:bg-zinc-800">
+            <Image
+              source={{ 
+                uri: podcastImage,
+                headers: {
+                  'Accept': 'image/jpeg,image/png,image/*',
+                  'User-Agent': 'Mozilla/5.0',
+                }
+              }}
+              className="w-full h-full"
+              resizeMode="contain"
+              onError={(e) => {
+                console.log('Error loading podcast image:', e.nativeEvent.error);
+                setPodcastImage(null);
+              }}
+            />
+            {/* Dark Overlay */}
+            <View className="absolute bottom-0 w-full h-20 bg-gradient-to-t from-zinc-900/60 to-transparent" />
+          </View>
+        )
       )}
 
       {/* Episodes List */}
@@ -157,7 +183,12 @@ export default function PodcastDetail() {
         </Text>
 
         {loading ? (
-          <ActivityIndicator size="large" className="mt-10" color="#22c55e" />
+          <View className="px-4 pt-4">
+            <EpisodeSkeleton />
+            <EpisodeSkeleton />
+            <EpisodeSkeleton />
+            <EpisodeSkeleton />
+          </View>
         ) : (
           <FlatList
             data={episodes}
@@ -229,6 +260,13 @@ export default function PodcastDetail() {
                     </Text>
                   </Link>
                 )}
+              </View>
+            )}
+            ListEmptyComponent={() => (
+              <View className="flex-1 items-center justify-center py-10">
+                <Text className="text-zinc-500 dark:text-zinc-400 text-center">
+                  No episodes found
+                </Text>
               </View>
             )}
           />

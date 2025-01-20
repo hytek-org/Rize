@@ -11,8 +11,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Parser from 'react-native-rss-parser';
 import { Link } from 'expo-router';
 import parseHTMLContent from '@/utils/parseHtml';
-import CustomAlert from '@/components/CustomAlert';  
+import CustomAlert from '@/components/CustomAlert';
+import { Skeleton } from '@/components/ui/Skeleton';
+
+// Add this helper function at the top of the file
+const generateUniqueId = (url: string): string => {
+  let hash = 0;
+  for (let i = 0; i < url.length; i++) {
+    const char = url.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return `feed-${hash}-${Date.now()}`;
+};
+
 interface Rss {
+  id: string; // Changed to string type
   title: string;
   description?: string;
   language?: string;
@@ -26,11 +40,11 @@ export default function Index() {
   const [inputUrl, setInputUrl] = useState<string>('');
   const [rssFeeds, setRssFeeds] = useState<Rss[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
- // CustomAlert state management
- const [alertVisible, setAlertVisible] = useState(false);
- const [alertTitle, setAlertTitle] = useState('');
- const [alertMessage, setAlertMessage] = useState('');
- const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
+  // CustomAlert state management
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
   const defaultFeeds = [
     {
       url: 'https://feeds.buzzsprout.com/1882267.rss',
@@ -88,7 +102,11 @@ export default function Index() {
       const rssText = await response.text();
       const feed = await Parser.parse(rssText);
 
+      // Generate a unique ID using the helper function
+      const uniqueId = generateUniqueId(url);
+
       return {
+        id: uniqueId,
         title: feed.title || 'No Title',
         description: feed.description || 'No Description',
         language: feed.language || 'Unknown',
@@ -129,6 +147,15 @@ export default function Index() {
     saveFeedsToStorage(updatedFeeds);
   };
 
+  const PodcastSkeleton = () => (
+    <View className="mb-5 p-5 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800">
+      <Skeleton height={24} className="mb-2" />
+      <Skeleton height={60} className="mb-2" />
+      <Skeleton height={16} width="50%" className="mb-1" />
+      <Skeleton height={16} width="40%" />
+    </View>
+  );
+
   return (
     <View className="flex-1 px-5 py-5 dark:bg-zinc-900 bg-zinc-100">
       <Text className="text-2xl mt-10 mb-5 text-center font-bold text-zinc-800 dark:text-zinc-200">
@@ -151,52 +178,58 @@ export default function Index() {
         </Pressable>
       </View>
 
-      {loading && <ActivityIndicator size="large" color="#0000ff" />}
-
-      <FlatList
-        data={rssFeeds}
-        keyExtractor={(item) => item.url}
-        renderItem={({ item }) => (
-          <View className="mb-5 p-5 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800">
-            <View>
-              <Text selectable={true} className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                {item.title}
-              </Text>
-              <Text selectable={true} className="text-sm text-zinc-700 dark:text-zinc-400">
-                {parseHTMLContent(item.description || '')}
-              </Text>
-              <Text className="text-xs text-zinc-600 dark:text-zinc-500">
-                Language: {item.language}
-              </Text>
-              <Text className="text-xs text-zinc-600 dark:text-zinc-500">
-                Last Updated: {item.lastBuildDate}
-              </Text>
-            </View>
-            <View className="flex-row justify-between mt-4">
-              <Link
-                href={{
-                  pathname: '/podcast/view/[id]',
-                  params: { url: encodeURIComponent(item.url) },
-                }}
-              >
-                <Text className="text-blue-600 dark:text-blue-400">
-                  View Episodes
+      {loading ? (
+        <>
+          <PodcastSkeleton />
+          <PodcastSkeleton />
+          <PodcastSkeleton />
+        </>
+      ) : (
+        <FlatList
+          data={rssFeeds}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View className="mb-5 p-5 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800">
+              <View>
+                <Text selectable={true} className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                  {item.title}
                 </Text>
-              </Link>
-              {!item.isDefault && (
-                <Pressable
-                  onPress={() => removeRssFeed(item.url)}
-                  className="bg-red-500 py-2 px-4 rounded-md"
+                <Text selectable={true} className="text-sm text-zinc-700 dark:text-zinc-400">
+                  {parseHTMLContent(item.description || '')}
+                </Text>
+                <Text className="text-xs text-zinc-600 dark:text-zinc-500">
+                  Language: {item.language}
+                </Text>
+                <Text className="text-xs text-zinc-600 dark:text-zinc-500">
+                  Last Updated: {item.lastBuildDate}
+                </Text>
+              </View>
+              <View className="flex-row justify-between mt-4">
+                <Link
+                  href={{
+                    pathname: '/podcast/view/[id]',
+                    params: { id: item.id, url: encodeURIComponent(item.url) },
+                  }}
                 >
-                  <Text className="text-white">Remove</Text>
-                </Pressable>
-              )}
+                  <Text className="text-blue-600 dark:text-blue-400">
+                    View Episodes
+                  </Text>
+                </Link>
+                {!item.isDefault && (
+                  <Pressable
+                    onPress={() => removeRssFeed(item.url)}
+                    className="bg-red-500 py-2 px-4 rounded-md"
+                  >
+                    <Text className="text-white">Remove</Text>
+                  </Pressable>
+                )}
+              </View>
             </View>
-          </View>
-        )}
-      />
-       {/* Display Custom Alert */}
-       <CustomAlert
+          )}
+        />
+      )}
+      {/* Display Custom Alert */}
+      <CustomAlert
         visible={alertVisible}
         title={alertTitle}
         message={alertMessage}

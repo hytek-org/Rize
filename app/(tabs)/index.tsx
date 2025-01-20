@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, useColorScheme, FlatList, Pressable, SafeAreaView, Image } from 'react-native';
+import { View, Text, FlatList, Pressable, SafeAreaView, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabProfileIcon } from "@/components/navigation/TabBarIcon";
-import { Link } from 'expo-router';
 import TimeBlock from '@/components/TimeBlock';
 import MyModal from '@/components/MyModel';
 import FloatingButton from '@/components/FlotingButton';
 import { useNotes } from '@/contexts/NotesContext';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
 import CustomAlert from '@/components/CustomAlert';
 import { ThemedText } from '@/components/ThemedText';
+import { Link } from 'expo-router';
 
 interface Routine {
   id: number;
@@ -23,15 +21,10 @@ const ROUTINES_KEY = "dailyRoutines";
 const HomeScreen = () => {
   const [tasks, setTasks] = useState<Routine[]>([]);
   const [latestTasks, setLatestTasks] = useState<Routine[]>([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Routine | null>(null);
-  const [editedContent, setEditedContent] = useState("");
-  const colorScheme = useColorScheme();
   const { notes, addNote } = useNotes();
   const [input, setInput] = useState('');
   const [tag, setTag] = useState('');
   const [modalVisibleNotes, setModalVisibleNotes] = useState(false);
-  const { togglePlayPause, skipForward, skipBackward, isPlaying, currentUrl, albumArt } = useAudioPlayer();
   const closeModal = () => {
     setModalVisibleNotes(false);
     setInput('');
@@ -92,12 +85,6 @@ const HomeScreen = () => {
     fetchLatestTasks();
   }, [latestTasks]);
 
-  const openModal = (task: Routine) => {
-    setSelectedTask(task);
-    setEditedContent(task.content);
-    setModalVisible(true);
-  };
-
 
 
   const now: Date = new Date();
@@ -114,7 +101,7 @@ const HomeScreen = () => {
   }
 
   return (
-    <SafeAreaView  style={{ flex: 1,  }}>
+    <SafeAreaView style={{ flex: 1, }}>
       <FlatList
         data={latestTasks}
         keyExtractor={(item) => item.id.toString()}
@@ -159,19 +146,19 @@ const HomeScreen = () => {
             </View>
           </View>
         )}
-        ListEmptyComponent={() => (
+        ListEmptyComponent={
           <View className="flex flex-col items-center justify-between  pt-32">
             <Image
               source={require("../../assets/images/icon.png")}
               className="rounded-xl w-32 h-32 mb-10"
             />
-            <ThemedText type="title" >No Template </ThemedText>
-            <ThemedText type="subtitle">Select a template to continue</ThemedText>
-            <Link href={'/(tabs)/create'} className="py-3 mt-2  px-4 bg-green-600 mx-auto rounded-full ">
-              <Text className="text-white text-lg font-medium">Select Template</Text>
+            <ThemedText type="title" >No Routine </ThemedText>
+            <ThemedText type="subtitle">Select a routine to continue</ThemedText>
+           <Link href={'/(tabs)/create'} className="py-3  mt-2  px-4 bg-green-600 mx-auto rounded-full ">
+              <Text className="text-white text-lg font-medium">Select Routine Template</Text>
             </Link>
           </View>
-        )}
+        }
       />
 
 
