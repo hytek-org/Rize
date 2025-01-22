@@ -3,10 +3,17 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 import { globalEmitter } from '@/utils/eventEmitter';
 
+interface SubTask {
+  id: string;
+  content: string;
+  completed: boolean;
+}
+
 interface TemplateItem {
   id: number;
   content: string;
   time: string;
+  subtasks?: SubTask[];
 }
 
 interface Template {
@@ -27,9 +34,12 @@ interface TemplateContextProps {
   addTemplateToDailyTasks: (template: Template) => void;
   setTemplates: React.Dispatch<React.SetStateAction<Template[]>>;
   deleteTemplate: (templateId: number) => void;
-  editTemplate: (updatedTemplate: Template) => void; // New function to edit the template
+  editTemplate: (updatedTemplate: Template) => void;
   updateRoutine: (taskId: number, content: string) => Promise<void>;
   getCurrentTemplate: () => Template | null;
+  updateSubtask: (taskId: number, subtaskId: string, completed: boolean) => Promise<void>;
+  addSubtask: (taskId: number, content: string) => Promise<void>;
+  removeSubtask: (taskId: number, subtaskId: string) => Promise<void>;
 }
 
 const TemplateContext = createContext<TemplateContextProps | undefined>(undefined);
@@ -45,31 +55,49 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const loadTemplates = async () => {
+    const loadTemplatesAndTasks = async () => {
       try {
-        const storedTemplates = await AsyncStorage.getItem(STORAGE_KEY);
-        const storedDailyTasksId = await AsyncStorage.getItem(TASKS_KEY_ID);
+        const [storedTemplates, storedTasks, storedTasksId] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEY),
+          AsyncStorage.getItem(TASKS_KEY),
+          AsyncStorage.getItem(TASKS_KEY_ID),
+        ]);
         
         if (storedTemplates) {
           setTemplates(JSON.parse(storedTemplates));
         }
-        if (storedDailyTasksId) {
-          setActiveTemplateId(Number(storedDailyTasksId));
+        if (storedTasks) {
+          setDailyTasks(JSON.parse(storedTasks));
+        }
+        if (storedTasksId) {
+          setActiveTemplateId(Number(storedTasksId));
         }
       } catch (error) {
-        console.error("Failed to load templates from local storage", error);
-        Alert.alert("Error", "Failed to load templates");
+        console.error("Failed to load data from storage", error);
       }
     };
-    loadTemplates();
+
+    loadTemplatesAndTasks();
   }, []);
+
+  useEffect(() => {
+    const saveDailyTasks = async () => {
+      try {
+        await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(dailyTasks));
+      } catch (error) {
+        console.error("Failed to save daily tasks", error);
+      }
+    };
+
+    if (dailyTasks.length > 0) {
+      saveDailyTasks();
+    }
+  }, [dailyTasks]);
 
   const addTemplate = async (newTemplate: Template) => {
     try {
-      // Update the local state first for an instant UI update
       setTemplates((prevTemplates) => {
         const updatedTemplates = [...prevTemplates, newTemplate];
-        // Save updated templates to AsyncStorage
         AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedTemplates));
         return updatedTemplates;
       });
@@ -87,10 +115,8 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
         throw new Error("Invalid template data.");
       }
 
-      // Clear existing tasks first
       await AsyncStorage.removeItem(TASKS_KEY);
       
-      // Set new tasks and template ID
       setDailyTasks(template.items);
       setActiveTemplateId(template.id);
 
@@ -99,7 +125,6 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
         AsyncStorage.setItem(TASKS_KEY_ID, JSON.stringify(template.id)),
       ]);
 
-      // Emit event using our custom event emitter
       globalEmitter.emit('TEMPLATE_CHANGED', template.items);
       Alert.alert("Success", "Template added to daily tasks successfully");
       
@@ -117,14 +142,12 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
     const templateToDelete = templates.find(template => template.id === templateId);
   
     if (templateToDelete?.public) {
-      // If the template is public, show an alert and do not proceed with deletion
       Alert.alert("Error", "Deleting public templates is not allowed.");
-      return; // Exit the function
+      return;
     }
   
-    // If the template is not public, proceed with deletion
     const filteredTemplates = templates.filter(template => template.id !== templateId);
-    setTemplates(filteredTemplates); // Update the state
+    setTemplates(filteredTemplates);
   
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filteredTemplates));
@@ -135,23 +158,19 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
     }
   };
 
-  // New editTemplate function
   const editTemplate = async (updatedTemplate: Template) => {
     try {
-      // Make sure the template has a valid id
       if (!updatedTemplate.id) {
         Alert.alert("Error", "Template ID is missing");
         return;
       }
 
-      // Update the template in the state
       const updatedTemplates = templates.map((template) =>
         template.id === updatedTemplate.id ? updatedTemplate : template
       );
 
-      setTemplates(updatedTemplates); // Update the state
+      setTemplates(updatedTemplates);
 
-      // Save the updated templates to AsyncStorage
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedTemplates));
       Alert.alert("Success", "Template updated successfully");
 
@@ -180,6 +199,75 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
     return templates.find(template => template.id === activeTemplateId) || null;
   };
 
+  const updateSubtask = async (taskId: number, subtaskId: string, completed: boolean) => {
+    try {
+      const updatedTasks = dailyTasks.map(task => {
+        if (task.id === taskId && task.subtasks) {
+          return {
+            ...task,
+            subtasks: task.subtasks.map(subtask => 
+              subtask.id === subtaskId ? { ...subtask, completed } : subtask
+            )
+          };
+        }
+        return task;
+      });
+
+      setDailyTasks(updatedTasks);
+      await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
+      globalEmitter.emit('TASKS_UPDATED', updatedTasks);
+    } catch (error) {
+      console.error("Failed to update subtask", error);
+      throw error;
+    }
+  };
+
+  const addSubtask = async (taskId: number, content: string) => {
+    try {
+      const updatedTasks = dailyTasks.map(task => {
+        if (task.id === taskId) {
+          const newSubtask: SubTask = {
+            id: `subtask-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            content,
+            completed: false
+          };
+          return {
+            ...task,
+            subtasks: [...(task.subtasks || []), newSubtask]
+          };
+        }
+        return task;
+      });
+
+      setDailyTasks(updatedTasks);
+      await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
+      globalEmitter.emit('TASKS_UPDATED', updatedTasks);
+    } catch (error) {
+      console.error("Failed to add subtask", error);
+      throw error;
+    }
+  };
+
+  const removeSubtask = async (taskId: number, subtaskId: string) => {
+    try {
+      const updatedTasks = dailyTasks.map(task => {
+        if (task.id === taskId && task.subtasks) {
+          return {
+            ...task,
+            subtasks: task.subtasks.filter(subtask => subtask.id !== subtaskId)
+          };
+        }
+        return task;
+      });
+
+      setDailyTasks(updatedTasks);
+      await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
+    } catch (error) {
+      console.error("Failed to remove subtask", error);
+      throw error;
+    }
+  };
+
   return (
     <TemplateContext.Provider
       value={{
@@ -192,9 +280,12 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
         addTemplateToDailyTasks,
         setTemplates,
         deleteTemplate,
-        editTemplate, // Expose the editTemplate function
+        editTemplate,
         updateRoutine,
         getCurrentTemplate,
+        updateSubtask,
+        addSubtask,
+        removeSubtask,
       }}
     >
       {children}

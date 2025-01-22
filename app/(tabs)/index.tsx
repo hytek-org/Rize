@@ -3,10 +3,6 @@ import { View, Text, FlatList, Pressable, SafeAreaView, Image } from 'react-nati
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TabProfileIcon } from "@/components/navigation/TabBarIcon";
 import TimeBlock from '@/components/TimeBlock';
-import MyModal from '@/components/MyModel';
-import FloatingButton from '@/components/FlotingButton';
-import { useNotes } from '@/contexts/NotesContext';
-import CustomAlert from '@/components/CustomAlert';
 import { ThemedText } from '@/components/ThemedText';
 import { Link } from 'expo-router';
 

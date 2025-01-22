@@ -23,6 +23,7 @@ const MAPPING = {
   'nights-stay': 'nights-stay',
   'lock-clock': 'lock-clock',
   'add-task': 'add-task',
+  'task-alt': 'task-alt',
   'note-add': 'note-add',
   'create': 'create',
   'add-circle-outline': 'add-circle-outline',
@@ -31,6 +32,9 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'filter-list': 'filter-list',
   'filter-list-off': 'filter-list-off',
+  'circle': 'circle',
+  'remove-circle-outline': 'remove-circle-outline',
+
   
   // Alert icons
   'error': 'error',
