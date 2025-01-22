@@ -21,37 +21,8 @@ const ROUTINES_KEY = "dailyRoutines";
 const HomeScreen = () => {
   const [tasks, setTasks] = useState<Routine[]>([]);
   const [latestTasks, setLatestTasks] = useState<Routine[]>([]);
-  const { notes, addNote } = useNotes();
-  const [input, setInput] = useState('');
-  const [tag, setTag] = useState('');
-  const [modalVisibleNotes, setModalVisibleNotes] = useState(false);
-  const closeModal = () => {
-    setModalVisibleNotes(false);
-    setInput('');
-    setTag('');
-  };
-  // CustomAlert state management
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertTitle, setAlertTitle] = useState('');
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
 
-  const handleAddNote = () => {
-    if (!input.trim()) {
-      setAlertTitle('Error');
-      setAlertMessage('Note cannot be empty.');
-      setAlertType('error');
-      setAlertVisible(true);
-      return;
-    }
-    addNote(input, tag);
-    setInput('');
-    setModalVisibleNotes(false);
-    setAlertTitle('Success');
-    setAlertMessage('Note added successfully!');
-    setAlertType('success');
-    setAlertVisible(true);
-  };
+
 
   useEffect(() => {
     const fetchLatestTasks = async () => {
@@ -162,31 +133,7 @@ const HomeScreen = () => {
       />
 
 
-      <FloatingButton
-        iconName='edit'
-        onPress={() => setModalVisibleNotes(true)}
-      />
-
-      {/* Modal for Notes */}
-      <MyModal
-        visible={modalVisibleNotes}
-        onClose={closeModal}
-        input={input}
-        setInput={setInput}
-        tag={tag}
-        setTag={setTag}
-        addNote={handleAddNote}
-      />
-
-
-      {/* Display Custom Alert */}
-      <CustomAlert
-        visible={alertVisible}
-        title={alertTitle}
-        message={alertMessage}
-        onClose={() => setAlertVisible(false)}
-        type={alertType}
-      />
+      
 
     </SafeAreaView>
   );

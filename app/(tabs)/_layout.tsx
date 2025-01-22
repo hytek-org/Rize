@@ -1,5 +1,5 @@
 import { router, Tabs, } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Platform } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
@@ -9,49 +9,50 @@ import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { TabBarIcon, TabCreateIcon, TabProfileIcon } from '@/components/navigation/TabBarIcon';
 import FloatingPlayer from '@/components/podcast/FloatingPlayer';
+import CustomAlert from '@/components/CustomAlert';
+import { DrawerMenu } from '@/components/navigation/DrawerMenu';
+import { NoteModal } from '@/components/notes/NoteModal';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [modalVisibleNotes, setModalVisibleNotes] = useState(false);
+  const [alertState, setAlertState] = useState({
+    visible: false,
+    title: '',
+    message: '',
+    type: 'error' as const
+  });
 
-  const CreateDrawer = () => (
-    <View className="absolute  w-full bottom-0 bg-white rounded-t-[4rem] shadow-lg px-4 pt-4">
-      <View className='flex flex-row flex-wrap justify-center items-center'>
-        <Pressable
-          className="flex flex-col items-center px-4 py-3 space-x-3"
-          onPress={() => { router.push('/(tabs)/create'); setIsDrawerOpen(false); }}
-        >
-          <IconSymbol name="close" size={24} color={Colors[colorScheme ?? 'light'].text} />
-          <Text className="text-base font-medium text-zinc-900 dark:text-zinc-100">New Template</Text>
-        </Pressable>
+  const handleNoteSuccess = () => {
+    setAlertState({
+      visible: true,
+      title: 'Success',
+      message: 'Note added successfully!',
+      type: 'success'
+    });
+  };
 
-        <Pressable
-          className="flex flex-col items-center px-4 py-3 space-x-3"
-          onPress={() => { router.push('/(tabs)/create'); setIsDrawerOpen(false); }}
-        >
-          <IconSymbol name="close" size={24} color={Colors[colorScheme ?? 'light'].text} />
-          <Text className="text-base font-medium text-zinc-900 dark:text-zinc-100">Quick Task</Text>
-        </Pressable>
+  const handleNoteError = (message: string) => {
+    setAlertState({
+      visible: true,
+      title: 'Error',
+      message,
+      type: 'error'
+    });
+  };
 
-        <Pressable
-          className="flex flex-col items-center px-4 py-3 space-x-3"
-          onPress={() => { router.push('/(tabs)/create'); setIsDrawerOpen(false); }}
-        >
-          <IconSymbol name="close" size={24} color={Colors[colorScheme ?? 'light'].text} />
-          <Text className="text-base font-medium text-zinc-900 dark:text-zinc-100">New Note</Text>
-        </Pressable>
-      </View>
+  const handleOpenDrawer = useCallback(() => {
+    setIsDrawerOpen(true);
+  }, []);
 
-      <Pressable className='mx-auto' onPress={() => setIsDrawerOpen(!isDrawerOpen)}>
-        <IconSymbol
-          size={40}
-          name={isDrawerOpen ? "close" : "add-circle-outline"}
+  const handleCloseDrawer = useCallback(() => {
+    setIsDrawerOpen(false);
+  }, []);
 
-        />
-      </Pressable>
-    </View >
-  );
-
+  const handleOpenNoteModal = useCallback(() => {
+    setModalVisibleNotes(true);
+  }, []);
   return (
     <>
       <Tabs
@@ -87,20 +88,17 @@ export default function TabLayout() {
           options={{
             title: '',
             tabBarIcon: ({ color }) => (
-              <Pressable onPress={() => setIsDrawerOpen(!isDrawerOpen)}>
-                <IconSymbol
-                  size={30}
-                  name={isDrawerOpen ? "close" : "add-circle-outline"}
-                  color={color}
-                />
-              </Pressable>
+              <IconSymbol
+                size={30}
+                name={isDrawerOpen ? 'close' : 'add-circle-outline'}
+                color={color}
+              />
             ),
           }}
           listeners={{
             tabPress: (e) => {
-              // Prevent default navigation
               e.preventDefault();
-              setIsDrawerOpen(!isDrawerOpen);
+              handleOpenDrawer();
             },
           }}
         />
@@ -119,7 +117,28 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-      {isDrawerOpen && <CreateDrawer />}
+
+      <DrawerMenu 
+        isOpen={isDrawerOpen}
+        onClose={handleCloseDrawer}
+        onOpenNoteModal={handleOpenNoteModal}
+      />
+
+      <NoteModal
+        visible={modalVisibleNotes}
+        onClose={() => setModalVisibleNotes(false)}
+        onSuccess={handleNoteSuccess}
+        onError={handleNoteError}
+      />
+
+      <CustomAlert
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        onClose={() => setAlertState(prev => ({ ...prev, visible: false }))}
+        type={alertState.type}
+      />
+      
       <FloatingPlayer />
     </>
   );

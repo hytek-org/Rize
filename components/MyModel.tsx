@@ -88,7 +88,7 @@ const MyModal: React.FC<MyModalProps> = ({
       onRequestClose={onClose} // Handle Android hardware back press
     >
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <View style={{ flex: 1, justifyContent: 'flex-start', }}>
+        <View style={{ flex: 1, justifyContent: 'flex-start' }}>
           <Animated.View 
             className='absolute w-full h-full bg-black/50'
             style={{ opacity: fadeAnim }}

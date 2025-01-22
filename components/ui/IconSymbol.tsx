@@ -22,6 +22,7 @@ const MAPPING = {
   'wb-sunny': 'wb-sunny',
   'nights-stay': 'nights-stay',
   'lock-clock': 'lock-clock',
+  'add-task': 'add-task',
   'create': 'create',
   'add-circle-outline': 'add-circle-outline',
   'paperplane.fill': 'send',
