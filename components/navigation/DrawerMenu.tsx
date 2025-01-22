@@ -33,9 +33,9 @@ interface DrawerMenuProps {
 
 const MENU_ITEMS = [
   { icon: 'lock-clock', label: 'Routines', route: '/(tabs)/create' },
-  { icon: 'add-task', label: 'Quick Task', route: '/(tabs)/tasks' },
+  { icon: 'add-task', label: 'Add Task', route: '/(tabs)/tasks' },
   { icon: 'note-add', label: 'Quick Note', action: 'note' },
-  { icon: 'podcasts', label: 'Podcast', route: '/podcast' },
+  { icon: 'podcasts', label: 'Podcasts', route: '/podcast' },
 ] as const;
 
 export const DrawerMenu = React.memo(({ isOpen, onClose, onOpenNoteModal }: DrawerMenuProps) => {

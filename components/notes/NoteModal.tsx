@@ -80,12 +80,11 @@ export const NoteModal = ({ visible,
             onRequestClose={onClose} // Handle Android hardware back press
         >
             <TouchableWithoutFeedback className='z-50' onPress={() => Keyboard.dismiss()}>
-                <View style={{ flex: 1, justifyContent: 'flex-start' }}>
+                <View style={{ flex: 1, justifyContent: 'flex-start', zIndex:50}}>
                     <Animated.View
-                        className='absolute w-full h-full bg-black/50'
+                        className='absolute w-full h-full bg-black/50 '
                         style={{ opacity: fadeAnim }}
                     />
-
                     <KeyboardAvoidingView
                         style={{ flex: 1 }}
                         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

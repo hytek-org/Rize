@@ -23,6 +23,7 @@ const MAPPING = {
   'nights-stay': 'nights-stay',
   'lock-clock': 'lock-clock',
   'add-task': 'add-task',
+  'note-add': 'note-add',
   'create': 'create',
   'add-circle-outline': 'add-circle-outline',
   'paperplane.fill': 'send',
