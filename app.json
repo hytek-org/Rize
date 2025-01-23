@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Rize",
-    "slug": "Rize",
+    "slug": "rize",
     "version": "2.1.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -11,17 +11,23 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
       "package": "com.hytek.rize",
-      "versionCode": 11,
+      "versionCode": 12,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "permissions": ["RECEIVE_BOOT_COMPLETED", "NOTIFICATIONS", "android.permission.FOREGROUND_SERVICE"]
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "NOTIFICATIONS",
+        "android.permission.FOREGROUND_SERVICE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -40,8 +46,8 @@
             "image": "./assets/splash-icon.png",
             "backgroundColor": "#000000"
           },
-        "backgroundColor": "#ffffff",
-        "imageWidth": 200
+          "backgroundColor": "#ffffff",
+          "imageWidth": 200
         }
       ],
       [
@@ -70,10 +76,8 @@
     "extra": {
       "router": {
         "origin": false
-      },
-      "eas": {
-        "projectId": "1d476dbb-bd8f-42d0-b3a7-06b5023193b4"
       }
+     
     },
     "owner": "k4kuldeep108"
   }
