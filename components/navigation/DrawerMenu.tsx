@@ -5,7 +5,6 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   useSharedValue,
-  runOnJS,
   withTiming,
 } from 'react-native-reanimated';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -110,7 +109,7 @@ export const DrawerMenu = React.memo(({ isOpen, onClose, onOpenNoteModal }: Draw
 
       <Animated.View
         style={[animatedStyle]}
-        className="absolute z-10 bottom-0 w-full bg-white dark:bg-zinc-900 rounded-t-[2rem] pb-8"
+        className="absolute z-30 bottom-0 w-full bg-white dark:bg-zinc-900 rounded-t-[2rem] pb-8"
       >
         <View style={{ paddingBottom: insets.bottom }}>
           {/* Drawer Handle */}
@@ -121,7 +120,7 @@ export const DrawerMenu = React.memo(({ isOpen, onClose, onOpenNoteModal }: Draw
             {MENU_ITEMS.map((item, index) => (
               <Pressable
                 key={index}
-                className="w-[25%] items-center mb-4"
+                className="w-[25%]  items-center mb-4"
                 onPress={() => handleNavigate(item)}
               >
                 <View className="w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 items-center justify-center mb-2">

@@ -137,7 +137,7 @@ export const TaskItem: React.FC<TaskItemProps> = React.memo(({ task, isCurrentHo
                     onPress={() => updateSubtask(task.id, subtask.id, !subtask.completed)}
                   >
                     <IconSymbol
-                      name={subtask.completed ? "check-circle" : "circle"}
+                      name={subtask.completed ? "check-circle" : "task-alt"}
                       size={20}
                       color={subtask.completed ? '#22c55e' : '#71717a'}
                     />

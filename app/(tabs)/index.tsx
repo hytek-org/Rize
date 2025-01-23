@@ -1,140 +1,242 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Pressable, SafeAreaView, Image } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, FlatList, Pressable, SafeAreaView, Image, TextInput, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { TabProfileIcon } from "@/components/navigation/TabBarIcon";
-import TimeBlock from '@/components/TimeBlock';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ThemedText } from '@/components/ThemedText';
 import { Link } from 'expo-router';
+import { useTemplateContext } from '@/contexts/TemplateContext';
+import { SubtaskInput } from '@/components/tasks/SubtaskInput';
+import TimeBlock from '@/components/TimeBlock';
 
-interface Routine {
-  id: number;
-  content: string;
-  time: string;
+interface TimeSlotTask {
+  task: {
+    id: number;
+    content: string;
+    time: string;
+    subtasks?: {
+      id: string;
+      content: string;
+      completed: boolean;
+    }[];
+  };
+  label: 'Previous' | 'Current' | 'Next';
+  timeLabel: string;
+  borderColor: string; // Add this property to the interface
 }
 
-const ROUTINES_KEY = "dailyRoutines";
-
 const HomeScreen = () => {
-  const [tasks, setTasks] = useState<Routine[]>([]);
-  const [latestTasks, setLatestTasks] = useState<Routine[]>([]);
-
-
+  const { dailyTasks, updateSubtask, addSubtask, removeSubtask } = useTemplateContext();
+  const [timeSlots, setTimeSlots] = useState<TimeSlotTask[]>([]);
+  const [showSubtaskInput, setShowSubtaskInput] = useState<number | null>(null);
+  const [newSubtaskText, setNewSubtaskText] = useState('');
 
   useEffect(() => {
-    const fetchLatestTasks = async () => {
-      try {
-        const tasksJson = await AsyncStorage.getItem(ROUTINES_KEY);
-        if (tasksJson) {
-          const tasks: Routine[] = JSON.parse(tasksJson);
+    const now = new Date();
+    const currentHour = now.getHours();
+    const prevHour = (currentHour - 1 + 24) % 24;
+    const nextHour = (currentHour + 1) % 24;
 
-          const currentHour = new Date().getHours();
-          const previousHour = (currentHour - 1 + 24) % 24;
-          const nextHour = (currentHour + 1) % 24;
-
-          const filteredTasks = tasks.filter(task => {
-            const taskHour = parseInt(task.time, 10);
-            return taskHour === previousHour || taskHour === currentHour || taskHour === nextHour;
-          });
-          setTasks(tasks);
-          setLatestTasks(filteredTasks);
-        } else {
-          setLatestTasks([
-            { id: 1, content: "... .... .... ....", time: "00" },
-            { id: 2, content: "... .... .... ....", time: "01" },
-            { id: 3, content: "... .... .... ....", time: "02" },
-          ]);
+    const slots: Array<{
+      hour: number;
+      label: TimeSlotTask['label'];
+      borderColor: string;
+    }> = [
+        {
+          hour: prevHour,
+          label: 'Previous',
+          borderColor: 'border-t-yellow-600'
+        },
+        {
+          hour: currentHour,
+          label: 'Current',
+          borderColor: 'border-t-green-600'
+        },
+        {
+          hour: nextHour,
+          label: 'Next',
+          borderColor: 'border-t-red-600'
         }
-      } catch (error) {
-        console.error('Error fetching latest tasks:', error);
-      }
-    };
+      ];
 
-    fetchLatestTasks();
-  }, [latestTasks]);
+    const updatedTimeSlots = slots.map(slot => {
+      const task = dailyTasks.find(t => parseInt(t.time) === slot.hour);
+      return {
+        task: task || {
+          id: -1,
+          content: 'No task scheduled',
+          time: slot.hour.toString().padStart(2, '0')
+        },
+        label: slot.label,
+        timeLabel: convertHourTo12HourFormat(slot.hour.toString().padStart(2, '0')),
+        borderColor: slot.borderColor
+      };
+    });
 
+    setTimeSlots(updatedTimeSlots);
+  }, [dailyTasks]);
 
-
-  const now: Date = new Date();
-  const currentHour: number = now.getHours();
-  const currentHourString: string = now.getHours().toString().padStart(2, '0');
-  const prevHour: string = ((currentHour - 1 + 24) % 24).toString().padStart(2, '0');
-  const nextHour: string = ((currentHour + 1) % 24).toString().padStart(2, '0');
-
-  function convertHourTo12HourFormat(hourStr: string): string {
+  const convertHourTo12HourFormat = (hourStr: string): string => {
     const hour = parseInt(hourStr, 10);
     const period = hour >= 12 ? 'PM' : 'AM';
     const twelveHour = hour % 12 || 12;
     return `${twelveHour} ${period}`;
-  }
+  };
+
+  const handleAddSubtask = (taskId: number) => {
+    if (!newSubtaskText.trim()) return;
+    addSubtask(taskId, newSubtaskText.trim());
+    setNewSubtaskText('');
+    setShowSubtaskInput(null);
+  };
+
+  const canEditTask = (label: TimeSlotTask['label']): boolean => {
+    return label === 'Current' || label === 'Next';
+  };
+  const now: Date = new Date();
+  const currentHourString: string = now.getHours().toString().padStart(2, '0');
+  const renderTask = ({ item }: { item: TimeSlotTask }) => (
+    <View className={`bg-white border border-t-4 ${item.borderColor} 
+      shadow-sm rounded-[32px] dark:bg-neutral-900 dark:shadow-neutral-700/70
+      mb-5 px-4 py-4 mx-4`}>
+      {/* Task Header */}
+      <View className="flex-row justify-between items-center">
+        <View className="flex-row items-center space-x-1">
+          <Text className="text-xs sm:text-sm text-gray-800 dark:text-white">
+            {item.timeLabel}
+          </Text>
+          <Text className={`text-xs ${item.label === 'Previous'
+              ? 'text-yellow-500'
+              : item.label === 'Current'
+                ? 'text-green-500'
+                : 'text-red-500'
+            }`}>
+            ({item.label})
+          </Text>
+        </View>
+        {item.task.id !== -1 && canEditTask(item.label) && (
+          <Pressable
+            onPress={() => setShowSubtaskInput(item.task.id)}
+            className="flex-row items-center space-x-1 bg-green-500 px-3 py-1.5 rounded-full"
+          >
+            <IconSymbol name="add-task" size={16} color="#fff" />
+            <Text className="text-white text-sm">Add Subtask</Text>
+          </Pressable>
+        )}
+      </View>
+
+      <View className="p-2 md:p-5">
+        <Text className="text-base font-semibold text-gray-800 dark:text-white">
+          {item.task.content}
+        </Text>
+
+        {/* Subtasks Section */}
+        {item.task.subtasks && item.task.subtasks.length > 0 && (
+          <View className="mt-4 pl-4 border-l-2 border-zinc-200 dark:border-zinc-700">
+            {item.task.subtasks.map(subtask => (
+              <View key={subtask.id} className="flex-row items-center justify-between ">
+                <Pressable
+                  className="flex-row items-center "
+                  onPress={() => canEditTask(item.label) && updateSubtask(item.task.id, subtask.id, !subtask.completed)}
+                  disabled={!canEditTask(item.label)}
+                >
+                  <IconSymbol
+                    name={subtask.completed ? "check-circle" : "task-alt"}
+                    size={20}
+                    color={
+                      !canEditTask(item.label)
+                        ? '#9ca3af' // gray-400 for disabled state
+                        : subtask.completed
+                          ? '#22c55e'
+                          : '#71717a'
+                    }
+                  />
+                  <Text className={`ml-2 flex-1 ${subtask.completed
+                      ? 'line-through text-zinc-400'
+                      : !canEditTask(item.label)
+                        ? 'text-zinc-500'
+                        : 'text-zinc-900 dark:text-zinc-100'
+                    }`}>
+                    {subtask.content}
+                  </Text>
+                </Pressable>
+                {canEditTask(item.label) && (
+                  <Pressable
+                    onPress={() => removeSubtask(item.task.id, subtask.id)}
+                    className="p-2"
+                  >
+                    <IconSymbol name="xmark.circle.fill" size={20} color="#ef4444" />
+                  </Pressable>
+                )}
+
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* Add Subtask Input - Only show for current and upcoming tasks */}
+        {showSubtaskInput === item.task.id && canEditTask(item.label) && (
+          <View style={{ marginBottom: 200 }}>
+            <SubtaskInput
+              onAdd={(content) => {
+                addSubtask(item.task.id, content);
+                setShowSubtaskInput(null);
+                Keyboard.dismiss();
+              }}
+              onCancel={() => {
+                setShowSubtaskInput(null);
+                Keyboard.dismiss();
+              }}
+            />
+          </View>
+        )}
+      </View>
+      <View className='pr-8'>
+        <TimeBlock item={item} currentHourString={currentHourString} />
+      </View>
+    </View>
+  );
 
   return (
-    <SafeAreaView style={{ flex: 1, }}>
-      <FlatList
-        data={latestTasks}
-        keyExtractor={(item) => item.id.toString()}
-        showsVerticalScrollIndicator={true}
-        ListHeaderComponent={() => (
-          <View>
-            <Text className='text-2xl sm:text-4xl pt-12 pb-4 text-center dark:text-neutral-100'>
-              Manage Routines
-            </Text>
-          </View>
-        )}
-        renderItem={({ item }) => (
-          <View
-            className={`bg-white border border-t-4  ${item.time === currentHourString
-              ? "border-t-green-600 dark:border-t-green-500"
-              : " "}
-              ${item.time == nextHour
-                ? "border-t-red-600 dark:border-t-red-500"
-                : " "}  ${item.time == prevHour
-                  ? "border-t-yellow-600 dark:border-t-yellow-500"
-                  : " "}
-            shadow-sm rounded-[32px] dark:bg-neutral-900 dark:shadow-neutral-700/70
-            mb-5 px-4 py-4 mx-4`}
-          >
-            <View className="flex flex-row justify-between">
-              <Text className="text-xs sm:text-sm text-gray-800 dark:text-white">
-                {convertHourTo12HourFormat(item.time)}
-              </Text>
-              {(item.time == currentHourString || item.time == nextHour) && (
-                <Pressable >
-                  <TabProfileIcon name="plus-circle" className="dark:text-white" />
-                </Pressable>
-              )}
-            </View>
-            <View className="p-2 md:p-5 ">
-              <Text className="text-base font-semibold text-gray-800 dark:text-white">
-                {item.content}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      className="flex-1"
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 120 : 0}
+    >
+      <SafeAreaView className="flex-1">
+        <FlatList
+          data={timeSlots}
+          keyExtractor={(item) => item.label}
+          renderItem={renderTask}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="none"
+          contentContainerStyle={{ paddingBottom: 200 }}
+          onScrollBeginDrag={Keyboard.dismiss}
+          ListHeaderComponent={() => (
+            <View>
+              <Text className='text-2xl sm:text-4xl pt-12 pb-4 text-center dark:text-neutral-100'>
+                Today's Schedule
               </Text>
             </View>
-            <View className='pr-8'>
-              <TimeBlock item={item} currentHourString={currentHourString} />
+          )}
+          ListEmptyComponent={
+            <View className="flex flex-col items-center justify-between h-full pt-32">
+              <Image
+                source={require("../../assets/images/icon.png")}
+                className="rounded-xl w-52 h-56 mb-10"
+              />
+              <ThemedText type="title">No Routine</ThemedText>
+              <ThemedText type="subtitle">Select a routine to continue</ThemedText>
+              <Link href={'/(tabs)/create'} className="py-6">
+                <View className="py-3 px-4 bg-green-600 rounded-full flex items-center">
+                  <Text className="text-white text-lg font-medium">Select Routine Template</Text>
+                </View>
+              </Link>
             </View>
-          </View>
-        )}
-        ListEmptyComponent={
-          <View className="flex flex-col items-center justify-between  pt-32">
-            <Image
-              source={require("../../assets/images/icon.png")}
-              className="rounded-xl w-32 h-32 mb-10"
-            />
-            <ThemedText type="title" >No Routine </ThemedText>
-            <ThemedText type="subtitle">Select a routine to continue</ThemedText>
-           <Link href={'/(tabs)/create'} className="py-3  mt-2  px-4 bg-green-600 mx-auto rounded-full ">
-              <Text className="text-white text-lg font-medium">Select Routine Template</Text>
-            </Link>
-          </View>
-        }
-      />
-
-
-      
-
-    </SafeAreaView>
+          }
+        />
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
-
-
 
 export default HomeScreen;
