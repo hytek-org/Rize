@@ -105,10 +105,10 @@ const HomeScreen = () => {
             {item.timeLabel}
           </Text>
           <Text className={`text-xs ${item.label === 'Previous'
-              ? 'text-yellow-500'
-              : item.label === 'Current'
-                ? 'text-green-500'
-                : 'text-red-500'
+            ? 'text-yellow-500'
+            : item.label === 'Current'
+              ? 'text-green-500'
+              : 'text-red-500'
             }`}>
             ({item.label})
           </Text>
@@ -151,10 +151,10 @@ const HomeScreen = () => {
                     }
                   />
                   <Text className={`ml-2 flex-1 ${subtask.completed
-                      ? 'line-through text-zinc-400'
-                      : !canEditTask(item.label)
-                        ? 'text-zinc-500'
-                        : 'text-zinc-900 dark:text-zinc-100'
+                    ? 'line-through text-zinc-400'
+                    : !canEditTask(item.label)
+                      ? 'text-zinc-500'
+                      : 'text-zinc-900 dark:text-zinc-100'
                     }`}>
                     {subtask.content}
                   </Text>
@@ -216,8 +216,16 @@ const HomeScreen = () => {
               <Text className='text-2xl sm:text-4xl pt-12 pb-4 text-center dark:text-neutral-100'>
                 Today's Schedule
               </Text>
+
             </View>
           )}
+          ListFooterComponent={dailyTasks.length == 0 &&
+            <Link href={'/(tabs)/create'} className="py-6 mx-auto">
+              <View className="py-3 px-4 mx-auto text-center bg-green-600 rounded-full flex items-center">
+                <Text className="text-white text-lg font-medium">Select Routine Template</Text>
+              </View>
+            </Link>
+          }
           ListEmptyComponent={
             <View className="flex flex-col items-center justify-between h-full pt-32">
               <Image
@@ -234,6 +242,7 @@ const HomeScreen = () => {
             </View>
           }
         />
+
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

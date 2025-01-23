@@ -1,6 +1,6 @@
 import { router, Tabs, } from 'expo-router';
 import React, { useState, useCallback } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Platform } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -17,6 +17,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [modalVisibleNotes, setModalVisibleNotes] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [alertState, setAlertState] = useState({
     visible: false,
     title: '',
@@ -43,26 +44,36 @@ export default function TabLayout() {
   };
 
   const handleOpenDrawer = useCallback(() => {
-    setIsDrawerOpen(true);
-  }, []);
+    if (isAnimating) return;
+    setIsDrawerOpen(prev => !prev);
+  }, [isAnimating]);
 
   const handleCloseDrawer = useCallback(() => {
+    if (isAnimating) return;
+    setIsAnimating(true);
     setIsDrawerOpen(false);
-  }, []);
+    setTimeout(() => setIsAnimating(false), 300);
+  }, [isAnimating]);
 
   const handleOpenNoteModal = useCallback(() => {
-    handleCloseDrawer(); // Close drawer first
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setIsDrawerOpen(false);
     setTimeout(() => {
-      setModalVisibleNotes(true); // Then open note modal
-    }, 300); // Increased delay for smoother transition
-  }, [handleCloseDrawer]);
+      setModalVisibleNotes(true);
+      setIsAnimating(false);
+    }, 300);
+  }, [isAnimating]);
 
   const handleCloseNoteModal = useCallback(() => {
+    if (isAnimating) return;
+    setIsAnimating(true);
     setModalVisibleNotes(false);
-  }, []);
+    setTimeout(() => setIsAnimating(false), 300);
+  }, [isAnimating]);
 
   return (
-    <>
+    <View style={styles.container}>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
@@ -71,10 +82,15 @@ export default function TabLayout() {
           tabBarBackground: TabBarBackground,
           tabBarStyle: Platform.select({
             ios: {
-              // Use a transparent background on iOS to show the blur effect
               position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 1,
             },
-            default: {},
+            default: {
+              zIndex: 1,
+            },
           }),
         }}>
         <Tabs.Screen
@@ -126,28 +142,45 @@ export default function TabLayout() {
         />
       </Tabs>
 
-      <DrawerMenu 
-        isOpen={isDrawerOpen}
-        onClose={handleCloseDrawer}
-        onOpenNoteModal={handleOpenNoteModal}
-      />
+      <View style={styles.overlay}>
+        <DrawerMenu 
+          isOpen={isDrawerOpen}
+          onClose={handleCloseDrawer}
+          onOpenNoteModal={handleOpenNoteModal}
+        />
 
-      <NoteModal
-        visible={modalVisibleNotes}
-        onClose={handleCloseNoteModal}
-        onSuccess={handleNoteSuccess}
-        onError={handleNoteError}
-      />
+        <NoteModal
+          visible={modalVisibleNotes}
+          onClose={handleCloseNoteModal}
+          onSuccess={handleNoteSuccess}
+          onError={handleNoteError}
+        />
 
-      <CustomAlert
-        visible={alertState.visible}
-        title={alertState.title}
-        message={alertState.message}
-        onClose={() => setAlertState(prev => ({ ...prev, visible: false }))}
-        type={alertState.type}
-      />
-      
-      <FloatingPlayer />
-    </>
+        <CustomAlert
+          visible={alertState.visible}
+          title={alertState.title}
+          message={alertState.message}
+          onClose={() => setAlertState(prev => ({ ...prev, visible: false }))}
+          type={alertState.type}
+        />
+        
+        <FloatingPlayer />
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 2,
+    pointerEvents: 'box-none',
+  },
+});

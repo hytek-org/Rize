@@ -25,11 +25,13 @@ export const DrawerMenu = React.memo(({ isOpen, onClose, onOpenNoteModal }: Draw
   const handleNavigate = useCallback((item: typeof MENU_ITEMS[number]) => {
     if (item.action === 'note') {
       onOpenNoteModal(); // Just trigger the note modal
+      onClose();
       return; // Don't close drawer here, let the layout handle it
     }
     onClose();
     setTimeout(() => {
       router.push(item.route);
+      onClose();
     }, 100);
   }, [onClose, onOpenNoteModal]);
 
