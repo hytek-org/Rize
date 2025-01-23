@@ -51,8 +51,16 @@ export default function TabLayout() {
   }, []);
 
   const handleOpenNoteModal = useCallback(() => {
-    setModalVisibleNotes(true);
+    handleCloseDrawer(); // Close drawer first
+    setTimeout(() => {
+      setModalVisibleNotes(true); // Then open note modal
+    }, 300); // Increased delay for smoother transition
+  }, [handleCloseDrawer]);
+
+  const handleCloseNoteModal = useCallback(() => {
+    setModalVisibleNotes(false);
   }, []);
+
   return (
     <>
       <Tabs
@@ -126,7 +134,7 @@ export default function TabLayout() {
 
       <NoteModal
         visible={modalVisibleNotes}
-        onClose={() => setModalVisibleNotes(false)}
+        onClose={handleCloseNoteModal}
         onSuccess={handleNoteSuccess}
         onError={handleNoteError}
       />

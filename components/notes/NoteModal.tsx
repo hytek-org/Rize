@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     Modal,
     View,
@@ -20,29 +20,26 @@ import { TabCreateIcon } from "@/components/navigation/TabBarIcon";
 interface NoteModalProps {
     visible: boolean;
     onClose: () => void;
-    input: string;
-    setInput: (text: string) => void;
-    tag: string;
-    setTag: (text: string) => void;
+    input?: string;
+    setInput?: (text: string) => void;
+    tag?: string;
+    setTag?: (text: string) => void;
     editMode?: boolean;  // Optional editMode prop
-    addNote: () => void;
+    addNote?: () => void;
     editNote?: () => void;
     onSuccess: () => void;
     onError: (message: string) => void;
 }
 
-export const NoteModal = ({ visible,
-    onClose, onSuccess, onError, }: NoteModalProps) => {
+export const NoteModal = ({ visible, onClose, onSuccess, onError }: NoteModalProps) => {
     const colorScheme = useColorScheme();
     const isDarkMode = colorScheme === 'dark';
     const [isLoading, setIsLoading] = useState(false);
-    const [fadeAnim] = useState(new Animated.Value(0));
     const { addNote } = useNotes();
     const [input, setInput] = React.useState('');
     const [tag, setTag] = React.useState('');
 
     const handleAddNote = () => {
-
         if (!input.trim()) {
             onError('Note cannot be empty.');
             return;
@@ -53,38 +50,21 @@ export const NoteModal = ({ visible,
         setTag('');
         onSuccess();
         setIsLoading(false);
-        onClose();
+        setTimeout(() => {
+            onClose();
+        }, 500); // Add delay before closing
     };
 
-
-    // Handle back button press for Android
-    useEffect(() => {
-        const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-            if (visible) {
-                onClose(); // Close modal when back button is pressed
-                return true; // Indicate we handled the event
-            }
-            return false; // Default back press behavior
-        });
-
-        // Cleanup back handler on component unmount
-        return () => backHandler.remove();
-    }, [visible, onClose]);
-
+    if (!visible) return null;
 
     return (
         <Modal
             visible={visible}
-            animationType="slide"
             transparent={true}
-            onRequestClose={onClose} // Handle Android hardware back press
+            onRequestClose={onClose}
         >
             <TouchableWithoutFeedback className='z-50' onPress={() => Keyboard.dismiss()}>
-                <View style={{ flex: 1, justifyContent: 'flex-start', zIndex:50}}>
-                    <Animated.View
-                        className='absolute w-full h-full bg-black/50 '
-                        style={{ opacity: fadeAnim }}
-                    />
+                <View style={{ flex: 1, justifyContent: 'flex-start', zIndex: 50 }}>
                     <KeyboardAvoidingView
                         style={{ flex: 1 }}
                         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
