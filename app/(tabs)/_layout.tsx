@@ -110,11 +110,11 @@ export default function TabLayout() {
         <Tabs.Screen
           name="create"
           options={{
-            title: '',
+            title: 'more',
             tabBarIcon: ({ color }) => (
               <IconSymbol
-                size={30}
-                name={isDrawerOpen ? 'close' : 'add-circle-outline'}
+                size={36}
+                name={isDrawerOpen ? 'keyboard-arrow-down' : 'keyboard-arrow-up'}
                 color={color}
               />
             ),
@@ -143,7 +143,7 @@ export default function TabLayout() {
       </Tabs>
 
       <View style={styles.overlay}>
-        <DrawerMenu 
+        <DrawerMenu
           isOpen={isDrawerOpen}
           onClose={handleCloseDrawer}
           onOpenNoteModal={handleOpenNoteModal}
@@ -163,7 +163,7 @@ export default function TabLayout() {
           onClose={() => setAlertState(prev => ({ ...prev, visible: false }))}
           type={alertState.type}
         />
-        
+
         <FloatingPlayer />
       </View>
     </View>

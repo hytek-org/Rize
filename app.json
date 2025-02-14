@@ -2,7 +2,7 @@
   "expo": {
     "name": "Rize",
     "slug": "rize",
-    "version": "2.1.6",
+    "version": "2.1.7",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
