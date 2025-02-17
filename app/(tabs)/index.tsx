@@ -79,12 +79,12 @@ const SubtaskDrawer: React.FC<SubtaskDrawerProps> = ({ visible, onClose, onSave 
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View className="flex-1 justify-end bg-black bg-opacity-50">
+      <View className="flex-1 justify-end bg-zinc-50/80 dark:bg-zinc-900/60">
         <View className="bg-white dark:bg-zinc-800 p-4 rounded-t-2xl">
           <Text className="text-xl font-bold text-center mb-4 text-zinc-800 dark:text-white">
             Add Subtasks
           </Text>
-          <ScrollView style={{ maxHeight: 300 }}>
+          <ScrollView style={{ maxHeight: 500 ,minHeight: 50}}>
             {inputs.map((input, index) => (
               <View key={index} className="flex-row items-center mb-2">
                 <TextInput
@@ -102,9 +102,9 @@ const SubtaskDrawer: React.FC<SubtaskDrawerProps> = ({ visible, onClose, onSave 
               </View>
             ))}
           </ScrollView>
-          <Pressable onPress={addField} className="py-2">
+          {/* <Pressable onPress={addField} className="py-2">
             <Text className="text-green-600 dark:text-green-400 text-center">Add Another</Text>
-          </Pressable>
+          </Pressable> */}
           <View className="flex-row justify-between mt-4">
             <Pressable
               onPress={onClose}
@@ -209,64 +209,73 @@ const HomeScreen = () => {
           </Pressable>
         )}
       </View>
-
+  
       {/* Task Content */}
       <View className="mt-4">
         <Text className="text-lg font-semibold text-zinc-800 dark:text-white">
           {item.task.content}
         </Text>
-        {/* TimeBlock */}
-        <View className="mt-4 items-end pl-5">
-          <TimeBlock item={item} currentHourString={currentHourString} />
-        </View>
-        {/* Subtasks */}
+  
+        {/* Updated Subtasks UI with ScrollView */}
         {item.task.subtasks && item.task.subtasks.length > 0 && (
           <View className="mt-4 pl-4 border-l border-zinc-200 dark:border-zinc-700">
-            {item.task.subtasks.map(subtask => (
-              <View key={subtask.id} className="flex-row items-center justify-between my-1">
-                <Pressable
-                  className="flex-row items-center"
-                  onPress={() =>
-                    canEditTask(item.label) &&
-                    updateSubtask(item.task.id, subtask.id, !subtask.completed)
-                  }
-                  disabled={!canEditTask(item.label)}
-                >
-                  <IconSymbol
-                    name={subtask.completed ? 'check-circle' : 'task-alt'}
-                    size={20}
-                    color={
-                      !canEditTask(item.label)
-                        ? '#9ca3af'
-                        : subtask.completed
-                        ? '#22c55e'
-                        : '#71717a'
+            <ScrollView
+              style={{ maxHeight: '90%'}}
+              contentContainerStyle={{ paddingVertical: 2 }}
+            >
+              {item.task.subtasks.map((subtask) => (
+                <View key={subtask.id} className="flex-row items-center justify-between my-1">
+                  <Pressable
+                    className="flex-row items-center flex-1"
+                    onPress={() =>
+                      canEditTask(item.label) &&
+                      updateSubtask(item.task.id, subtask.id, !subtask.completed)
                     }
-                  />
-                  <Text
-                    className={`ml-2 flex-1 ${
-                      subtask.completed
-                        ? 'line-through text-zinc-400'
-                        : !canEditTask(item.label)
-                        ? 'text-zinc-500'
-                        : 'text-zinc-900 dark:text-zinc-100'
-                    }`}
+                    disabled={!canEditTask(item.label)}
                   >
-                    {subtask.content}
-                  </Text>
-                </Pressable>
-                {canEditTask(item.label) && (
-                  <Pressable onPress={() => removeSubtask(item.task.id, subtask.id)} className="p-1">
-                    <IconSymbol name="xmark.circle.fill" size={20} color="#ef4444" />
+                    <IconSymbol
+                      name={subtask.completed ? 'check-circle' : 'task-alt'}
+                      size={20}
+                      color={
+                        !canEditTask(item.label)
+                          ? '#9ca3af'
+                          : subtask.completed
+                          ? '#22c55e'
+                          : '#71717a'
+                      }
+                    />
+                    <Text
+                      className={`ml-2 ${
+                        subtask.completed
+                          ? 'line-through text-zinc-400'
+                          : !canEditTask(item.label)
+                          ? 'text-zinc-500'
+                          : 'text-zinc-900 dark:text-zinc-100'
+                      }`}
+                    >
+                      {subtask.content}
+                    </Text>
                   </Pressable>
-                )}
-              </View>
-            ))}
+                  {canEditTask(item.label) && (
+                    <Pressable onPress={() => removeSubtask(item.task.id, subtask.id)} className="p-1">
+                      <IconSymbol name="remove-circle-outline" size={20} color="#ef4444" />
+                    </Pressable>
+                  )}
+                </View>
+              ))}
+            </ScrollView>
           </View>
         )}
       </View>
+  
+      {/* TimeBlock */}
+      <View className="mt-auto items-end pl-5">
+        <TimeBlock item={item} currentHourString={currentHourString} />
+      </View>
     </View>
   );
+  
+  
 
   // Always call useFocusEffect so hook order remains consistent.
   useFocusEffect(

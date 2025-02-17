@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface Note {
+export interface Note {
   id: string;
   contentPreview: string;
-  content: string;
-  tag: string; // Make tag required but allow empty string
+  content: string; // This can contain markdown-formatted text.
+  tag: string;
   date: string;
 }
 
@@ -67,7 +67,7 @@ export const NotesProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const newNote: Note = {
       id: Date.now().toString(),
       contentPreview: content.trim().substring(0, 150),
-      content:content.trim(),
+      content: content.trim(), // Markdown content is stored as-is.
       tag: tag.trim() || 'Untagged',
       date: formatDateToIndian(new Date()),
     };
@@ -77,12 +77,12 @@ export const NotesProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const editNote = (id: string, content: string, tag: string = '') => {
     const updatedNotes = notes.map(note =>
-      note.id === id ? { 
-        ...note, 
+      note.id === id ? {
+        ...note,
         content,
-        contentPreview: content.substring(0, 150), // Add preview update
+        contentPreview: content.substring(0, 150),
         tag: tag.trim() || 'Untagged',
-        date: formatDateToIndian(new Date()) 
+        date: formatDateToIndian(new Date())
       } : note
     );
     saveNotes(updatedNotes);

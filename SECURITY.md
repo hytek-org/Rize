@@ -6,6 +6,7 @@ We currently support the following versions with security updates:
 
 | Version | Supported          |
 | ------- | ------------------ |
+| 2.1.7   | :white_check_mark: |
 | 2.1.6   | :white_check_mark: |
 | 2.1.5   | :white_check_mark: |
 | 2.1.4   | :white_check_mark: |

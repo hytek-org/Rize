@@ -5,16 +5,14 @@ import MyModal from '@/components/MyModel';
 import FloatingButton from '@/components/FlotingButton';
 import { useNotes } from '@/contexts/NotesContext';
 import CustomAlert from '@/components/CustomAlert';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import { AlertState, AlertType, Note } from '@/types/notes';
+import Markdown from 'react-native-markdown-display';
 
-interface TagOption{
-tagOption:string;
-}
 
 export default function NotesScreen() {
   const colorScheme = useColorScheme();
-  const color = colorScheme === 'dark' ? 'white' : 'black';
+  const color = colorScheme === 'dark' ? '#fff' : '#000';
   const { notes, addNote } = useNotes();
   const [input, setInput] = useState('');
   const [tag, setTag] = useState('');
@@ -32,7 +30,7 @@ export default function NotesScreen() {
   });
 
   // Memoized unique tags - fixed type assertion
-  const uniqueTags = useMemo(() => 
+  const uniqueTags = useMemo(() =>
     Array.from(new Set(notes.map((note) => note.tag))).filter((tag): tag is string => Boolean(tag)),
     [notes]
   );
@@ -82,14 +80,14 @@ export default function NotesScreen() {
   }, []);
 
   const renderNoteItem = useCallback(({ item }: { item: Note }) => (
-    <Pressable    onPress={() => router.push({
+    <Pressable onPress={() => router.push({
       pathname: '/notesdetails/[id]',
       params: { id: item.id },
     })}
-      className="bg-white dark:bg-neutral-800 rounded-lg mx-2 mb-4 p-4 shadow-sm"
+      className="bg-white dark:bg-neutral-800 text-black dark:text-white rounded-lg mx-2 mb-4 p-4 shadow-sm"
       style={{ elevation: 2 }}
     >
-      
+
       <View className="flex-row justify-between items-center mb-2">
         <View className="flex-row items-center">
           <TabCreateIcon name="tago" size={16} />
@@ -103,14 +101,23 @@ export default function NotesScreen() {
           <Text className="text-white font-medium">View</Text>
         </View>
       </View>
-
-      <Text 
-        numberOfLines={3}
-        className="dark:text-white text-lg font-medium mb-2"
-      >
+      <Markdown      style={{
+              body: {
+                fontSize: 16,
+                lineHeight: 24,
+                color: color,
+              },
+              link: {
+                color: '#1e90ff', // Blue color for links
+                textDecorationLine: 'underline',
+              },
+              heading1: { fontSize: 24, marginBottom: 10 },
+              heading2: { fontSize: 20, marginBottom: 8 },
+              paragraph: { marginBottom: 10 },
+              listItem: { flexDirection: 'row', marginBottom: 4 },
+            }}>
         {item.contentPreview}
-      </Text>
-
+      </Markdown>
       <Text className="text-gray-500 dark:text-gray-400 text-xs">
         {item.date}
       </Text>
@@ -118,7 +125,7 @@ export default function NotesScreen() {
   ), []);
 
   return (
-    <View className="flex-1 bg-slate-100 dark:bg-neutral-900 pb-20">
+    <View className="flex-1 bg-slate-100 dark:bg-neutral-900 ">
       <View className="pt-12 px-4">
         <Text className="text-3xl font-bold dark:text-white mb-4">
           My Notes
@@ -137,25 +144,24 @@ export default function NotesScreen() {
             onPress={() => setSortBy(sortBy === 'date' ? 'title' : 'date')}
             className="p-2"
           >
-            <TabTaskIcon 
-              size={24} 
-              name={sortBy === 'date' ? 'sort' : 'sort-by-alpha'} 
-              color={color} 
+            <TabTaskIcon
+              size={24}
+              name={sortBy === 'date' ? 'sort' : 'sort-by-alpha'}
+              color={color}
             />
           </Pressable>
         </View>
 
         {/* Tags ScrollView */}
-        <ScrollView 
+        <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           className="mb-4"
         >
           <Pressable
             onPress={() => setSelectedTag(null)}
-            className={`mr-2 px-4 py-2 rounded-full ${
-              selectedTag === null ? 'bg-blue-500' : 'bg-gray-200 dark:bg-neutral-700'
-            }`}
+            className={`mr-2 px-4 py-2 rounded-full ${selectedTag === null ? 'bg-blue-500' : 'bg-gray-200 dark:bg-neutral-700'
+              }`}
           >
             <Text className={selectedTag === null ? 'text-white' : 'text-black dark:text-white'}>
               All
@@ -165,13 +171,11 @@ export default function NotesScreen() {
             <Pressable
               key={tag}
               onPress={() => setSelectedTag(tag)}
-              className={`mr-2 px-4 py-2 rounded-full ${
-                selectedTag === tag ? 'bg-blue-500' : 'bg-gray-200 dark:bg-neutral-700'
-              }`}
+              className={`mr-2 px-4 py-2 rounded-full ${selectedTag === tag ? 'bg-blue-500' : 'bg-gray-200 dark:bg-neutral-700'
+                }`}
             >
-              <Text className={`${
-                selectedTag === tag ? 'text-white' : 'text-black dark:text-white'
-              }`}>
+              <Text className={`${selectedTag === tag ? 'text-white' : 'text-black dark:text-white'
+                }`}>
                 {tag}
               </Text>
             </Pressable>
@@ -179,16 +183,16 @@ export default function NotesScreen() {
         </ScrollView>
       </View>
 
-      <FlatList
+      <FlatList 
         data={filteredAndSortedNotes}
         renderItem={renderNoteItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingVertical: 8 }}
         ListEmptyComponent={() => (
           <View className="items-center justify-center py-20">
-            <Image 
-              source={require('../../assets/images/empty-note.png')} 
-              style={{ width: 200, height: 200 }} 
+            <Image
+              source={require('../../assets/images/empty-note.png')}
+              style={{ width: 200, height: 200 }}
               resizeMode="contain"
             />
             <Text className="dark:text-white text-lg mt-4">No notes found</Text>
@@ -197,7 +201,7 @@ export default function NotesScreen() {
       />
 
       <FloatingButton onPress={() => setModalVisible(true)} />
-      
+
       <MyModal
         visible={modalVisible}
         onClose={closeModal}
@@ -207,7 +211,7 @@ export default function NotesScreen() {
         setTag={setTag}
         editMode={false}
         addNote={handleAddNote}
-        editNote={() => {}}
+        editNote={() => { }}
       />
 
       <CustomAlert
