@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, Pressable, TextInput, Alert } from 'react-native';
+import { View, Text, Pressable, TextInput, Alert, useColorScheme } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useTemplateContext } from '@/contexts/TemplateContext';
 import CustomAlert from '../CustomAlert';
@@ -62,6 +62,8 @@ export const TaskItem: React.FC<TaskItemProps> = React.memo(({ task, isCurrentHo
   const { updateSubtask, addSubtask, removeSubtask } = useTemplateContext();
   const [showSubtaskInput, setShowSubtaskInput] = useState(false);
   const [newSubtaskText, setNewSubtaskText] = useState('');
+  const colorScheme = useColorScheme();
+  const color = colorScheme === 'dark' ? '#fff' : '#000';
   // Fix alert state with proper typing
   const [alertState, setAlertState] = useState<AlertState>({
     visible: false,
@@ -118,7 +120,7 @@ export const TaskItem: React.FC<TaskItemProps> = React.memo(({ task, isCurrentHo
               )}
             </View>
             <Pressable onPress={onEdit}>
-              <IconSymbol name="pencil.circle" size={20} />
+              <IconSymbol name="mode-edit-outline" size={20} color={color} />
             </Pressable>
           </View>
 

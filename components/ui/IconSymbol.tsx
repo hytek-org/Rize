@@ -19,6 +19,7 @@ const MAPPING: Record<string, keyof typeof MaterialIcons.glyphMap> = {
   "lock-clock": "lock-clock",
   "add-task": "add-task",
   "task-alt": "task-alt",
+  "mode-edit-outline": "mode-edit-outline",
   "note-add": "note-add",
   "create": "create",
   "add-circle-outline": "add-circle-outline",
