@@ -44,6 +44,7 @@ const LAST_DATE_KEY = "lastDate";
 export default function RoutinesScreen() {
   const {
     dailyTasks: contextDailyTasks,
+    updateRoutine,
     updateSubtask,
     removeSubtask,
   } = useTemplateContext();
@@ -69,17 +70,12 @@ export default function RoutinesScreen() {
     if (!selectedTask) return;
 
     try {
-      const updatedTasks = contextDailyTasks.map((task) =>
-        task.id === selectedTask.id
-          ? { ...task, content: editedContent, subtasks: task.subtasks || [] }
-          : task
-      );
-
-      await AsyncStorage.setItem(DAILY_TASKS_STORAGE_KEY, JSON.stringify(updatedTasks));
+      await updateRoutine(selectedTask.id, editedContent);
       setModalVisible(false);
-      showAlert("Success", "Routine updated successfully!", "success");
+      setSelectedTask(null);
+      showAlert("Success", "Task updated successfully!", "success");
     } catch (error) {
-      showAlert("Error", "Failed to update routine", "error");
+      showAlert("Error", "Failed to update task", "error");
     }
   };
 
@@ -180,7 +176,17 @@ export default function RoutinesScreen() {
       </KeyboardAvoidingView>
 
       {/* Routine Modal */}
-      <RoutineModal visible={modalVisible} onClose={() => setModalVisible(false)} content={editedContent} setContent={setEditedContent} onSave={saveEditedTask} time={selectedTask?.time || "00"} />
+      <RoutineModal 
+        visible={modalVisible} 
+        onClose={() => {
+          setModalVisible(false);
+          setSelectedTask(null);
+        }} 
+        content={editedContent} 
+        setContent={setEditedContent} 
+        onSave={saveEditedTask} 
+        time={selectedTask?.time || "00"} 
+      />
 
       {/* Custom Alert */}
       <CustomAlert visible={alertVisible} title={alertTitle} message={alertMessage} onClose={() => setAlertVisible(false)} type={alertType} />

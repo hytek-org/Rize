@@ -94,6 +94,27 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
     }
   }, [dailyTasks]);
 
+  useEffect(() => {
+    const resetDailyTasks = async () => {
+      const today = new Date().toDateString();
+      const lastResetDate = await AsyncStorage.getItem('lastResetDate');
+      
+      if (lastResetDate !== today) {
+        // Reset all subtasks for the new day
+        const resetTasks = dailyTasks.map(task => ({
+          ...task,
+          subtasks: [] // Clear subtasks for new day
+        }));
+        
+        setDailyTasks(resetTasks);
+        await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(resetTasks));
+        await AsyncStorage.setItem('lastResetDate', today);
+      }
+    };
+
+    resetDailyTasks();
+  }, []);
+
   const addTemplate = async (newTemplate: Template) => {
     try {
       setTemplates((prevTemplates) => {

@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
+  Pressable,
 } from 'react-native';
 import { TabCreateIcon } from "@/components/navigation/TabBarIcon";
 
@@ -31,9 +33,12 @@ const RoutineModal: React.FC<RoutineModalProps> = ({
 }) => {
   const isDarkMode = useColorScheme() === 'dark';
 
-  const formatTime = (timeStr: string): string => {
-    const hour = parseInt(timeStr, 10);
-    return `${hour % 12 || 12}:00 ${hour >= 12 ? 'PM' : 'AM'}`;
+  const handleSave = () => {
+    if (!content.trim()) {
+      Alert.alert('Error', 'Task content cannot be empty');
+      return;
+    }
+    onSave();
   };
 
   return (
@@ -51,46 +56,52 @@ const RoutineModal: React.FC<RoutineModalProps> = ({
             <View className="p-4 border-b border-gray-200 dark:border-zinc-800">
               <View className="w-12 h-1 bg-gray-200 dark:bg-zinc-700 rounded-full mx-auto mb-4" />
               <Text className="text-xl font-semibold text-center dark:text-white">
-                Edit Routine for {formatTime(time)}
+                Edit Task for {convertTo12Hour(time)}
               </Text>
             </View>
 
-            <ScrollView className="p-4">
-              <View className="space-y-4">
-                <TextInput
-                  className="bg-gray-50 dark:bg-zinc-800 rounded-xl p-4 text-base dark:text-white"
-                  value={content}
-                  onChangeText={setContent}
-                  multiline
-                  maxLength={100}
-                  placeholder="Enter routine details..."
-                  placeholderTextColor={isDarkMode ? "#666" : "#999"}
-                  style={{ minHeight: 120, textAlignVertical: 'top' }}
-                />
+            <View className="p-4 space-y-4">
+              <TextInput
+                className="bg-gray-50 dark:bg-zinc-800 rounded-xl p-4 text-base dark:text-white"
+                value={content}
+                onChangeText={setContent}
+                multiline
+                maxLength={100}
+                placeholder="Enter task details..."
+                placeholderTextColor={isDarkMode ? "#666" : "#999"}
+                style={{ minHeight: 100, textAlignVertical: 'top' }}
+                autoFocus
+              />
 
-                <TouchableOpacity
-                  className="bg-green-600 p-4 rounded-xl flex-row justify-center items-center space-x-2"
-                  onPress={onSave}
-                >
-                  <Text className="text-white font-medium">Save Changes</Text>
-                  <TabCreateIcon name="check" size={20} color="white" />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  className="p-4"
+              <View className="flex-row space-x-3">
+                <Pressable
+                  className="flex-1 p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800"
                   onPress={onClose}
                 >
-                  <Text className="text-center text-zinc-600 dark:text-zinc-400">
+                  <Text className="text-center text-zinc-600 dark:text-zinc-400 font-medium">
                     Cancel
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
+                <Pressable
+                  className="flex-1 p-4 rounded-xl bg-green-600"
+                  onPress={handleSave}
+                >
+                  <Text className="text-center text-white font-medium">
+                    Save Changes
+                  </Text>
+                </Pressable>
               </View>
-            </ScrollView>
+            </View>
           </View>
         </KeyboardAvoidingView>
       </View>
     </Modal>
   );
+};
+
+const convertTo12Hour = (timeStr: string): string => {
+  const hour = parseInt(timeStr, 10);
+  return `${hour % 12 || 12}:00 ${hour >= 12 ? 'PM' : 'AM'}`;
 };
 
 export default RoutineModal;

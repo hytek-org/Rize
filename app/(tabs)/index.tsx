@@ -291,11 +291,11 @@ const HomeScreen = () => {
       <View className="mt-4">
         <View className='flex flex-row items-center'>
           <IconSymbol size={28} name="lock-clock" color={'#22c55e'} />
-          <Text className="text-lg font-semibold text-zinc-800 dark:text-white max-h-20">
+          <Text className="text-2xl font-semibold text-zinc-800 dark:text-white max-h-20">
             {item.task.content} 
           </Text>
         </View>
-        <View className="flex-row justify-between items-center mt-2.5 ">
+        <View className="flex-row justify-between items-center mt-4 ">
           <Text className='text-sm font-semibold text-black/50 dark:text-white/50'>Manage your Tasks</Text>
           {canEditTask(item.label) && (
             <Pressable

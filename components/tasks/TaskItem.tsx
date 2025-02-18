@@ -1,9 +1,16 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, Pressable, TextInput, Alert, useColorScheme } from 'react-native';
+import {
+  View, Text, Pressable, 
+
+} from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useTemplateContext } from '@/contexts/TemplateContext';
 import CustomAlert from '../CustomAlert';
 import { AlertState, AlertType, } from '@/types/notes';
+import * as Haptics from 'expo-haptics';
+import { SubtaskDrawer } from './SubtaskDrawer';
+import { SubtaskItem } from './SubtaskItem';
+
 interface SubTask {
   id: string;
   content: string;
@@ -25,31 +32,9 @@ interface SubtaskItemProps {
   subtask: SubTask;
   onToggle: () => void;
   onRemove: () => void;
+  onEdit: () => void;  // Add this line
 }
 
-const SubtaskItem: React.FC<SubtaskItemProps> = React.memo(({ subtask, onToggle, onRemove }) => (
-  <View className="flex-row items-center justify-between py-2">
-    <Pressable
-      className="flex-row items-center flex-1"
-      onPress={onToggle}
-    >
-      <IconSymbol
-        name={subtask.completed ? "checkmark.circle.fill" : "circle"}
-        size={20}
-        color={subtask.completed ? '#22c55e' : '#71717a'}
-      />
-      <Text className={`ml-2 flex-1 ${subtask.completed ? 'line-through text-zinc-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
-        {subtask.content}
-      </Text>
-    </Pressable>
-    <Pressable
-      onPress={onRemove}
-      className="p-2"
-    >
-      <IconSymbol name="xmark.circle.fill" size={20} color="#ef4444" />
-    </Pressable>
-  </View>
-));
 
 const convertTo12Hour = (hourStr: string): string => {
   const hour = parseInt(hourStr, 10);
@@ -60,149 +45,155 @@ const convertTo12Hour = (hourStr: string): string => {
 
 export const TaskItem: React.FC<TaskItemProps> = React.memo(({ task, isCurrentHour, onEdit }) => {
   const { updateSubtask, addSubtask, removeSubtask } = useTemplateContext();
-  const [showSubtaskInput, setShowSubtaskInput] = useState(false);
-  const [newSubtaskText, setNewSubtaskText] = useState('');
-  const colorScheme = useColorScheme();
-  const color = colorScheme === 'dark' ? '#fff' : '#000';
-  // Fix alert state with proper typing
+  const [isSubtasksVisible, setIsSubtasksVisible] = useState(false);
+  const [showSubtaskDrawer, setShowSubtaskDrawer] = useState(false);
+  const [editingSubtask, setEditingSubtask] = useState<{ id: string; content: string } | null>(null);
   const [alertState, setAlertState] = useState<AlertState>({
     visible: false,
     title: '',
     message: '',
     type: 'info'
   });
-  const showAlert = useCallback((title: string, message: string, type: AlertType) => {
-    setAlertState({
-      visible: true,
-      title,
-      message,
-      type
-    });
-  }, []);
-  const handleAddSubtask = () => {
-    if (newSubtaskText.trim()) {
-      addSubtask(task.id, newSubtaskText.trim())
-        .then(() => {
-          setNewSubtaskText('');
-          setShowSubtaskInput(false);
 
-        })
-        .catch(() => {
-          showAlert('Error', 'Failed to add subtask', 'error');
-        });
+  const toggleSubtasks = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => { });
+    setIsSubtasksVisible(!isSubtasksVisible);
+  }, [isSubtasksVisible]);
+
+  const showAlert = useCallback((title: string, message: string, type: AlertType) => {
+    setAlertState({ visible: true, title, message, type });
+  }, []);
+
+ 
+
+  const handleAddSubtask = async (content: string) => {
+    try {
+      await addSubtask(task.id, content);
+      showAlert('Success', 'Subtask added successfully', 'success');
+      setShowSubtaskDrawer(false);
+    } catch (error) {
+      showAlert('Error', 'Failed to add subtask', 'error');
     }
   };
 
-  const handleRemoveSubtask = (subtaskId: string) => {
-    removeSubtask(task.id, subtaskId)
-    showAlert('Success', 'Subtask Removed', 'success');
+  const handleEditSubtask = (subtaskId: string, content: string) => {
+    setEditingSubtask({ id: subtaskId, content });
+    setShowSubtaskDrawer(true);
   };
 
-  const completedCount = task.subtasks?.filter(st => st.completed).length ?? 0;
-  const totalCount = task.subtasks?.length ?? 0;
+  const handleRemoveSubtask = async (subtaskId: string) => {
+    try {
+      await removeSubtask(task.id, subtaskId);
+      showAlert('Success', 'Subtask removed', 'success');
+    } catch (error) {
+      showAlert('Error', 'Failed to remove subtask', 'error');
+    }
+  };
 
   return (
-    <>
+    <View className="mx-4 mb-4">
       <View className={`bg-white dark:bg-zinc-900 border border-l-4 
-      ${isCurrentHour ? "border-l-green-600" : "border-l-neutral-300 dark:border-l-neutral-700"}
-      rounded-xl mx-4 mb-4 shadow-sm`}>
+        ${isCurrentHour ? "border-l-green-600" : "border-l-neutral-300 dark:border-l-neutral-700"}
+        rounded-xl shadow-sm`}
+      >
+        {/* Header */}
         <View className="p-4">
-          {/* Header with time and task count */}
-          <View className="flex-row justify-between items-center mb-3">
-            <View className="flex-row items-center space-x-2">
-              <Text className="text-sm text-gray-800 dark:text-gray-200">
+          <View className="flex-row justify-between items-center">
+            {/* Time and Edit Button */}
+            <View className="flex-row items-center space-x-3">
+              <IconSymbol name="schedule" size={20} color="#22c55e" />
+              <Text className=" pl-1.5 text-xs font-medium text-zinc-900 dark:text-zinc-100">
                 {convertTo12Hour(task.time)}
               </Text>
-              {totalCount > 0 && (
-                <Text className="text-xs text-gray-500 dark:text-gray-400">
-                  ({completedCount}/{totalCount})
+            </View>
+            <View className="flex-row items-center ">
+              {/* Show subtask count if there are subtasks */}
+              {task.subtasks && task.subtasks.length > 0 && (
+                <Text className="text-sm text-zinc-500 mr-2">
+                  {task.subtasks.filter(st => st.completed).length}/{task.subtasks.length}
                 </Text>
               )}
+              {/* Always show toggle button */}
+              <Pressable
+                onPress={toggleSubtasks}
+                className="p-2 rounded-full bg-zinc-100 dark:bg-zinc-800"
+              >
+                <IconSymbol
+                  name={isSubtasksVisible ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
+                  size={24}
+                  color="#71717a"
+                />
+              </Pressable>
+
+
+              <Pressable
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  onEdit();
+                }}
+                className="p-2 ml-4 rounded-full bg-zinc-100 dark:bg-zinc-800"
+              >
+                <IconSymbol name="mode-edit-outline" size={20} color="#22c55e" />
+              </Pressable>
             </View>
-            <Pressable onPress={onEdit}>
-              <IconSymbol name="mode-edit-outline" size={20} color={color} />
-            </Pressable>
           </View>
 
-          {/* Main task */}
-          <Text className="text-base text-zinc-900 dark:text-zinc-100 mb-3">
+          {/* Task Content */}
+          <Text className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mt-2">
             {task.content}
           </Text>
 
-          {/* Subtasks list */}
-          {task.subtasks && task.subtasks.length > 0 && (
-            <View className="mb-3">
-              {task.subtasks.map((subtask) => (
-                <View key={subtask.id} className="flex-row items-center py-2 border-b border-zinc-100 dark:border-zinc-800">
-                  <Pressable
-                    className="flex-row items-center flex-1"
-                    onPress={() => updateSubtask(task.id, subtask.id, !subtask.completed)}
-                  >
-                    <IconSymbol
-                      name={subtask.completed ? "check-circle" : "task-alt"}
-                      size={20}
-                      color={subtask.completed ? '#22c55e' : '#71717a'}
-                    />
-                    <Text className={`ml-2 flex-1 ${subtask.completed
-                      ? 'line-through text-zinc-400 dark:text-zinc-600'
-                      : 'text-zinc-900 dark:text-zinc-100'
-                      }`}>
-                      {subtask.content}
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => handleRemoveSubtask(subtask.id)}
-                    className="p-2"
-                  >
-                    <IconSymbol name="remove-circle-outline" size={20} color="#ef4444" />
-                  </Pressable>
-                </View>
-              ))}
-            </View>
-          )}
+          {/* Subtasks Section */}
+          {isSubtasksVisible && (
+            <View className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+              {/* Show existing subtasks if any */}
+              {task.subtasks && task.subtasks.length > 0 ? (
+                task.subtasks.map((subtask) => (
+                  <SubtaskItem
+                    key={subtask.id}
+                    subtask={subtask}
+                    onToggle={() => updateSubtask(task.id, subtask.id, !subtask.completed)}
+                    onRemove={() => handleRemoveSubtask(subtask.id)}
+                    onEdit={() => handleEditSubtask(subtask.id, subtask.content)}
+                  />
+                ))
+              ) : (
+                <Text className="text-zinc-500 text-center pb-4">No subtasks yet</Text>
+              )}
 
-          {/* Add subtask input */}
-          {showSubtaskInput ? (
-            <View className="flex-col w-full items-center mt-4 space-y-3 px-4">
-              <TextInput
-                className="w-full bg-zinc-100 dark:bg-zinc-800 px-4 py-3 rounded-lg text-zinc-900 dark:text-zinc-100"
-                value={newSubtaskText}
-                onChangeText={setNewSubtaskText}
-                placeholder="Add a subtask..."
-                placeholderTextColor="#888"
-                onSubmitEditing={handleAddSubtask}
-                autoFocus
-                multiline
-              />
-              <View className="flex flex-row justify-between items-center w-full space-x-3 mt-4">
-                <Pressable
-                  className="flex-row items-center justify-center bg-green-500 px-4 py-2 rounded-lg shadow-md"
-                  onPress={handleAddSubtask}
-                >
-                  <IconSymbol name="task-alt" size={24} color="#fff" />
-                  <Text className="ml-2 text-white font-medium">Add Task</Text>
-                </Pressable>
-                <Pressable
-                  className="flex-row items-center justify-center bg-zinc-200 dark:bg-zinc-700 px-4 py-2 rounded-lg shadow-md"
-                  onPress={() => setShowSubtaskInput(false)}
-                >
-                  <IconSymbol name="close" size={24} color="#666" />
-                  <Text className="ml-2 text-zinc-800 dark:text-zinc-300 font-medium">Close</Text>
-                </Pressable>
-              </View>
+              {/* Add Subtask Button */}
+              <Pressable
+                className="flex-row items-center justify-center py-3 mt-2 bg-zinc-100 dark:bg-zinc-800 rounded-xl"
+                onPress={() => setShowSubtaskDrawer(true)}
+              >
+                <IconSymbol name="add-task" size={20} color="#22c55e" />
+                <Text className="ml-2 text-green-600 font-medium">Add New Subtask</Text>
+              </Pressable>
             </View>
-
-          ) : (
-            <Pressable
-              className="flex-row items-center mt-2"
-              onPress={() => setShowSubtaskInput(true)}
-            >
-              <IconSymbol name="add-task" size={20} color="#22c55e" />
-              <Text className="ml-2 text-green-500">Add Subtask</Text>
-            </Pressable>
           )}
         </View>
       </View>
+
+      {/* Drawers and Alerts */}
+      <SubtaskDrawer
+        visible={showSubtaskDrawer}
+        onClose={() => {
+          setShowSubtaskDrawer(false);
+          setEditingSubtask(null);
+        }}
+        onSave={editingSubtask ?
+          (content) => {
+            updateSubtask(task.id, editingSubtask.id, false, content);
+            setEditingSubtask(null);
+            setShowSubtaskDrawer(false);
+            showAlert('Success', 'Subtask updated', 'success');
+          } :
+          handleAddSubtask
+        }
+        editMode={!!editingSubtask}
+        initialValue={editingSubtask?.content}
+      />
+
       <CustomAlert
         visible={alertState.visible}
         title={alertState.title}
@@ -210,7 +201,7 @@ export const TaskItem: React.FC<TaskItemProps> = React.memo(({ task, isCurrentHo
         onClose={() => setAlertState(prev => ({ ...prev, visible: false }))}
         type={alertState.type}
       />
-    </>
+    </View>
   );
 });
 
