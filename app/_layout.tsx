@@ -13,6 +13,9 @@ import { TemplateProvider } from '@/contexts/TemplateContext';
 import { AuthProvider } from '@/contexts/AuthProvider';
 import { AudioPlayerProvider } from '@/contexts/AudioPlayerContext';
 import { PodcastProvider } from '@/contexts/PodcastContext';
+import * as Notifications from 'expo-notifications';
+import { playAlarm, stopAlarm, restoreAlarms } from '@/utils/alarmService';
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -29,7 +32,23 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
+      // Restore alarms when app starts
+      restoreAlarms();
     }
+
+    const subscription = Notifications.addNotificationReceivedListener(notification => {
+      if (notification.request.content.data?.type === 'alarm') {
+        const { hour, minute } = notification.request.content.data;
+        playAlarm(parseInt(hour), parseInt(minute));
+      }
+    });
+
+    const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
+      if (response.notification.request.content.data?.type === 'alarm') {
+        stopAlarm();
+      }
+    });
+
     const fetchTemplates = async () => {
       try {
         const templates = await initializeTemplates();
@@ -42,12 +61,15 @@ export default function RootLayout() {
     };
 
     fetchTemplates();
+    return () => {
+      subscription.remove();
+      responseSubscription.remove();
+    };
   }, [loaded]);
 
   if (!loaded) {
     return null;
   }
-
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <AuthProvider>
@@ -56,7 +78,7 @@ export default function RootLayout() {
             <PodcastProvider>
               <AudioPlayerProvider>
                 <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false,  }} />
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false, }} />
                   <Stack.Screen name="+not-found" />
                 </Stack>
               </AudioPlayerProvider>

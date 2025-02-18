@@ -9,11 +9,17 @@ interface SubTask {
   completed: boolean;
 }
 
+interface TaskAlarm {
+  minute: number;
+  enabled: boolean;
+}
+
 interface TemplateItem {
   id: number;
   content: string;
   time: string;
   subtasks?: SubTask[];
+  alarm?: TaskAlarm;
 }
 
 interface Template {
@@ -40,6 +46,7 @@ interface TemplateContextProps {
   updateSubtask: (taskId: number, subtaskId: string, completed: boolean, newContent?: string) => void;
   addSubtask: (taskId: number, content: string) => Promise<void>;
   removeSubtask: (taskId: number, subtaskId: string) => Promise<void>;
+  updateTaskAlarm: (taskId: number, minute: number) => Promise<void>;
 }
 
 const TemplateContext = createContext<TemplateContextProps | undefined>(undefined);
@@ -288,6 +295,26 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
     }
   };
 
+  const updateTaskAlarm = async (taskId: number, minute: number) => {
+    try {
+      const updatedTasks = dailyTasks.map(task =>
+        task.id === taskId ? {
+          ...task,
+          alarm: {
+            minute,
+            enabled: true
+          }
+        } : task
+      );
+
+      setDailyTasks(updatedTasks);
+      await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
+    } catch (error) {
+      console.error('Failed to update task alarm:', error);
+      throw error;
+    }
+  };
+
   return (
     <TemplateContext.Provider
       value={{
@@ -306,6 +333,7 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
         updateSubtask,
         addSubtask,
         removeSubtask,
+        updateTaskAlarm,
       }}
     >
       {children}

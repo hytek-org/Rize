@@ -35,6 +35,7 @@ const MAPPING: Record<string, keyof typeof MaterialIcons.glyphMap> = {
   "error": "error",
   "check": "check",
   "pause": "pause",
+  "download": "download",
   "queue-music": "queue-music",
   "playlist-add": "playlist-add",
   
@@ -44,6 +45,8 @@ const MAPPING: Record<string, keyof typeof MaterialIcons.glyphMap> = {
   "filter-list": "filter-list",
   "filter-list-off": "filter-list-off",
   "chevron-right": "chevron-right",
+  "alarm-on": "alarm-on",
+  "alarm-add": "alarm-add",
 };
 
 export type IconSymbolName = keyof typeof MAPPING;
