@@ -111,7 +111,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="tasks"
           options={{
-            title: 'Tasks',
+            title: 'Routines',
             tabBarIcon: ({ color }) => <IconSymbol size={28} name="lock-clock" color={color} />,
           }}
         />

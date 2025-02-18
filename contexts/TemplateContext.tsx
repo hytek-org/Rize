@@ -37,7 +37,7 @@ interface TemplateContextProps {
   editTemplate: (updatedTemplate: Template) => void;
   updateRoutine: (taskId: number, content: string) => Promise<void>;
   getCurrentTemplate: () => Template | null;
-  updateSubtask: (taskId: number, subtaskId: string, completed: boolean) => Promise<void>;
+  updateSubtask: (taskId: number, subtaskId: string, completed: boolean, newContent?: string) => void;
   addSubtask: (taskId: number, content: string) => Promise<void>;
   removeSubtask: (taskId: number, subtaskId: string) => Promise<void>;
 }
@@ -199,27 +199,26 @@ export const TemplateProvider: React.FC<React.PropsWithChildren<{}>> = ({ childr
     return templates.find(template => template.id === activeTemplateId) || null;
   };
 
-  const updateSubtask = async (taskId: number, subtaskId: string, completed: boolean) => {
-    try {
-      const updatedTasks = dailyTasks.map(task => {
-        if (task.id === taskId && task.subtasks) {
+  const updateSubtask = (taskId: number, subtaskId: string, completed: boolean, newContent?: string) => {
+    setDailyTasks(prevTasks =>
+      prevTasks.map(task => {
+        if (task.id === taskId) {
           return {
             ...task,
-            subtasks: task.subtasks.map(subtask => 
-              subtask.id === subtaskId ? { ...subtask, completed } : subtask
-            )
+            subtasks: task.subtasks?.map(subtask =>
+              subtask.id === subtaskId
+                ? {
+                    ...subtask,
+                    completed,
+                    ...(newContent !== undefined && { content: newContent }),
+                  }
+                : subtask
+            ),
           };
         }
         return task;
-      });
-
-      setDailyTasks(updatedTasks);
-      await AsyncStorage.setItem(TASKS_KEY, JSON.stringify(updatedTasks));
-      globalEmitter.emit('TASKS_UPDATED', updatedTasks);
-    } catch (error) {
-      console.error("Failed to update subtask", error);
-      throw error;
-    }
+      })
+    );
   };
 
   const addSubtask = async (taskId: number, content: string) => {

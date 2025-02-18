@@ -51,76 +51,147 @@ interface SubtaskDrawerProps {
   visible: boolean;
   onClose: () => void;
   onSave: (subtasks: string[]) => void;
+  editMode?: boolean;
+  initialValue?: string;
 }
 
-const SubtaskDrawer: React.FC<SubtaskDrawerProps> = ({ visible, onClose, onSave }) => {
-  const [inputs, setInputs] = useState<string[]>(['']);
+const SubtaskDrawer: React.FC<SubtaskDrawerProps> = ({ 
+  visible, 
+  onClose, 
+  onSave, 
+  editMode = false,
+  initialValue = '' 
+}) => {
+  const [inputs, setInputs] = useState<string[]>([editMode ? initialValue : '']);
+  const [errors, setErrors] = useState<string[]>([]);
 
   const handleInputChange = (text: string, index: number) => {
     const newInputs = [...inputs];
+    const newErrors = [...errors];
     newInputs[index] = text;
+    newErrors[index] = ''; // Clear error when typing
     setInputs(newInputs);
+    setErrors(newErrors);
   };
 
   const addField = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setInputs([...inputs, '']);
+    setErrors([...errors, '']);
   };
 
   const removeField = (index: number) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const newInputs = inputs.filter((_, i) => i !== index);
+    const newErrors = errors.filter((_, i) => i !== index);
     setInputs(newInputs);
+    setErrors(newErrors);
+  };
+
+  const validateInputs = (): boolean => {
+    const newErrors = inputs.map(input => 
+      input.trim() === '' ? 'Subtask cannot be empty' : ''
+    );
+    setErrors(newErrors);
+    return !newErrors.some(error => error !== '');
   };
 
   const handleSave = () => {
-    const nonEmptySubtasks = inputs.filter(input => input.trim() !== '');
-    onSave(nonEmptySubtasks);
-    setInputs(['']);
+    if (validateInputs()) {
+      const nonEmptySubtasks = inputs.filter(input => input.trim() !== '');
+      if (nonEmptySubtasks.length > 0) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        onSave(nonEmptySubtasks);
+        setInputs(['']);
+        setErrors([]);
+      }
+    }
   };
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View className="flex-1 justify-end bg-zinc-50/80 dark:bg-zinc-900/60">
-        <View className="bg-white dark:bg-zinc-800 p-4 rounded-t-2xl">
-          <Text className="text-xl font-bold text-center mb-4 text-zinc-800 dark:text-white">
-            Add Subtasks
-          </Text>
-          <ScrollView style={{ maxHeight: 500 ,minHeight: 50}}>
-            {inputs.map((input, index) => (
-              <View key={index} className="flex-row items-center mb-2">
-                <TextInput
-                  className="flex-1 border border-zinc-300 dark:border-zinc-600 p-2 rounded-md text-zinc-800 dark:text-white"
-                  placeholder="Enter subtask"
-                  placeholderTextColor="#9ca3af"
-                  value={input}
-                  onChangeText={(text) => handleInputChange(text, index)}
-                />
-                {inputs.length > 1 && (
-                  <Pressable onPress={() => removeField(index)} className="ml-2">
-                    <IconSymbol name="xmark.circle.fill" size={24} color="#ef4444" />
-                  </Pressable>
-                )}
-              </View>
-            ))}
-          </ScrollView>
-          {/* <Pressable onPress={addField} className="py-2">
-            <Text className="text-green-600 dark:text-green-400 text-center">Add Another</Text>
-          </Pressable> */}
-          <View className="flex-row justify-between mt-4">
-            <Pressable
-              onPress={onClose}
-              className="py-2 px-4 border border-zinc-300 dark:border-zinc-600 rounded-md"
+      <Pressable 
+        className="flex-1 bg-zinc-900/60"
+        onPress={onClose}
+      >
+        <View className="flex-1 justify-end">
+          <Pressable className="bg-white dark:bg-zinc-800 p-6 rounded-t-3xl">
+            <View className="w-12 h-1 bg-zinc-300 dark:bg-zinc-600 rounded-full self-center mb-6" />
+            
+            <Text className="text-2xl font-semibold text-center mb-6 text-zinc-800 dark:text-white">
+              Add Subtasks
+            </Text>
+
+            <ScrollView 
+              className="max-h-[400px]"
+              showsVerticalScrollIndicator={false}
             >
-              <Text className="text-zinc-800 dark:text-white">Cancel</Text>
-            </Pressable>
-            <Pressable
-              onPress={handleSave}
-              className="py-2 px-4 bg-green-600 dark:bg-green-700 rounded-md"
+              {inputs.map((input, index) => (
+                <View key={index} className="mb-4">
+                  <View className="flex-row items-center">
+                    <View className="flex-1">
+                      <TextInput
+                        className={`bg-zinc-100 dark:bg-zinc-700 px-4 py-3 rounded-xl text-zinc-800 dark:text-white text-base
+                          ${errors[index] ? 'border-2 border-red-500' : ''}`}
+                        placeholder="Enter subtask"
+                        placeholderTextColor="#9ca3af"
+                        value={input}
+                        onChangeText={(text) => handleInputChange(text, index)}
+                      />
+                      {errors[index] && (
+                        <Text className="text-red-500 text-sm mt-1 ml-2">
+                          {errors[index]}
+                        </Text>
+                      )}
+                    </View>
+                    {inputs.length > 1 && (
+                      <Pressable 
+                        onPress={() => removeField(index)}
+                        className="ml-2 p-2"
+                      >
+                        <IconSymbol 
+                          name="remove-circle" 
+                          size={28} 
+                          color="#ef4444"
+                        />
+                      </Pressable>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+
+            <Pressable 
+              onPress={addField}
+              className="flex-row items-center justify-center py-3 mt-2 mb-4"
             >
-              <Text className="text-white">Save</Text>
+              <IconSymbol name="add-task" size={24} color="#22c55e" />
+              <Text className="text-green-600 ml-2 text-base font-medium">
+                Add Another Subtask
+              </Text>
             </Pressable>
-          </View>
+
+            <View className="flex-row justify-between mt-2">
+              <Pressable
+                onPress={onClose}
+                className="flex-1 py-3 mr-2 border-2 border-zinc-300 dark:border-zinc-600 rounded-xl"
+              >
+                <Text className="text-center text-zinc-800 dark:text-white text-base font-medium">
+                  Cancel
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={handleSave}
+                className="flex-1 py-3 ml-2 bg-green-600 dark:bg-green-700 rounded-xl"
+              >
+                <Text className="text-center text-white text-base font-medium">
+                  Save Subtasks
+                </Text>
+              </Pressable>
+            </View>
+          </Pressable>
         </View>
-      </View>
+      </Pressable>
     </Modal>
   );
 };
@@ -134,6 +205,8 @@ const HomeScreen = () => {
   const [showSubtaskInput, setShowSubtaskInput] = useState<number | null>(null);
   const [activeIndex, setActiveIndex] = useState<number>(1);
   const flatListRef = useRef<FlatList>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editingSubtask, setEditingSubtask] = useState<{ taskId: number; subtaskId: string; content: string } | null>(null);
 
   // Set up the three time slot cards
   useEffect(() => {
@@ -178,6 +251,11 @@ const HomeScreen = () => {
   const now = new Date();
   const currentHourString = now.getHours().toString().padStart(2, '0');
 
+  const handleEditSubtask = (taskId: number, subtaskId: string, content: string) => {
+    setEditingSubtask({ taskId, subtaskId, content });
+    setShowSubtaskInput(taskId);
+  };
+
   const renderTask = (item: TimeSlotTask) => (
     <View
       className={`bg-white dark:bg-zinc-800 border border-t-4 ${item.borderColor} dark:border-zinc-700 shadow-lg rounded-2xl p-5`}
@@ -188,13 +266,12 @@ const HomeScreen = () => {
         <View className="flex-row items-center space-x-2">
           <Text className="text-sm text-zinc-800 dark:text-white">{item.timeLabel}</Text>
           <Text
-            className={`text-sm ${
-              item.label === 'Previous'
+            className={`text-sm ${item.label === 'Previous'
                 ? 'text-yellow-500'
                 : item.label === 'Current'
-                ? 'text-green-500'
-                : 'text-red-500'
-            }`}
+                  ? 'text-green-500'
+                  : 'text-red-500'
+              }`}
           >
             ({item.label})
           </Text>
@@ -209,18 +286,38 @@ const HomeScreen = () => {
           </Pressable>
         )}
       </View>
-  
+
       {/* Task Content */}
       <View className="mt-4">
         <Text className="text-lg font-semibold text-zinc-800 dark:text-white">
           {item.task.content}
         </Text>
-  
-        {/* Updated Subtasks UI with ScrollView */}
+        <View className="flex-row justify-between items-center mt-2.5 ">
+          <Text>Manage your Tasks</Text>
+          {canEditTask(item.label) && (
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setEditMode(!editMode);
+              }}
+              className={`px-3 py-1 rounded-full ${
+                editMode ? 'bg-green-100 dark:bg-green-900' : 'bg-zinc-100 dark:bg-zinc-700'
+              }`}
+            >
+              <Text className={`text-sm ${
+                editMode ? 'text-green-600 dark:text-green-400' : 'text-zinc-600 dark:text-zinc-400'
+              }`}>
+                {editMode ? 'Done' : 'Edit'}
+              </Text>
+            </Pressable>
+          )}
+        </View>
+
+        {/* Subtasks List */}
         {item.task.subtasks && item.task.subtasks.length > 0 && (
-          <View className="mt-4 pl-4 border-l border-zinc-200 dark:border-zinc-700">
+          <View className="mt-4 pl-4 border-l h-96 border-zinc-200 dark:border-zinc-700">
             <ScrollView
-              style={{ maxHeight: '90%'}}
+              style={{ maxHeight: '100%' }}
               contentContainerStyle={{ paddingVertical: 2 }}
             >
               {item.task.subtasks.map((subtask) => (
@@ -240,15 +337,14 @@ const HomeScreen = () => {
                         !canEditTask(item.label)
                           ? '#9ca3af'
                           : subtask.completed
-                          ? '#22c55e'
-                          : '#71717a'
+                            ? '#22c55e'
+                            : '#71717a'
                       }
                     />
                     <Text
-                      className={`ml-2 ${
-                        subtask.completed
-                          ? 'line-through text-zinc-400'
-                          : !canEditTask(item.label)
+                      className={`ml-2 ${subtask.completed
+                        ? 'line-through text-zinc-400'
+                        : !canEditTask(item.label)
                           ? 'text-zinc-500'
                           : 'text-zinc-900 dark:text-zinc-100'
                       }`}
@@ -256,10 +352,21 @@ const HomeScreen = () => {
                       {subtask.content}
                     </Text>
                   </Pressable>
-                  {canEditTask(item.label) && (
-                    <Pressable onPress={() => removeSubtask(item.task.id, subtask.id)} className="p-1">
-                      <IconSymbol name="remove-circle-outline" size={20} color="#ef4444" />
-                    </Pressable>
+                  {canEditTask(item.label) && editMode && (
+                    <View className="flex-row items-center">
+                      <Pressable 
+                        onPress={() => handleEditSubtask(item.task.id, subtask.id, subtask.content)} 
+                        className="p-2"
+                      >
+                        <IconSymbol name="mode-edit-outline" size={20} color="#22c55e" />
+                      </Pressable>
+                      <Pressable 
+                        onPress={() => removeSubtask(item.task.id, subtask.id)} 
+                        className="p-2"
+                      >
+                        <IconSymbol name="remove-circle-outline" size={20} color="#ef4444" />
+                      </Pressable>
+                    </View>
                   )}
                 </View>
               ))}
@@ -267,16 +374,13 @@ const HomeScreen = () => {
           </View>
         )}
       </View>
-  
+
       {/* TimeBlock */}
       <View className="mt-auto items-end pl-5">
         <TimeBlock item={item} currentHourString={currentHourString} />
       </View>
     </View>
   );
-  
-  
-
   // Always call useFocusEffect so hook order remains consistent.
   useFocusEffect(
     useCallback(() => {
@@ -367,12 +471,21 @@ const HomeScreen = () => {
         {showSubtaskInput !== null && (
           <SubtaskDrawer
             visible={true}
-            onClose={() => setShowSubtaskInput(null)}
+            onClose={() => {
+              setShowSubtaskInput(null);
+              setEditingSubtask(null);
+            }}
             onSave={(subtasks) => {
-              // For each new subtask, call addSubtask for the current task.
-              subtasks.forEach((subtask) => addSubtask(showSubtaskInput, subtask));
+              if (editingSubtask) {
+                updateSubtask(editingSubtask.taskId, editingSubtask.subtaskId, false, subtasks[0]);
+                setEditingSubtask(null);
+              } else {
+                subtasks.forEach((subtask) => addSubtask(showSubtaskInput, subtask));
+              }
               setShowSubtaskInput(null);
             }}
+            editMode={!!editingSubtask}
+            initialValue={editingSubtask?.content}
           />
         )}
       </SafeAreaView>

@@ -36,9 +36,9 @@ const TimeBlock: React.FC<TimeBlockProps> = ({ item, currentHourString }) => {
   // Choose the color palette based on the task's label.
   const blockColors =
     item.label === 'Previous'
-      ? ['bg-yellow-500', 'bg-yellow-400', 'bg-yellow-300', 'bg-yellow-200']
+      ? ['bg-yellow-500', 'bg-yellow-500', 'bg-yellow-500', 'bg-yellow-500']
       : item.label === 'Next'
-      ? ['bg-red-500', 'bg-red-400', 'bg-red-300', 'bg-red-200']
+      ? ['bg-red-500', 'bg-red-500', 'bg-red-500', 'bg-red-500']
       : ['bg-green-500', 'bg-green-400', 'bg-green-300', 'bg-green-200'];
 
   // Fallback color when the block is not "filled"
