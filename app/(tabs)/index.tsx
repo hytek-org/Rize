@@ -55,12 +55,12 @@ interface SubtaskDrawerProps {
   initialValue?: string;
 }
 
-const SubtaskDrawer: React.FC<SubtaskDrawerProps> = ({ 
-  visible, 
-  onClose, 
-  onSave, 
+const SubtaskDrawer: React.FC<SubtaskDrawerProps> = ({
+  visible,
+  onClose,
+  onSave,
   editMode = false,
-  initialValue = '' 
+  initialValue = ''
 }) => {
   const [inputs, setInputs] = useState<string[]>([editMode ? initialValue : '']);
   const [errors, setErrors] = useState<string[]>([]);
@@ -89,7 +89,7 @@ const SubtaskDrawer: React.FC<SubtaskDrawerProps> = ({
   };
 
   const validateInputs = (): boolean => {
-    const newErrors = inputs.map(input => 
+    const newErrors = inputs.map(input =>
       input.trim() === '' ? 'Subtask cannot be empty' : ''
     );
     setErrors(newErrors);
@@ -110,19 +110,19 @@ const SubtaskDrawer: React.FC<SubtaskDrawerProps> = ({
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <Pressable 
+      <Pressable
         className="flex-1 bg-zinc-900/60"
         onPress={onClose}
       >
         <View className="flex-1 justify-end">
           <Pressable className="bg-white dark:bg-zinc-800 p-6 rounded-t-3xl">
             <View className="w-12 h-1 bg-zinc-300 dark:bg-zinc-600 rounded-full self-center mb-6" />
-            
+
             <Text className="text-2xl font-semibold text-center mb-6 text-zinc-800 dark:text-white">
               Add Subtasks
             </Text>
 
-            <ScrollView 
+            <ScrollView
               className="max-h-[400px]"
               showsVerticalScrollIndicator={false}
             >
@@ -145,13 +145,13 @@ const SubtaskDrawer: React.FC<SubtaskDrawerProps> = ({
                       )}
                     </View>
                     {inputs.length > 1 && (
-                      <Pressable 
+                      <Pressable
                         onPress={() => removeField(index)}
                         className="ml-2 p-2"
                       >
-                        <IconSymbol 
-                          name="remove-circle" 
-                          size={28} 
+                        <IconSymbol
+                          name="close"
+                          size={28}
                           color="#ef4444"
                         />
                       </Pressable>
@@ -161,7 +161,7 @@ const SubtaskDrawer: React.FC<SubtaskDrawerProps> = ({
               ))}
             </ScrollView>
 
-            <Pressable 
+            <Pressable
               onPress={addField}
               className="flex-row items-center justify-center py-3 mt-2 mb-4"
             >
@@ -267,10 +267,10 @@ const HomeScreen = () => {
           <Text className="text-sm text-zinc-800 dark:text-white">{item.timeLabel}</Text>
           <Text
             className={`text-sm ${item.label === 'Previous'
-                ? 'text-yellow-500'
-                : item.label === 'Current'
-                  ? 'text-green-500'
-                  : 'text-red-500'
+              ? 'text-yellow-500'
+              : item.label === 'Current'
+                ? 'text-green-500'
+                : 'text-red-500'
               }`}
           >
             ({item.label})
@@ -281,33 +281,34 @@ const HomeScreen = () => {
             onPress={() => setShowSubtaskInput(item.task.id)}
             className="flex-row items-center bg-green-500 dark:bg-green-600 px-3 py-1 rounded-full"
           >
-            <IconSymbol name="add-task" size={16} color="#fff" />
-            <Text className="text-white text-sm ml-1">Add Subtask</Text>
+            <IconSymbol name="add-task" size={22} color="#fff" />
+            <Text className="text-white text-lg ml-1">Subtask</Text>
           </Pressable>
         )}
       </View>
 
       {/* Task Content */}
       <View className="mt-4">
-        <Text className="text-lg font-semibold text-zinc-800 dark:text-white">
-          {item.task.content}
-        </Text>
+        <View className='flex flex-row items-center'>
+          <IconSymbol size={28} name="lock-clock" color={'#22c55e'} />
+          <Text className="text-lg font-semibold text-zinc-800 dark:text-white max-h-20">
+            {item.task.content} 
+          </Text>
+        </View>
         <View className="flex-row justify-between items-center mt-2.5 ">
-          <Text>Manage your Tasks</Text>
+          <Text className='text-sm font-semibold text-black/50 dark:text-white/50'>Manage your Tasks</Text>
           {canEditTask(item.label) && (
             <Pressable
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setEditMode(!editMode);
               }}
-              className={`px-3 py-1 rounded-full ${
-                editMode ? 'bg-green-100 dark:bg-green-900' : 'bg-zinc-100 dark:bg-zinc-700'
-              }`}
+              className={`px-3 py-1  rounded-full  ${editMode ? 'bg-green-100 dark:bg-green-900' : 'bg-zinc-100 dark:bg-zinc-700'
+                }`}
             >
-              <Text className={`text-sm ${
-                editMode ? 'text-green-600 dark:text-green-400' : 'text-zinc-600 dark:text-zinc-400'
-              }`}>
-                {editMode ? 'Done' : 'Edit'}
+              <Text className={`text-xl font-bold  ${editMode ? 'text-green-600 dark:text-green-400' : 'text-zinc-600 dark:text-zinc-400'
+                }`}>
+                {editMode ? <IconSymbol name="task-alt" size={24} color="#22c55e" /> : <IconSymbol name="mode-edit-outline" size={24} color="#22c55e" />}
               </Text>
             </Pressable>
           )}
@@ -315,7 +316,7 @@ const HomeScreen = () => {
 
         {/* Subtasks List */}
         {item.task.subtasks && item.task.subtasks.length > 0 && (
-          <View className="mt-4 pl-4 border-l h-96 border-zinc-200 dark:border-zinc-700">
+          <View className="mt-4 pl-4 border-l  border-zinc-200 dark:border-zinc-700">
             <ScrollView
               style={{ maxHeight: '100%' }}
               contentContainerStyle={{ paddingVertical: 2 }}
@@ -347,21 +348,21 @@ const HomeScreen = () => {
                         : !canEditTask(item.label)
                           ? 'text-zinc-500'
                           : 'text-zinc-900 dark:text-zinc-100'
-                      }`}
+                        }`}
                     >
                       {subtask.content}
                     </Text>
                   </Pressable>
                   {canEditTask(item.label) && editMode && (
                     <View className="flex-row items-center">
-                      <Pressable 
-                        onPress={() => handleEditSubtask(item.task.id, subtask.id, subtask.content)} 
+                      <Pressable
+                        onPress={() => handleEditSubtask(item.task.id, subtask.id, subtask.content)}
                         className="p-2"
                       >
                         <IconSymbol name="mode-edit-outline" size={20} color="#22c55e" />
                       </Pressable>
-                      <Pressable 
-                        onPress={() => removeSubtask(item.task.id, subtask.id)} 
+                      <Pressable
+                        onPress={() => removeSubtask(item.task.id, subtask.id)}
                         className="p-2"
                       >
                         <IconSymbol name="remove-circle-outline" size={20} color="#ef4444" />
@@ -452,15 +453,14 @@ const HomeScreen = () => {
             />
 
             {/* Pagination Indicators */}
-            <View className="flex-row justify-center mb-24 mt-6">
+            <View className="flex-row justify-center mb-4 mt-6">
               {timeSlots.map((_, index) => (
                 <View
                   key={index}
-                  className={`w-2.5 h-2.5 rounded-full mx-1 ${
-                    index === activeIndex
-                      ? 'bg-green-500 dark:bg-green-400'
-                      : 'bg-zinc-300 dark:bg-zinc-600'
-                  }`}
+                  className={`w-2.5 h-2.5 rounded-full mx-1 ${index === activeIndex
+                    ? 'bg-green-500 dark:bg-green-400'
+                    : 'bg-zinc-300 dark:bg-zinc-600'
+                    }`}
                 />
               ))}
             </View>
