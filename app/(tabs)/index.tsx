@@ -290,11 +290,10 @@ const HomeScreen = () => {
         </View>
         <View className="flex-row justify-between items-center mt-4 ">
           <Text className='text-sm font-semibold text-black/50 dark:text-white/50'>Manage your Tasks</Text>
-
         </View>
 
         {/* Subtasks List */}
-        {item.task.subtasks && item.task.subtasks.length > 0 && (
+        {item.task.subtasks && item.task.subtasks.length > 0 ? (
           <View className="mt-4 pl-4 border-l  border-zinc-200 dark:border-zinc-700">
             <ScrollView
               style={{ maxHeight: '100%' }}
@@ -351,6 +350,10 @@ const HomeScreen = () => {
                 </View>
               ))}
             </ScrollView>
+          </View>
+        ):(
+          <View>
+            <Text className="text-2xl font-semibold text-zinc-500 text-center pt-safe pb-4">No subtasks yet</Text>
           </View>
         )}
       </View>
