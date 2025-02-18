@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, TextInput, FlatList, Alert, Image } from 'react-native';
+import { View, Text, Pressable, TextInput, FlatList, Image } from 'react-native';
 import { usePodcasts } from '@/contexts/PodcastContext';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useRouter } from 'expo-router';
@@ -35,6 +35,8 @@ export default function PlaylistScreen() {
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
   const router = useRouter();
   const colorScheme = useColorScheme();
 
@@ -53,19 +55,22 @@ export default function PlaylistScreen() {
     }
   };
 
-  const confirmDelete = (id: string, name: string) => {
-    Alert.alert(
-      'Delete Playlist',
-      `Are you sure you want to delete "${name}"?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Delete', 
-          onPress: () => deletePlaylist(id),
-          style: 'destructive'
-        },
-      ]
-    );
+  const handleDeleteConfirm = (playlist: Playlist) => {
+    setSelectedPlaylist(playlist);
+    setDeleteConfirmVisible(true);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmVisible(false);
+    setSelectedPlaylist(null);
+  };
+
+  const handleDeleteConfirmed = () => {
+    if (selectedPlaylist) {
+      deletePlaylist(selectedPlaylist.id);
+      setDeleteConfirmVisible(false);
+      setSelectedPlaylist(null);
+    }
   };
 
   const renderItem = ({ item: playlist }: { item: Playlist }) => (
@@ -131,7 +136,7 @@ export default function PlaylistScreen() {
           <IconSymbol name="edit" size={24} color={colorScheme === 'dark' ? '#fff' : '#000'} />
         </Pressable>
         <Pressable 
-          onPress={() => confirmDelete(playlist.id, playlist.name)}
+          onPress={() => handleDeleteConfirm(playlist)}
           className="p-2"
         >
           <IconSymbol name="delete" size={24} color="#ef4444" />
@@ -185,6 +190,33 @@ export default function PlaylistScreen() {
           </View>
         }
       />
+
+      {deleteConfirmVisible && selectedPlaylist && (
+        <View className="absolute inset-0 bg-black/50 flex items-center justify-center px-4">
+          <View className="bg-white dark:bg-zinc-800 p-6 rounded-2xl w-full max-w-sm">
+            <Text className="text-lg font-bold text-zinc-800 dark:text-zinc-100 mb-4">
+              Delete Playlist
+            </Text>
+            <Text className="text-md text-zinc-600 dark:text-zinc-300 mb-6">
+              Are you sure you want to delete "{selectedPlaylist.name}"?
+            </Text>
+            <View className="flex-row justify-end space-x-4">
+              <Pressable
+                onPress={handleDeleteCancel}
+                className="px-4 py-2 rounded-lg"
+              >
+                <Text className="text-blue-600 dark:text-blue-400">Cancel</Text>
+              </Pressable>
+              <Pressable
+                onPress={handleDeleteConfirmed}
+                className="px-4 py-2 bg-red-500 rounded-lg"
+              >
+                <Text className="text-white font-medium">Delete</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
