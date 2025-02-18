@@ -26,12 +26,15 @@ const MAPPING: Record<string, keyof typeof MaterialIcons.glyphMap> = {
   "lock-clock": "lock-clock",
   "podcasts": "podcasts",
   "note-add": "note-add",
-  
+  "forward-30": "forward-30",
+  "replay-30": "replay-30",
+  "play-arrow": "play-arrow",
   // Status icons
   "info": "info",
   "warning": "warning",
   "error": "error",
   "check": "check",
+  "pause": "pause",
   
   // Additional UI elements
   "keyboard-arrow-up": "keyboard-arrow-up",
