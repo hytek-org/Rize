@@ -6,6 +6,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useColorScheme } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
+import { TabCreateIcon } from '@/components/navigation/TabBarIcon';
 
 interface Episode {
   id: string;
@@ -38,8 +39,8 @@ export default function PlaylistDetails() {
       `Remove "${title}" from playlist?`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Remove', 
+        {
+          text: 'Remove',
           onPress: () => removeFromPlaylist(playlist.id, episodeId),
           style: 'destructive'
         },
@@ -48,11 +49,11 @@ export default function PlaylistDetails() {
   };
 
   const renderItem = ({ item: episode }: { item: Episode }) => (
-    <Pressable 
+    <Pressable
       className="flex-row items-center p-4 bg-white dark:bg-zinc-800 rounded-xl mb-3 shadow-sm"
       onPress={() => router.push({
         pathname: '/podcast/play/[id]',
-        params: { 
+        params: {
           id: episode.id,
           audioUrl: episode.audioUrl,
           title: episode.title,
@@ -61,11 +62,11 @@ export default function PlaylistDetails() {
         }
       })}
     >
-      <Image 
+      <Image
         source={{ uri: episode.imageUrl }}
         className="w-16 h-16 rounded-lg mr-4"
       />
-      
+
       <View className="flex-1">
         <ThemedText type="subtitle" className="text-base font-semibold mb-1">
           {episode.title}
@@ -73,19 +74,12 @@ export default function PlaylistDetails() {
       </View>
 
       <View className="flex-row items-center">
-        {currentId === episode.id && (
-          <IconSymbol 
-            name={isPlaying ? "pause" : "play-arrow"} 
-            size={24} 
-            color={colorScheme === 'dark' ? '#fff' : '#000'} 
-            style={{ marginRight: 8 }}  // Replace className with style
-          />
-        )}
-        <Pressable 
+
+        <Pressable
           onPress={() => confirmRemove(episode.id, episode.title)}
           className="p-2"
         >
-          <IconSymbol name="remove" size={24} color="#ef4444" />
+          <IconSymbol name="delete" size={24} color="#ef4444" />
         </Pressable>
       </View>
     </Pressable>
@@ -95,15 +89,11 @@ export default function PlaylistDetails() {
     <View className="flex-1 bg-zinc-100 dark:bg-zinc-900 px-4">
       <View className="mt-16 mb-6">
         <View className="flex-row items-center mb-4">
-          <Pressable 
+          <Pressable
             onPress={() => router.back()}
             className="mr-4"
           >
-            <IconSymbol 
-              name="arrow-back" 
-              size={24} 
-              color={colorScheme === 'dark' ? '#fff' : '#000'} 
-            />
+            <TabCreateIcon name="arrowleft" size={26} color={colorScheme === 'dark' ? '#fff' : '#000'} />
           </Pressable>
           <ThemedText type="title" className="text-2xl font-bold flex-1">
             {playlist.name}
@@ -122,10 +112,10 @@ export default function PlaylistDetails() {
         contentContainerStyle={{ paddingBottom: 100 }}
         ListEmptyComponent={
           <View className="items-center justify-center py-8">
-            <IconSymbol 
-              name="queue-music" 
-              size={48} 
-              color={colorScheme === 'dark' ? '#fff' : '#000'} 
+            <IconSymbol
+              name="queue-music"
+              size={48}
+              color={colorScheme === 'dark' ? '#fff' : '#000'}
             />
             <ThemedText type="subtitle" className="text-center mt-4">
               No episodes in playlist

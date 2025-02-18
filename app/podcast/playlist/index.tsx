@@ -92,13 +92,14 @@ export default function PlaylistScreen() {
       <View className="flex-1">
         {editingId === playlist.id ? (
           <View className="flex-row items-center">
-            <TextInput
+            <TextInput 
               value={editName}
               onChangeText={setEditName}
               onBlur={() => handleRename(playlist.id)}
               autoFocus
-              className="flex-1 text-lg dark:text-white p-2 border-b dark:border-zinc-600"
+              className="flex-1 text-lg  dark:text-white p-2 border-b dark:border-zinc-600"
               placeholder="Enter new name"
+              placeholderTextColor={colorScheme === "dark" ? "#888" : "#ccc"}
             />
             <Pressable 
               onPress={() => handleRename(playlist.id)}
@@ -151,6 +152,7 @@ export default function PlaylistScreen() {
             value={newPlaylistName}
             onChangeText={setNewPlaylistName}
             placeholder="Create new playlist"
+            placeholderTextColor={colorScheme === "dark" ? "#888" : "#ccc"}
             className="flex-1 px-4 py-2 dark:text-white"
           />
           <Pressable

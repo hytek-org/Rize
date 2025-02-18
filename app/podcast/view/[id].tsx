@@ -191,6 +191,7 @@ export default function PodcastDetail() {
           </View>
         ) : (
           <FlatList
+          showsVerticalScrollIndicator={false}
             data={episodes}
             keyExtractor={(item) => item.id}
             className="px-4 pt-4"

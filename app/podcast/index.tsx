@@ -4,8 +4,8 @@ import {
   Text,
   TextInput,
   Pressable,
-  ActivityIndicator,
   FlatList,
+  Animated
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Parser from 'react-native-rss-parser';
@@ -13,6 +13,7 @@ import { Link } from 'expo-router';
 import parseHTMLContent from '@/utils/parseHtml';
 import CustomAlert from '@/components/CustomAlert';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // Add this helper function at the top of the file
 const generateUniqueId = (url: string): string => {
@@ -45,6 +46,7 @@ export default function Index() {
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState<'error' | 'success' | 'info' | 'warning'>('error');
+  const [scaleAnim] = useState(new Animated.Value(1));
   const defaultFeeds = [
     {
       url: 'https://feeds.buzzsprout.com/1882267.rss',
@@ -156,86 +158,118 @@ export default function Index() {
     </View>
   );
 
-  return (
-    <View className="flex-1 px-5 py-5 dark:bg-zinc-900 bg-zinc-100">
-      <Text className="text-2xl mt-10 mb-5 text-center font-bold text-zinc-800 dark:text-zinc-200">
-        Podcast Feeds
-      </Text>
 
-      <View className="flex-row mb-5">
-        <TextInput
-          className="flex-1 h-12 border border-zinc-300 dark:border-zinc-600 rounded-md px-3 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
-          placeholder="Enter RSS Feed URL"
-          placeholderTextColor="#888"
-          value={inputUrl}
-          onChangeText={setInputUrl}
-        />
-        <Pressable
-          className="rounded-full bg-green-500 py-3 px-4 ml-4"
-          onPress={addRssFeed}
-        >
-          <Text className="text-white">Add Feed</Text>
-        </Pressable>
-      </View>
-      <View>
-        <Link href={'/podcast/playlist'}>
-          <Text className='text-green-500 text-xl'>Playlist</Text>
-        </Link>
-        <Link href={'/podcast/download'}>
-          <Text className='text-green-500 text-xl'>Download</Text>
-        </Link>
+
+  return (
+    <View className="flex-1 px-4 py-5 dark:bg-zinc-900 bg-zinc-50">
+      {/* Header Section */}
+      <View className="mb-4 mt-6">
+        <Text className="text-3xl font-bold text-zinc-800 dark:text-zinc-100 text-center">
+          Podcast Hub
+        </Text>
+        <Text className="text-center text-zinc-500 dark:text-zinc-400 mt-2">
+          Discover and manage your favorite podcasts
+        </Text>
       </View>
       {loading ? (
-        <>
+        <View className="space-y-4">
           <PodcastSkeleton />
           <PodcastSkeleton />
           <PodcastSkeleton />
-        </>
+        </View>
       ) : (
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={rssFeeds}
           keyExtractor={(item) => item.id}
+          contentContainerClassName="pb-6"
+          ItemSeparatorComponent={() => <View className="h-4" />}
           renderItem={({ item }) => (
-            <View className="mb-5 p-5 border border-zinc-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800">
-              <View>
-                <Text selectable={true} className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+            <Animated.View
+              style={{ transform: [{ scale: scaleAnim }] }}
+              className="bg-white dark:bg-zinc-800 rounded-xl p-5 shadow-sm border border-zinc-100 dark:border-zinc-700"
+            >
+              <View className="space-y-2">
+                <Text className="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
                   {item.title}
                 </Text>
-                <Text selectable={true} className="text-sm text-zinc-700 dark:text-zinc-400">
+                <Text className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
                   {parseHTMLContent(item.description || '')}
                 </Text>
-                <Text className="text-xs text-zinc-600 dark:text-zinc-500">
-                  Language: {item.language}
-                </Text>
-                <Text className="text-xs text-zinc-600 dark:text-zinc-500">
-                  Last Updated: {item.lastBuildDate}
-                </Text>
+                <View className="flex-row space-x-4 mt-2">
+                  <Text className="text-xs text-zinc-500 dark:text-zinc-500">
+                    <MaterialIcons name="language" size={12} color="#71717A" /> {item.language}
+                  </Text>
+                  <Text className="text-xs text-zinc-500 dark:text-zinc-500">
+                    <MaterialIcons name="update" size={12} color="#71717A" /> {item.lastBuildDate}
+                  </Text>
+                </View>
               </View>
-              <View className="flex-row justify-between mt-4">
+
+              <View className="flex-row justify-between items-center mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-700">
                 <Link
                   href={{
                     pathname: '/podcast/view/[id]',
                     params: { id: item.id, url: encodeURIComponent(item.url) },
                   }}
                 >
-                  <Text className="text-blue-600 dark:text-blue-400">
-                    View Episodes
-                  </Text>
+                  <View className="flex-row items-center space-x-2">
+                    <MaterialIcons name="playlist-play" size={20} color="#2563EB" />
+                    <Text className="text-blue-600 dark:text-blue-400 font-medium">
+                      View Episodes
+                    </Text>
+                  </View>
                 </Link>
                 {!item.isDefault && (
                   <Pressable
                     onPress={() => removeRssFeed(item.url)}
-                    className="bg-red-500 py-2 px-4 rounded-md"
+                    className="bg-red-500 py-2 px-4 rounded-lg"
                   >
-                    <Text className="text-white">Remove</Text>
+                    <Text className="text-white font-medium">Remove</Text>
                   </Pressable>
                 )}
               </View>
-            </View>
+            </Animated.View>
           )}
         />
       )}
-      {/* Display Custom Alert */}
+      {/* Input Section */}
+      <View className=" bg-white dark:bg-zinc-800 p-4 rounded-xl shadow-sm">
+        {/* Navigation Links */}
+        <View className="flex-row justify-between items-center px-2 mb-4">
+          <Link href="/podcast/playlist">
+            <View className="flex-row items-center space-x-2">
+              <MaterialIcons name="playlist-play" size={20} color="#22C55E" />
+              <Text className="text-green-500 font-medium">Playlist</Text>
+            </View>
+          </Link>
+          <Link href="/podcast/download">
+            <View className="flex-row items-center space-x-2">
+              <MaterialIcons name="file-download" size={20} color="#22C55E" />
+              <Text className="text-green-500 font-medium">Downloads</Text>
+            </View>
+          </Link>
+        </View>
+        <View className="flex-row items-center space-x-3 mb-4">
+          <TextInput
+            className="flex-1 h-12 bg-zinc-100 dark:bg-zinc-700 rounded-xl px-4 text-base text-zinc-800 dark:text-zinc-200"
+            placeholder="Enter RSS Feed URL"
+            placeholderTextColor="#9CA3AF"
+            value={inputUrl}
+            onChangeText={setInputUrl}
+          />
+          <Pressable
+            onPress={() => {
+              addRssFeed();
+            }}
+            className="h-12 px-6 ml-2 bg-green-500 rounded-xl items-center justify-center"
+          >
+            <MaterialIcons name="add" size={24} color="white" />
+          </Pressable>
+        </View>
+
+
+      </View>
       <CustomAlert
         visible={alertVisible}
         title={alertTitle}
