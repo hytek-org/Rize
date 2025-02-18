@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, useColorScheme, Image, Animated, Dimensions, Modal, TextInput, ScrollView, Alert } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, useColorScheme, Image, Animated, Dimensions, Modal, TextInput, ScrollView, } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useLocalSearchParams } from 'expo-router';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';
@@ -8,6 +8,8 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 import parseHTMLContent from '@/utils/parseHtml';
 import Parser from 'react-native-rss-parser';
 import { usePodcasts } from '@/contexts/PodcastContext';
+import CustomAlert from '@/components/CustomAlert';
+import { AlertState, AlertType } from '@/types/notes';
 
 interface EpisodeDetails {
   title: string;
@@ -44,7 +46,21 @@ export default function PlayEpisode() {
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const { playlists, createPlaylist, addToPlaylist, downloadEpisode, isDownloaded, getDownloadPath, downloadProgress, getDownloadProgress } = usePodcasts();
   const [downloadStatus, setDownloadStatus] = useState<'none' | 'downloading' | 'downloaded'>('none');
-
+  // Fix alert state with proper typing
+  const [alertState, setAlertState] = useState<AlertState>({
+    visible: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
+  const showAlert = useCallback((title: string, message: string, type: AlertType) => {
+    setAlertState({
+      visible: true,
+      title,
+      message,
+      type
+    });
+  }, []);
   // Add function to fetch episode details
   const fetchEpisodeDetails = async () => {
     if (!feedUrl) return;
@@ -57,10 +73,10 @@ export default function PlayEpisode() {
         },
       });
       if (!response.ok) throw new Error('Failed to fetch RSS');
-      
+
       const rssText = await response.text();
       const feed = await Parser.parse(rssText);
-      
+
       // Find matching episode by audio URL
       const episode = feed.items.find(
         (item: any) => item.enclosures?.[0]?.url === audioUrl
@@ -116,7 +132,7 @@ export default function PlayEpisode() {
   // Calculate parallax effect
   const imageTranslateY = scrollY.interpolate({
     inputRange: [-screenHeight, 0, screenHeight],
-    outputRange: [screenHeight/2, 0, -screenHeight/2],
+    outputRange: [screenHeight / 2, 0, -screenHeight / 2],
     extrapolate: 'clamp'
   });
 
@@ -145,11 +161,11 @@ export default function PlayEpisode() {
         feedUrl: feedUrl as string,
       });
       setDownloadStatus('downloaded');
-      Alert.alert('Success', 'Episode downloaded successfully');
+      showAlert('Success', 'Episode downloaded successfully', 'success');
     } catch (error) {
       console.error('Download error:', error);
       setDownloadStatus('none');
-      Alert.alert('Download Failed', 'Please try again.');
+      showAlert('Error', 'Please try again.', 'error');
     }
   };
 
@@ -166,38 +182,14 @@ export default function PlayEpisode() {
       });
 
       setShowPlaylistModal(false);
-      Alert.alert(
-        'Success',
-        'Episode added to playlist',
-        [{ text: 'OK' }]
-      );
+      showAlert('Success', 'Episode added to playlist', 'success');
     } catch (error) {
       console.error('Add to playlist error:', error);
-      Alert.alert(
-        'Error',
-        'Failed to add episode to playlist',
-        [{ text: 'OK' }]
-      );
+      showAlert('Error', 'Failed to add episode to playlist.', 'error');
     }
   };
 
-  const renderDownloadButton = () => {
-    switch (downloadStatus) {
-      case 'downloading':
-        return (
-          <View className="flex-row items-center">
-            <ActivityIndicator size="small" color="#fff" />
-            <Text className="text-white ml-2">
-              {Math.round(getDownloadProgress(id as string) * 100)}%
-            </Text>
-          </View>
-        );
-      case 'downloaded':
-        return <Text className="text-white">Downloaded</Text>;
-      default:
-        return <Text className="text-white">Download</Text>;
-    }
-  };
+
 
   const handlePlayAudio = async () => {
     const episodeId = Array.isArray(id) ? id[0] : id;
@@ -205,7 +197,7 @@ export default function PlayEpisode() {
 
     try {
       const localPath = getDownloadPath(episodeId);
-      
+
       // If already playing this episode, just toggle play/pause
       if (currentId === episodeId) {
         await togglePlayPause();
@@ -243,7 +235,7 @@ export default function PlayEpisode() {
     const showPauseIcon = isCurrentEpisode && isPlaying;
 
     return (
-      <IconSymbol 
+      <IconSymbol
         size={40}
         color="white"
         name={showPauseIcon ? 'pause' : 'play-arrow'}
@@ -326,7 +318,7 @@ export default function PlayEpisode() {
               maximumTrackTintColor={sliderStyles.maximumTrackTintColor}
               thumbTintColor={sliderStyles.thumbTintColor}
             />
-            
+
             {/* Time Display */}
             <View className="flex-row justify-between mt-2">
               <Text className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -340,56 +332,78 @@ export default function PlayEpisode() {
 
           {/* Controls Section with Glass Effect */}
           <View className="flex-row items-center justify-around mb-8 p-4 bg-white/10 backdrop-blur-lg rounded-2xl">
-            <Pressable 
-              onPress={skipBackward} 
+            <Pressable
+              onPress={skipBackward}
               className="p-3 bg-zinc-200 dark:bg-zinc-800 rounded-full"
             >
-              <IconSymbol size={32} name="replay-30" color={colorScheme === 'dark' ? '#fff' : '#000'}/>
+              <IconSymbol size={32} name="replay-30" color={colorScheme === 'dark' ? '#fff' : '#000'} />
             </Pressable>
 
             <Pressable
               onPress={handlePlayAudio}
               disabled={loading}
-              className={`p-6 rounded-full ${
-                loading 
-                  ? 'bg-zinc-400' 
-                  : 'bg-green-500'
-              }`}
+              className={`p-6 rounded-full ${loading
+                ? 'bg-zinc-400'
+                : 'bg-green-500'
+                }`}
             >
               {renderPlayButton()}
             </Pressable>
 
-            <Pressable 
-              onPress={skipForward} 
+            <Pressable
+              onPress={skipForward}
               className="p-3 bg-zinc-200 dark:bg-zinc-800 rounded-full"
             >
-              <IconSymbol size={32} name="forward-30" color={colorScheme === 'dark' ? '#fff' : '#000'}/>
+              <IconSymbol size={32} name="forward-30" color={colorScheme === 'dark' ? '#fff' : '#000'} />
             </Pressable>
           </View>
 
-          <View className="flex-row justify-around mt-4 mb-8">
-            {isDownloaded(id as string) ? (
-              <Text className="text-green-500">Downloaded</Text>
-            ) : (
-              <Pressable
-                onPress={handleDownload}
-                disabled={downloadStatus === 'downloading'}
-                className={`bg-blue-500 px-4 py-2 rounded-full ${
-                  downloadStatus === 'downloading' ? 'opacity-75' : ''
-                }`}
-              >
-                {renderDownloadButton()}
-              </Pressable>
-            )}
+          {/* Action Buttons */}
+          <View className="flex-row justify-center gap-4 mb-8">
+            <Pressable
+              onPress={handleDownload}
+              disabled={downloadStatus === 'downloading' || downloadStatus === 'downloaded'}
+              className={`flex-row items-center px-6 py-3 rounded-full ${downloadStatus === 'downloaded'
+                ? 'bg-green-500/20 dark:bg-green-500/30'
+                : 'bg-white/10 dark:bg-zinc-800/50 backdrop-blur-lg'
+                } active:opacity-70`}
+            >
+              {downloadStatus === 'downloading' ? (
+                <>
+                  <ActivityIndicator size="small" color="#22c55e" />
+                  <Text className="ml-2 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                    {Math.round(getDownloadProgress(id as string) * 100)}%
+                  </Text>
+                </>
+              ) : downloadStatus === 'downloaded' ? (
+                <>
+                  <IconSymbol name="check-circle" size={20} color="#22c55e" />
+                  <Text className="ml-2 text-sm font-medium text-green-500">
+                    Downloaded
+                  </Text>
+                </>
+              ) : (
+                <>
+                  <IconSymbol name="download" size={20} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+                  <Text className="ml-2 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                    Download
+                  </Text>
+                </>
+              )}
+            </Pressable>
 
             <Pressable
               onPress={() => setShowPlaylistModal(true)}
-              className="bg-purple-500 px-4 py-2 rounded-full"
+              className="flex-row items-center px-6 py-3 rounded-full bg-white/10 dark:bg-zinc-800/50 backdrop-blur-lg active:opacity-70"
             >
-              <Text className="text-white">Add to Playlist</Text>
+              <IconSymbol name="playlist-add" size={20} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+              <Text className="ml-2 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                Add to Playlist
+              </Text>
             </Pressable>
           </View>
 
+          {/* Modernized Modal */}
           <Modal
             visible={showPlaylistModal}
             transparent
@@ -397,49 +411,58 @@ export default function PlayEpisode() {
             onRequestClose={() => setShowPlaylistModal(false)}
           >
             <View className="flex-1 justify-end">
-              <View className="bg-white dark:bg-zinc-800 rounded-t-3xl p-6">
-                <Text className="text-xl font-bold mb-4 dark:text-white">
-                  Add to Playlist
-                </Text>
-                
-                <View className="flex-row mb-4">
-                  <TextInput
-                    className="flex-1 border p-2 rounded-l-lg dark:text-white"
-                    placeholder="New Playlist Name"
-                    value={newPlaylistName}
-                    onChangeText={setNewPlaylistName}
-                  />
-                  <Pressable
-                    className="bg-green-500 p-2 rounded-r-lg"
-                    onPress={async () => {
-                      if (newPlaylistName.trim()) {
-                        await createPlaylist(newPlaylistName);
-                        setNewPlaylistName('');
-                      }
-                    }}
-                  >
-                    <Text className="text-white">Create</Text>
-                  </Pressable>
+              <View className="bg-white/80 dark:bg-zinc-900/90 backdrop-blur-xl rounded-t-3xl">
+                <View className="p-6">
+                  <View className="flex-row justify-between items-center mb-6">
+                    <Text className="text-xl font-bold text-zinc-800 dark:text-white">
+                      Add to Playlist
+                    </Text>
+                    <Pressable
+                      onPress={() => setShowPlaylistModal(false)}
+                      className="p-2 rounded-full bg-zinc-100/50 dark:bg-zinc-800/50 active:opacity-70"
+                    >
+                      <IconSymbol name="close" size={20} color={colorScheme === 'dark' ? '#fff' : '#000'} />
+                    </Pressable>
+                  </View>
+
+                  <View className="flex-row mb-6">
+                    <TextInput
+                      className="flex-1 px-4 py-3 bg-white/50 dark:bg-zinc-800/50 rounded-l-xl text-zinc-800 dark:text-white"
+                      placeholder="New Playlist Name"
+                      placeholderTextColor={colorScheme === 'dark' ? '#9ca3af' : '#6b7280'}
+                      value={newPlaylistName}
+                      onChangeText={setNewPlaylistName}
+                    />
+                    <Pressable
+                      className="px-4 py-3 bg-green-500/90 rounded-r-xl active:opacity-70"
+                      onPress={async () => {
+                        if (newPlaylistName.trim()) {
+                          await createPlaylist(newPlaylistName);
+                          setNewPlaylistName('');
+                        }
+                      }}
+                    >
+                      <Text className="text-white font-medium">Create</Text>
+                    </Pressable>
+                  </View>
+
+                  <ScrollView className="max-h-80">
+                    {playlists.map(playlist => (
+                      <Pressable
+                        key={playlist.id}
+                        className="p-4 mb-2 rounded-xl bg-white/50 dark:bg-zinc-800/50 active:opacity-70"
+                        onPress={() => handleAddToPlaylist(playlist.id)}
+                      >
+                        <Text className="text-zinc-800 dark:text-white font-medium">
+                          {playlist.name}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
                 </View>
 
-                <ScrollView className="max-h-80">
-                  {playlists.map(playlist => (
-                    <Pressable
-                      key={playlist.id}
-                      className="p-4 border-b dark:border-zinc-700"
-                      onPress={() => handleAddToPlaylist(playlist.id)}
-                    >
-                      <Text className="dark:text-white">{playlist.name}</Text>
-                    </Pressable>
-                  ))}
-                </ScrollView>
-
-                <Pressable
-                  className="mt-4 p-4 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
-                  onPress={() => setShowPlaylistModal(false)}
-                >
-                  <Text className="text-center dark:text-white">Close</Text>
-                </Pressable>
+                {/* Safe Area Padding */}
+                <View className="h-8 bg-white/80 dark:bg-zinc-900/90" />
               </View>
             </View>
           </Modal>
@@ -460,6 +483,14 @@ export default function PlayEpisode() {
             </View>
           ) : null}
         </View>
+        <CustomAlert
+          visible={alertState.visible}
+          title={alertState.title}
+          message={alertState.message}
+          onClose={() => setAlertState(prev => ({ ...prev, visible: false }))}
+          type={alertState.type}
+        />
+
       </Animated.ScrollView>
     </View>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, Image, Dimensions } from 'react-native';
+import { View, Text, FlatList,  Image, Dimensions } from 'react-native';
 import Parser from 'react-native-rss-parser';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, } from 'expo-router';
 import parseHTMLContent from '@/utils/parseHtml';
 import * as FileSystem from 'expo-file-system';
 import { useAudioPlayer } from '@/contexts/AudioPlayerContext';

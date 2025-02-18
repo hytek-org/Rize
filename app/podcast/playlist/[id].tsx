@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, FlatList, Alert, Image } from 'react-native';
+import { View, Text, Pressable, FlatList,  Image } from 'react-native';
 import { usePodcasts } from '@/contexts/PodcastContext';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useRouter, useLocalSearchParams } from 'expo-router';

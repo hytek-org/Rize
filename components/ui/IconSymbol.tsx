@@ -36,6 +36,7 @@ const MAPPING: Record<string, keyof typeof MaterialIcons.glyphMap> = {
   "check": "check",
   "pause": "pause",
   "queue-music": "queue-music",
+  "playlist-add": "playlist-add",
   
   // Additional UI elements
   "keyboard-arrow-up": "keyboard-arrow-up",
