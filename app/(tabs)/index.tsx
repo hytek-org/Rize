@@ -264,9 +264,10 @@ const HomeScreen = () => {
       {/* Header */}
       <View className="flex-row justify-between items-center">
         <View className="flex-row items-center space-x-2">
-          <Text className="text-sm text-zinc-800 dark:text-white">{item.timeLabel}</Text>
+          <Text className="text-sm text-zinc-800/80 dark:text-white/80 font-semibold">{item.timeLabel}</Text>
+
           <Text
-            className={`text-sm ${item.label === 'Previous'
+            className={`text-sm ml-2 ${item.label === 'Previous'
               ? 'text-yellow-500'
               : item.label === 'Current'
                 ? 'text-green-500'
@@ -276,42 +277,20 @@ const HomeScreen = () => {
             ({item.label})
           </Text>
         </View>
-        {item.task.id !== -1 && canEditTask(item.label) && (
-          <Pressable
-            onPress={() => setShowSubtaskInput(item.task.id)}
-            className="flex-row items-center bg-green-500 dark:bg-green-600 px-3 py-1 rounded-full"
-          >
-            <IconSymbol name="add-task" size={22} color="#fff" />
-            <Text className="text-white text-lg ml-1">Subtask</Text>
-          </Pressable>
-        )}
+        <Text className='text-zinc-800/80 dark:text-white/80 font-semibold px-1'> Routine</Text>
       </View>
 
       {/* Task Content */}
       <View className="mt-4">
-        <View className='flex flex-row items-center'>
+        <View className='flex flex-row items-center gap-1 '>
           <IconSymbol size={28} name="lock-clock" color={'#22c55e'} />
-          <Text className="text-2xl font-semibold text-zinc-800 dark:text-white max-h-20">
-            {item.task.content} 
+          <Text className="text-2xl font-semibold text-wrap w-11/12 text-zinc-800 dark:text-white ">
+            {item.task.content}
           </Text>
         </View>
         <View className="flex-row justify-between items-center mt-4 ">
           <Text className='text-sm font-semibold text-black/50 dark:text-white/50'>Manage your Tasks</Text>
-          {canEditTask(item.label) && (
-            <Pressable
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setEditMode(!editMode);
-              }}
-              className={`px-3 py-1  rounded-full  ${editMode ? 'bg-green-100 dark:bg-green-900' : 'bg-zinc-100 dark:bg-zinc-700'
-                }`}
-            >
-              <Text className={`text-xl font-bold  ${editMode ? 'text-green-600 dark:text-green-400' : 'text-zinc-600 dark:text-zinc-400'
-                }`}>
-                {editMode ? <IconSymbol name="task-alt" size={24} color="#22c55e" /> : <IconSymbol name="mode-edit-outline" size={24} color="#22c55e" />}
-              </Text>
-            </Pressable>
-          )}
+
         </View>
 
         {/* Subtasks List */}
@@ -343,7 +322,7 @@ const HomeScreen = () => {
                       }
                     />
                     <Text
-                      className={`ml-2 ${subtask.completed
+                      className={`ml-2 text-2xl ${subtask.completed
                         ? 'line-through text-zinc-400'
                         : !canEditTask(item.label)
                           ? 'text-zinc-500'
@@ -378,6 +357,32 @@ const HomeScreen = () => {
 
       {/* TimeBlock */}
       <View className="mt-auto items-end pl-5">
+        <View className='w-full mb-5 flex flex-row gap-4 items-center justify-between'>
+          {canEditTask(item.label) && (
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setEditMode(!editMode);
+              }}
+              className={`px-4 py-2  rounded-full  ${editMode ? 'bg-green-100 dark:bg-green-900' : 'bg-zinc-100 dark:bg-zinc-700'
+                }`}
+            >
+              <Text className={`text-xl font-bold  ${editMode ? 'text-green-600 dark:text-green-400' : 'text-zinc-600 dark:text-zinc-400'
+                }`}>
+                {editMode ? <IconSymbol name="task-alt" size={28} color="#22c55e" /> : <IconSymbol name="mode-edit-outline" size={28} color="#22c55e" />}
+              </Text>
+            </Pressable>
+          )}
+          {item.task.id !== -1 && canEditTask(item.label) && (
+            <Pressable
+              onPress={() => setShowSubtaskInput(item.task.id)}
+              className="flex-row items-center bg-green-500 dark:bg-green-600 px-4 py-2 rounded-full"
+            >
+              <IconSymbol name="add-task" size={28} color="#fff" />
+
+            </Pressable>
+          )}
+        </View>
         <TimeBlock item={item} currentHourString={currentHourString} />
       </View>
     </View>

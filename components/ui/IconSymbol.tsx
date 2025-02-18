@@ -24,6 +24,8 @@ const MAPPING: Record<string, keyof typeof MaterialIcons.glyphMap> = {
   "wb-sunny": "wb-sunny",
   "nights-stay": "nights-stay",
   "lock-clock": "lock-clock",
+  "podcasts": "podcasts",
+  "note-add": "note-add",
   
   // Status icons
   "info": "info",
