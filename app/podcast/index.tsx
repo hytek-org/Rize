@@ -177,7 +177,14 @@ export default function Index() {
           <Text className="text-white">Add Feed</Text>
         </Pressable>
       </View>
-
+      <View>
+        <Link href={'/podcast/playlist'}>
+          <Text className='text-green-500 text-xl'>Playlist</Text>
+        </Link>
+        <Link href={'/podcast/download'}>
+          <Text className='text-green-500 text-xl'>Download</Text>
+        </Link>
+      </View>
       {loading ? (
         <>
           <PodcastSkeleton />

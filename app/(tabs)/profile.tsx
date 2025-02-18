@@ -123,6 +123,7 @@ export default function ProfileScreen() {
         />
       </ParallaxScrollView>
       <FloatingLink route='/podcast' iconName='podcasts' />
+
     </>
   );
 }
