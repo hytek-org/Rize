@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, FlatList, Pressable, ScrollView, Image, TextInput, useColorScheme } from 'react-native';
 import { TabCreateIcon, TabTaskIcon } from '@/components/navigation/TabBarIcon';
-import MyModal from '@/components/MyModel';
+import MyModal from '@/components/notes/MyModel';
 import FloatingButton from '@/components/FlotingButton';
 import { useNotes } from '@/contexts/NotesContext';
 import CustomAlert from '@/components/CustomAlert';

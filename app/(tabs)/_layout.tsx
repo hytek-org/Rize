@@ -11,37 +11,25 @@ import { TabBarIcon, TabCreateIcon, TabProfileIcon } from '@/components/navigati
 import FloatingPlayer from '@/components/podcast/FloatingPlayer';
 import CustomAlert from '@/components/CustomAlert';
 import { DrawerMenu } from '@/components/navigation/DrawerMenu';
-import { NoteModal } from '@/components/notes/NoteModal';
+import MyModal from '@/components/notes/MyModel';
+import { useNotes } from '@/contexts/NotesContext';
+import { AlertState, AlertType } from '@/types/notes';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [modalVisibleNotes, setModalVisibleNotes] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [alertState, setAlertState] = useState({
+  const { notes, addNote } = useNotes();
+  const [input, setInput] = useState('');
+  const [tag, setTag] = useState('');
+  // Fix alert state with proper typing
+  const [alertState, setAlertState] = useState<AlertState>({
     visible: false,
     title: '',
     message: '',
-    type: 'error' as const
+    type: 'info'
   });
-
-  const handleNoteSuccess = () => {
-    setAlertState({
-      visible: true,
-      title: 'Success',
-      message: 'Note added successfully!',
-      type: 'success'
-    });
-  };
-
-  const handleNoteError = (message: string) => {
-    setAlertState({
-      visible: true,
-      title: 'Error',
-      message,
-      type: 'error'
-    });
-  };
 
   const handleOpenDrawer = useCallback(() => {
     if (isAnimating) return;
@@ -71,7 +59,27 @@ export default function TabLayout() {
     setModalVisibleNotes(false);
     setTimeout(() => setIsAnimating(false), 300);
   }, [isAnimating]);
+  const showAlert = useCallback((title: string, message: string, type: AlertType) => {
+    setAlertState({
+      visible: true,
+      title,
+      message,
+      type
+    });
+  }, []);
 
+  const handleAddNote = useCallback(() => {
+    if (!input.trim()) {
+      showAlert('Error', 'Note content cannot be empty.', 'error');
+      return;
+    }
+
+    addNote(input, tag || undefined); // Pass undefined if tag is empty
+    setInput('');
+    setTag('');
+    setModalVisibleNotes(false);
+    showAlert('Success', 'Note added successfully!', 'success');
+  }, [input, tag, addNote, showAlert]);
   return (
     <View style={styles.container}>
       <Tabs
@@ -148,12 +156,16 @@ export default function TabLayout() {
           onClose={handleCloseDrawer}
           onOpenNoteModal={handleOpenNoteModal}
         />
-
-        <NoteModal
+        <MyModal
           visible={modalVisibleNotes}
           onClose={handleCloseNoteModal}
-          onSuccess={handleNoteSuccess}
-          onError={handleNoteError}
+          input={input}
+          setInput={setInput}
+          tag={tag}
+          setTag={setTag}
+          editMode={false}
+          addNote={handleAddNote}
+          editNote={() => { }}
         />
 
         <CustomAlert

@@ -12,7 +12,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { TabCreateIcon, TabTaskIcon } from '@/components/navigation/TabBarIcon';
 import CustomAlert from '@/components/CustomAlert';
-import MyModal from '@/components/MyModel';
+import MyModal from '@/components/notes/MyModel';
 import { useNotes } from '@/contexts/NotesContext';
 import { AlertState, AlertType, Note } from '@/types/notes';
 import Markdown from 'react-native-markdown-display';
