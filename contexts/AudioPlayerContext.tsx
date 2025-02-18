@@ -30,6 +30,11 @@ type AudioPlayerContextType = {
   setCurrentFeedUrl: (url: string | null) => void;
   currentAudioUrl: string | null;
   setCurrentAudioUrl: (url: string | null) => void;
+  playOfflineAudio: (localPath: string, id: string, metadata: {
+    title: string;
+    artUrl?: string;
+    feedUrl?: string;
+  }) => Promise<void>;
 };
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(undefined);
@@ -97,48 +102,104 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
 
   const playAudio = async (url: string, id: string, artUrl?: string, title?: string, feedUrl?: string) => {
     setLoading(true);
-    setShouldPersist(true); // Enable persistence when starting playback
+    setShouldPersist(true);
 
     try {
-      if (sound) {
-        // If there is a currently playing sound, stop and unload it
-        await stopAndUnloadCurrentSound();
+      // If the same audio is already loaded, just resume playback
+      if (sound && currentUrl === url) {
+        await sound.playAsync();
+        setIsPlaying(true);
+        setLoading(false);
+        return;
       }
 
-      // Load and play the new audio
-      const { sound: newSound } = await Audio.Sound.createAsync({ uri: url });
+      // Stop previous sound before playing new one
+      if (sound) {
+        await stopAndUnloadCurrentSound(true);
+      }
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: url },
+        { shouldPlay: true },
+        (status) => {
+          if (!status.isLoaded) return;
+          
+          setPlaybackStatus({
+            positionMillis: status.positionMillis || 0,
+            durationMillis: status.durationMillis || 1,
+          });
+
+          setIsPlaying(status.isPlaying || false);
+        }
+      );
+
       setSound(newSound);
       setCurrentUrl(url);
       setCurrentId(id);
       setCurrentAudioUrl(url);
-      if (artUrl) {
-        setAlbumArt(artUrl);  // Set the album art from passed URL
-      }
-      if (title) {
-        setCurrentTitle(title);
-      }
-      if (feedUrl) {
-        setCurrentFeedUrl(feedUrl);
-      }
+      if (artUrl) setAlbumArt(artUrl);
+      if (title) setCurrentTitle(title);
+      if (feedUrl) setCurrentFeedUrl(feedUrl);
+
+      await newSound.playAsync();
       setIsPlaying(true);
 
-      // Attach playback status updates
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      setShouldPersist(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const playOfflineAudio = async (localPath: string, id: string, metadata: {
+    title: string;
+    artUrl?: string;
+    feedUrl?: string;
+  }) => {
+    setLoading(true);
+    setShouldPersist(true);
+
+    try {
+      // Always stop previous sound before playing new one
+      if (sound) {
+        await stopAndUnloadCurrentSound(true); // Force stop previous playback
+      }
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri: localPath },
+        { shouldPlay: true }
+      );
+
+      setSound(newSound);
+      setCurrentUrl(localPath);
+      setCurrentId(id);
+      setCurrentAudioUrl(localPath);
+      if (metadata.artUrl) setAlbumArt(metadata.artUrl);
+      if (metadata.title) setCurrentTitle(metadata.title);
+      if (metadata.feedUrl) setCurrentFeedUrl(metadata.feedUrl);
+      setIsPlaying(true);
+
       newSound.setOnPlaybackStatusUpdate((status) => {
         if (!status.isLoaded) return;
 
         setPlaybackStatus({
           positionMillis: status.positionMillis || 0,
-          durationMillis: status.durationMillis || 1, // Avoid 0 for duration
+          durationMillis: status.durationMillis || 1,
         });
 
+        // Update isPlaying based on status
+        setIsPlaying(status.isPlaying);
+
         if (status.didJustFinish) {
-          stopAndUnloadCurrentSound(); // Auto-stop after playback finishes
+          setIsPlaying(false);
+          // Optional: decide if you want to stop or just pause at end
+          // stopAndUnloadCurrentSound();
         }
       });
 
-      await newSound.playAsync();
     } catch (error) {
-      console.error('Error playing audio:', error);
+      console.error('Error playing offline audio:', error);
       setShouldPersist(false);
     } finally {
       setLoading(false);
@@ -149,15 +210,19 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     if (!sound) return;
 
     try {
-      if (isPlaying) {
+      const status = await sound.getStatusAsync();
+      if (!status.isLoaded) return;
+
+      if (status.isPlaying) {
         await sound.pauseAsync();
-        setIsPlaying(false);
       } else {
         await sound.playAsync();
-        setIsPlaying(true);
       }
+      
+      setIsPlaying(!status.isPlaying);
     } catch (error) {
       console.error('Error toggling play/pause:', error);
+      setIsPlaying(false);
     }
   };
 
@@ -223,6 +288,7 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
         setCurrentFeedUrl,
         currentAudioUrl,
         setCurrentAudioUrl,
+        playOfflineAudio,
       }}
     >
       {children}

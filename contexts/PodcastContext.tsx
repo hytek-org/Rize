@@ -38,6 +38,10 @@ interface PodcastContextType {
   isDownloaded: (episodeId: string) => boolean;
   getDownloadPath: (episodeId: string) => string | undefined;
   downloadProgress: DownloadProgress;
+  removePlaylist: (playlistId: string) => Promise<void>;
+  renamePlaylist: (playlistId: string, newName: string) => Promise<void>;
+  deletePlaylist: (playlistId: string) => Promise<void>;
+  getDownloadProgress: (episodeId: string) => number;
 }
 
 const PodcastContext = createContext<PodcastContextType | null>(null);
@@ -106,6 +110,26 @@ export const PodcastProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return playlist;
     });
     
+    await AsyncStorage.setItem('@podcast_playlists', JSON.stringify(updatedPlaylists));
+    setPlaylists(updatedPlaylists);
+  };
+
+  const removePlaylist = async (playlistId: string) => {
+    const updatedPlaylists = playlists.filter(p => p.id !== playlistId);
+    await AsyncStorage.setItem('@podcast_playlists', JSON.stringify(updatedPlaylists));
+    setPlaylists(updatedPlaylists);
+  };
+
+  const renamePlaylist = async (playlistId: string, newName: string) => {
+    const updatedPlaylists = playlists.map(playlist =>
+      playlist.id === playlistId ? { ...playlist, name: newName } : playlist
+    );
+    await AsyncStorage.setItem('@podcast_playlists', JSON.stringify(updatedPlaylists));
+    setPlaylists(updatedPlaylists);
+  };
+
+  const deletePlaylist = async (playlistId: string) => {
+    const updatedPlaylists = playlists.filter(p => p.id !== playlistId);
     await AsyncStorage.setItem('@podcast_playlists', JSON.stringify(updatedPlaylists));
     setPlaylists(updatedPlaylists);
   };
@@ -257,6 +281,10 @@ export const PodcastProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return downloadedEpisodes.find(episode => episode.id === episodeId)?.downloadPath;
   };
 
+  const getDownloadProgress = (episodeId: string): number => {
+    return downloadProgress[episodeId] || 0;
+  };
+
   return (
     <PodcastContext.Provider value={{
       playlists,
@@ -269,6 +297,10 @@ export const PodcastProvider: React.FC<{ children: React.ReactNode }> = ({ child
       isDownloaded,
       getDownloadPath,
       downloadProgress,
+      removePlaylist,
+      renamePlaylist,
+      deletePlaylist,
+      getDownloadProgress,
     }}>
       {children}
     </PodcastContext.Provider>

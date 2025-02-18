@@ -29,6 +29,7 @@ export default function PlayEpisode() {
     currentUrl,
     playbackStatus,
     playAudio,
+    playOfflineAudio, // Add this
     togglePlayPause,
     skipForward,
     skipBackward,
@@ -41,7 +42,8 @@ export default function PlayEpisode() {
 
   const [showPlaylistModal, setShowPlaylistModal] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
-  const { playlists, createPlaylist, addToPlaylist, downloadEpisode, isDownloaded, getDownloadPath } = usePodcasts();
+  const { playlists, createPlaylist, addToPlaylist, downloadEpisode, isDownloaded, getDownloadPath, downloadProgress, getDownloadProgress } = usePodcasts();
+  const [downloadStatus, setDownloadStatus] = useState<'none' | 'downloading' | 'downloaded'>('none');
 
   // Add function to fetch episode details
   const fetchEpisodeDetails = async () => {
@@ -88,6 +90,13 @@ export default function PlayEpisode() {
     };
   }, []);
 
+  useEffect(() => {
+    // Check download status on mount
+    if (id && isDownloaded(id as string)) {
+      setDownloadStatus('downloaded');
+    }
+  }, [id]);
+
   const formatTime = (millis: number = 0) => {
     const minutes = Math.floor(millis / 60000);
     const seconds = Math.floor((millis % 60000) / 1000);
@@ -127,6 +136,7 @@ export default function PlayEpisode() {
     if (!id || !url) return;
 
     try {
+      setDownloadStatus('downloading');
       await downloadEpisode({
         id: id as string,
         title: episodeDetails?.title || title as string,
@@ -134,20 +144,12 @@ export default function PlayEpisode() {
         imageUrl: imageUrl as string,
         feedUrl: feedUrl as string,
       });
-
-      // Show success message using Alert
-      Alert.alert(
-        'Success',
-        'Episode downloaded successfully',
-        [{ text: 'OK' }]
-      );
+      setDownloadStatus('downloaded');
+      Alert.alert('Success', 'Episode downloaded successfully');
     } catch (error) {
       console.error('Download error:', error);
-      Alert.alert(
-        'Download Failed',
-        'There was an error downloading the episode. Please try again.',
-        [{ text: 'OK' }]
-      );
+      setDownloadStatus('none');
+      Alert.alert('Download Failed', 'Please try again.');
     }
   };
 
@@ -177,6 +179,76 @@ export default function PlayEpisode() {
         [{ text: 'OK' }]
       );
     }
+  };
+
+  const renderDownloadButton = () => {
+    switch (downloadStatus) {
+      case 'downloading':
+        return (
+          <View className="flex-row items-center">
+            <ActivityIndicator size="small" color="#fff" />
+            <Text className="text-white ml-2">
+              {Math.round(getDownloadProgress(id as string) * 100)}%
+            </Text>
+          </View>
+        );
+      case 'downloaded':
+        return <Text className="text-white">Downloaded</Text>;
+      default:
+        return <Text className="text-white">Download</Text>;
+    }
+  };
+
+  const handlePlayAudio = async () => {
+    const episodeId = Array.isArray(id) ? id[0] : id;
+    if (!episodeId) return;
+
+    try {
+      const localPath = getDownloadPath(episodeId);
+      
+      // If already playing this episode, just toggle play/pause
+      if (currentId === episodeId) {
+        await togglePlayPause();
+        return;
+      }
+
+      // Otherwise start playing the episode
+      if (localPath) {
+        await playOfflineAudio(localPath, episodeId, {
+          title: episodeDetails?.title || title as string,
+          artUrl: imageUrl as string,
+          feedUrl: feedUrl as string,
+        });
+      } else {
+        await playAudio(
+          url,
+          episodeId,
+          imageUrl as string,
+          episodeDetails?.title || title as string,
+          feedUrl as string
+        );
+      }
+    } catch (error) {
+      console.error('Error handling playback:', error);
+    }
+  };
+
+  // Update the play button render logic
+  const renderPlayButton = () => {
+    if (loading) {
+      return <ActivityIndicator color="#fff" />;
+    }
+
+    const isCurrentEpisode = currentId === (Array.isArray(id) ? id[0] : id);
+    const showPauseIcon = isCurrentEpisode && isPlaying;
+
+    return (
+      <IconSymbol 
+        size={40}
+        color="white"
+        name={showPauseIcon ? 'pause' : 'play-arrow'}
+      />
+    );
   };
 
   return (
@@ -276,19 +348,7 @@ export default function PlayEpisode() {
             </Pressable>
 
             <Pressable
-              onPress={() => {
-                if (!isPlaying && url !== currentUrl) {
-                  playAudio(
-                    url,
-                    id as string,
-                    imageUrl as string,
-                    episodeDetails?.title || title as string,
-                    feedUrl as string
-                  );
-                } else {
-                  togglePlayPause();
-                }
-              }}
+              onPress={handlePlayAudio}
               disabled={loading}
               className={`p-6 rounded-full ${
                 loading 
@@ -296,15 +356,7 @@ export default function PlayEpisode() {
                   : 'bg-green-500'
               }`}
             >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <IconSymbol 
-                  size={40}
-                  color="white"
-                  name={isPlaying && url === currentUrl ? 'pause' : 'play-arrow'}
-                />
-              )}
+              {renderPlayButton()}
             </Pressable>
 
             <Pressable 
@@ -321,9 +373,12 @@ export default function PlayEpisode() {
             ) : (
               <Pressable
                 onPress={handleDownload}
-                className="bg-blue-500 px-4 py-2 rounded-full"
+                disabled={downloadStatus === 'downloading'}
+                className={`bg-blue-500 px-4 py-2 rounded-full ${
+                  downloadStatus === 'downloading' ? 'opacity-75' : ''
+                }`}
               >
-                <Text className="text-white">Download</Text>
+                {renderDownloadButton()}
               </Pressable>
             )}
 
