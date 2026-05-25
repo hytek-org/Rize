@@ -1,7 +1,7 @@
 {
   "name": "rize",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "2.1.8",
   "dependencies": {
     "@expo/ui": "~56.0.13",
     "expo": "~56.0.4",
