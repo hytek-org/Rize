@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "Rize",
-    "slug": "Rize",
-    "version": "1.0.0",
+    "slug": "rize",
+    "version": "2.1.8",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rize",
@@ -12,6 +12,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.hytek.rize",
+      "versionCode": 14,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -23,7 +25,8 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       "expo-router",
