@@ -1,5 +1,5 @@
-import { View, Text, ScrollView } from 'react-native';
 import { Button } from '@/components/ui/Button';
+import { ScrollView, Text, View } from 'react-native';
 
 export default function HomeScreen() {
   return (

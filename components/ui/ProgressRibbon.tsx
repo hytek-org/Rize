@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, type ViewProps, type DimensionValue } from 'react-native';
+import { View, type DimensionValue, type ViewProps } from 'react-native';
 
 type ProgressRibbonProps = ViewProps & {
   value: number; // 0..1
