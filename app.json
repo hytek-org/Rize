@@ -12,7 +12,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.hytek.rizebeta",
+      "package": "com.hytek.rize",
       "versionCode": 14,
       "adaptiveIcon": {
         "backgroundColor": "#05070A",
