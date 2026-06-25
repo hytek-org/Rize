@@ -1,99 +1,53 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { Button } from '@/components/ui/Button';
+import { ScrollView, Text, View } from 'react-native';
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
+    <ScrollView 
+      className="flex-1 bg-zinc-50 dark:bg-zinc-950" 
+      contentContainerStyle={{ padding: 24, paddingTop: 80, paddingBottom: 100 }}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Hero Insight */}
+      <View className="mb-16">
+        <Text className="font-inter-bold text-[40px] text-zinc-900 dark:text-white tracking-tight mb-8 leading-tight">
+          Good Morning, Kuldeep.
+        </Text>
         
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+        <Text className="font-inter-medium text-xl text-momentum mb-6">
+          You have built momentum for 12 days.
+        </Text>
+        
+        <Text className="font-inter text-[19px] text-zinc-600 dark:text-zinc-300 mb-2 leading-relaxed">
+          Today is ideal for strategic work.
+        </Text>
+        
+        <Text className="font-inter text-[19px] text-zinc-600 dark:text-zinc-300 leading-relaxed">
+          Protect your focus between{'\n'}9:30 AM and 12:15 PM.
+        </Text>
+      </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      {/* Primary Action */}
+      <View className="mb-16">
+        <Button title="Focus Session" variant="primary" />
+      </View>
+
+      {/* Key Metrics */}
+      <View className="gap-8 px-2">
+        <View>
+          <Text className="font-inter-semibold text-xs text-zinc-500 uppercase tracking-widest mb-1">
+            Momentum Score
+          </Text>
+          <Text className="font-inter-bold text-[32px] text-zinc-900 dark:text-white tracking-tight">87<Text className="text-xl text-zinc-500">%</Text></Text>
+        </View>
+
+        <View>
+          <Text className="font-inter-semibold text-xs text-zinc-500 uppercase tracking-widest mb-1">
+            Growth Trend
+          </Text>
+          <Text className="font-inter-bold text-[32px] text-momentum tracking-tight">+12% <Text className="font-inter-medium text-base text-zinc-500 tracking-normal lowercase">this week</Text></Text>
+        </View>
+      </View>
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
