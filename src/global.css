@@ -2,4 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: #FFFFFF;
+    --background-element: #F4F4F5;
+    --background-hover: #E4E4E7;
+    --border: #E4E4E7;
+    --text: #09090B;
+    --text-secondary: #52525B;
+    --text-tertiary: #A1A1AA;
+    --primary: #18181B;
+    --primary-foreground: #FAFAFA;
+    --accent: #10B981;
+    --error: #EF4444;
+  }
+  
+  .dark {
+    --background: #09090B;
+    --background-element: #18181B;
+    --background-hover: #27272A;
+    --border: #27272A;
+    --text: #FAFAFA;
+    --text-secondary: #A1A1AA;
+    --text-tertiary: #52525B;
+    --primary: #FAFAFA;
+    --primary-foreground: #18181B;
+    --accent: #10B981;
+    --error: #EF4444;
+  }
+}
 

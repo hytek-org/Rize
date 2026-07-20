@@ -12,11 +12,22 @@ module.exports = {
         'inter-bold': ['Inter_700Bold', 'sans-serif'],
       },
       colors: {
-        background: '#09090b', // zinc-950
-        momentum: '#10b981', // emerald-500
+        background: 'var(--background)',
+        element: 'var(--background-element)',
+        hover: 'var(--background-hover)',
+        border: 'var(--border)',
+        foreground: 'var(--text)',
+        muted: 'var(--text-secondary)',
+        faint: 'var(--text-tertiary)',
+        primary: {
+          DEFAULT: 'var(--primary)',
+          foreground: 'var(--primary-foreground)',
+        },
+        accent: 'var(--accent)',
+        error: 'var(--error)',
+        momentum: '#10b981',
       }
     },
   },
   plugins: [],
 }
-

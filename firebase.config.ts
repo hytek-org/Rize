@@ -1,16 +1,11 @@
 import { FirebaseApp, FirebaseOptions, getApp, getApps, initializeApp } from "firebase/app";
-import * as firebaseAuth from "firebase/auth";
-import { Auth, getAuth, initializeAuth, Persistence } from "firebase/auth";
-import { getFirestore, Firestore } from 'firebase/firestore';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Auth, getAuth, initializeAuth } from "firebase/auth";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+// @ts-ignore: Missing types in this Firebase version
+import { getReactNativePersistence } from "firebase/auth";
+import { Firestore, getFirestore } from 'firebase/firestore';
 import { Platform } from 'react-native';
-
-const getReactNativePersistence = (
-  firebaseAuth as typeof firebaseAuth & {
-    getReactNativePersistence: (storage: typeof AsyncStorage) => Persistence;
-  }
-).getReactNativePersistence;
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: Constants.expoConfig?.extra?.firebase?.apiKey,
@@ -22,14 +17,22 @@ const firebaseConfig: FirebaseOptions = {
   measurementId: Constants.expoConfig?.extra?.firebase?.measurementId,
 };
 
-
 const app: FirebaseApp = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
-const auth: Auth = Platform.OS === 'web'
-  ? getAuth(app)
-  : initializeAuth(app, {
+let auth: Auth;
+if (Platform.OS === 'web') {
+  auth = getAuth(app);
+} else {
+  try {
+    auth = initializeAuth(app, {
       persistence: getReactNativePersistence(AsyncStorage),
     });
+  } catch (error) {
+    const code = typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
+    if (code !== 'auth/already-initialized') throw error;
+    auth = getAuth(app);
+  }
+}
 
 const db: Firestore = getFirestore(app);
 
