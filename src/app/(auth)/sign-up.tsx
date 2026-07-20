@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Text } from 'react-native';
-import { AuthShell, Field, FooterLink, PrimaryButton } from '@/components/auth-ui';
+import { AuthShell, ErrorAlert, Field, FooterLink, PrimaryButton } from '@/components/auth-ui';
 import { useAuth } from '@/auth/AuthProvider';
 import { getAuthErrorMessage } from '@/auth/auth-service';
 
@@ -33,7 +33,7 @@ export default function SignUpScreen() {
       <Field label="Password" value={password} onChangeText={setPassword} placeholder="At least 6 characters" secure returnKeyType="next" />
       <Field label="Confirm password" value={confirm} onChangeText={setConfirm} placeholder="Type it again" secure returnKeyType="done" onSubmitEditing={submit} />
       
-      {error && <Text accessibilityLiveRegion="polite" className="text-error font-inter text-sm mb-4">{error}</Text>}
+      <ErrorAlert message={error} />
       
       <PrimaryButton label="Create account" loading={loading} onPress={submit} />
       <FooterLink prompt="Already have an account?" label="Sign in" href="/(auth)/login" />

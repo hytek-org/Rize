@@ -13,19 +13,15 @@ module.exports = {
       },
       colors: {
         background: 'var(--background)',
-        element: 'var(--background-element)',
-        hover: 'var(--background-hover)',
-        border: 'var(--border)',
-        foreground: 'var(--text)',
-        muted: 'var(--text-secondary)',
-        faint: 'var(--text-tertiary)',
+        foreground: 'var(--foreground)',
         primary: {
           DEFAULT: 'var(--primary)',
           foreground: 'var(--primary-foreground)',
         },
-        accent: 'var(--accent)',
+        surface: 'var(--surface)',
+        border: 'var(--border)',
+        muted: 'var(--muted)',
         error: 'var(--error)',
-        momentum: '#10b981',
       }
     },
   },

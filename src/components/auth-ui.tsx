@@ -7,12 +7,21 @@ export function AuthShell({ children, eyebrow, title, subtitle }: { children: Re
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} className="flex-1 bg-background">
       <ScrollView contentContainerClassName="flex-grow px-8 pt-20 pb-12" keyboardShouldPersistTaps="handled">
         <Image source={require('@/assets/images/logo.png')} className="w-11 h-11 mb-8" resizeMode="contain" accessibilityLabel="Rize" />
-        <Text className="text-muted font-inter-semibold text-xs tracking-wider uppercase mb-3">{eyebrow}</Text>
-        <Text className="text-foreground font-inter-bold text-4xl tracking-tight mb-3">{title}</Text>
-        <Text className="text-muted font-inter text-base leading-6 mb-10">{subtitle}</Text>
+        <Text className="text-muted font-medium text-xs tracking-wider uppercase mb-3">{eyebrow}</Text>
+        <Text className="text-foreground font-medium text-4xl tracking-tight mb-3">{title}</Text>
+        <Text className="text-muted font-medium text-base leading-6 mb-10">{subtitle}</Text>
         {children}
       </ScrollView>
     </KeyboardAvoidingView>
+  );
+}
+
+export function ErrorAlert({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <View accessibilityLiveRegion="polite" className="w-full bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-[16px] p-4 mb-5">
+      <Text className="text-red-600 dark:text-red-400 font-medium text-[13px] leading-5 text-center">{message}</Text>
+    </View>
   );
 }
 
@@ -21,14 +30,14 @@ export function Field({ label, error, secure, value, onChangeText, placeholder, 
   const [focused, setFocused] = useState(false);
 
   return (
-    <View className="mb-5">
-      <Text className="text-foreground font-inter-medium text-sm mb-2">{label}</Text>
-      <View className={`min-h-[52px] border rounded-xl px-4 flex-row items-center bg-element ${error ? 'border-error' : (focused ? 'border-foreground' : 'border-border')}`}>
+    <View className="w-full mb-5">
+      <Text className="mb-2 text-xs font-medium tracking-wider uppercase text-muted">{label}</Text>
+      <View className={`min-h-[56px] border rounded-2xl px-5 flex-row items-center bg-surface ${error ? 'border-error' : (focused ? 'border-primary' : 'border-border')}`}>
         <TextInput
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="#A1A1AA"
+          placeholderTextColor="#737373"
           secureTextEntry={secure && !visible}
           autoCapitalize="none"
           autoCorrect={false}
@@ -37,16 +46,16 @@ export function Field({ label, error, secure, value, onChangeText, placeholder, 
           onSubmitEditing={onSubmitEditing}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className="flex-1 text-foreground font-inter text-base py-3"
+          className="flex-1 text-[15px] font-normal text-foreground py-3"
           accessibilityLabel={label}
         />
         {secure && (
           <Pressable onPress={() => setVisible((current) => !current)} accessibilityRole="button" accessibilityLabel={visible ? 'Hide password' : 'Show password'} hitSlop={10}>
-            <Text className="text-muted font-inter-medium text-sm ml-2">{visible ? 'Hide' : 'Show'}</Text>
+            <Text className="text-muted font-medium text-sm ml-2">{visible ? 'Hide' : 'Show'}</Text>
           </Pressable>
         )}
       </View>
-      {error && <Text accessibilityLiveRegion="polite" className="text-error font-inter text-sm mt-1.5">{error}</Text>}
+      {error && <Text accessibilityLiveRegion="polite" className="text-error font-medium text-sm mt-1.5">{error}</Text>}
     </View>
   );
 }
@@ -58,18 +67,16 @@ export function PrimaryButton({ label, loading, onPress }: { label: string; load
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={label}
-      className={`min-h-[52px] rounded-xl bg-primary items-center justify-center mt-2 ${loading ? 'opacity-70' : 'active:opacity-80'}`}
+      className={`w-full h-14 rounded-full bg-primary items-center justify-center mt-2 shadow-sm shadow-primary/30 transition-all ${loading ? 'opacity-70' : 'active:opacity-85 active:scale-[0.985]'}`}
     >
       {loading ? (
-        <ActivityIndicator color="#FAFAFA" />
+        <ActivityIndicator color="#FFFFFF" />
       ) : (
-        <Text className="text-primary-foreground font-inter-semibold text-base">{label}</Text>
+        <Text className="text-primary-foreground font-medium text-[16px] tracking-wide">{label}</Text>
       )}
     </Pressable>
   );
 }
-
-
 
 interface GoogleButtonProps {
   loading?: boolean;
@@ -83,26 +90,21 @@ export function GoogleButton({ loading, onPress }: GoogleButtonProps) {
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel="Continue with Google"
-      className={`
-        relative flex-row items-center justify-center w-full min-h-[56px] mb-6 rounded-full
-        bg-white border border-gray-200 shadow-sm
-        dark:bg-[#121212] dark:border-zinc-800 dark:shadow-none
-        active:scale-[0.98] active:opacity-80
-        ${loading ? 'opacity-70' : 'opacity-100'}
-      `}
+      className={`relative flex-row items-center justify-center w-full h-14 mb-4 rounded-2xl bg-background border border-border shadow-sm dark:shadow-none transition-all ${loading ? 'opacity-70' : 'active:scale-[0.985] active:opacity-90'}`}
     >
-      {/* Icon Container - Anchored to the left for a premium balanced look */}
-      <View className="absolute left-6 justify-center items-center h-full">
+      <View className="absolute left-5 items-center justify-center">
         {loading ? (
           <ActivityIndicator size="small" color="#4285F4" />
         ) : (
-
-          <Image source={require('@/assets/images/google.svg')} resizeMode="contain" accessibilityLabel="Google logo" className="size-12" />
+          <Image
+            source={require('@/assets/images/google.png')}
+            resizeMode="contain"
+            accessibilityLabel="Google logo"
+            className="w-5 h-5"
+          />
         )}
       </View>
-
-      {/* Centered Text */}
-      <Text className="text-base font-semibold text-gray-900 dark:text-white">
+      <Text className="text-[15px] font-medium tracking-tight text-foreground">
         {loading ? 'Connecting...' : 'Continue with Google'}
       </Text>
     </Pressable>
@@ -113,9 +115,9 @@ export function FooterLink({ prompt, label, href }: { prompt: string; label: str
   const router = useRouter();
   return (
     <View className="flex-row justify-center mt-8">
-      <Text className="text-muted font-inter text-sm">{prompt} </Text>
+      <Text className="text-muted font-medium text-sm">{prompt} </Text>
       <Pressable onPress={() => router.push(href)} hitSlop={10}>
-        <Text className="text-foreground font-inter-semibold text-sm underline">{label}</Text>
+        <Text className="text-foreground font-medium text-sm underline">{label}</Text>
       </Pressable>
     </View>
   );

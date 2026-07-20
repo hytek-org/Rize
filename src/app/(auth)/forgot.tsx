@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Text } from 'react-native';
-import { AuthShell, Field, FooterLink, PrimaryButton } from '@/components/auth-ui';
+import { AuthShell, ErrorAlert, Field, FooterLink, PrimaryButton } from '@/components/auth-ui';
 import { useAuth } from '@/auth/AuthProvider';
 import { getAuthErrorMessage } from '@/auth/auth-service';
 
@@ -29,8 +29,8 @@ export default function ForgotPasswordScreen() {
     <AuthShell eyebrow="A fresh start" title="Reset password" subtitle="We will send a secure link to your inbox so you can get back in.">
       <Field label="Email address" value={email} onChangeText={setEmail} placeholder="you@example.com" returnKeyType="done" onSubmitEditing={submit} />
       
-      {message ? <Text className="text-accent font-inter text-sm mb-4 leading-5">{message}</Text> : null}
-      {error ? <Text accessibilityLiveRegion="polite" className="text-error font-inter text-sm mb-4">{error}</Text> : null}
+      {message ? <Text className="text-primary font-medium text-sm mb-4 leading-5">{message}</Text> : null}
+      <ErrorAlert message={error} />
       
       <PrimaryButton label="Send reset link" loading={loading} onPress={submit} />
       <FooterLink prompt="Remembered it?" label="Back to sign in" href="/(auth)/login" />
