@@ -29,7 +29,7 @@ export default function ForgotPasswordScreen() {
     <AuthShell eyebrow="A fresh start" title="Reset password" subtitle="We will send a secure link to your inbox so you can get back in.">
       <Field label="Email address" value={email} onChangeText={setEmail} placeholder="you@example.com" returnKeyType="done" onSubmitEditing={submit} />
       
-      {message ? <Text className="text-primary font-medium text-sm mb-4 leading-5">{message}</Text> : null}
+      {message ? <Text className="text-[#12D18E] font-medium text-sm mb-4 leading-5">{message}</Text> : null}
       <ErrorAlert message={error} />
       
       <PrimaryButton label="Send reset link" loading={loading} onPress={submit} />

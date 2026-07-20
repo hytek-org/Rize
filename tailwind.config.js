@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
- content: ['./src/**/*.{js,jsx,ts,tsx}', './components/**/*.{js,jsx,ts,tsx}'],
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './components/**/*.{js,jsx,ts,tsx}'],
   presets: [require("nativewind/preset")],
   darkMode: 'class',
   theme: {
@@ -12,18 +12,12 @@ module.exports = {
         'inter-bold': ['Inter_700Bold', 'sans-serif'],
       },
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
-        primary: {
-          DEFAULT: 'var(--primary)',
-          foreground: 'var(--primary-foreground)',
-        },
-        surface: 'var(--surface)',
-        border: 'var(--border)',
-        muted: 'var(--muted)',
-        error: 'var(--error)',
+        rize: {
+          emerald: '#12D18E',
+        }
       }
     },
   },
   plugins: [],
 }
+

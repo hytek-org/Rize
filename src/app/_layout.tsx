@@ -11,10 +11,12 @@ function RouteGate() {
   const { isLoading, isAuthenticated } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
   const isAuthRoute = segments[0] === '(auth)';
 
   if (isLoading) {
-    return <View style={styles.loading}><ActivityIndicator color="#24c78b" size="large" /></View>;
+    return <View style={[styles.loading, { backgroundColor: colors.background }]}><ActivityIndicator color="#12D18E" size="large" /></View>;
   }
 
   if (!isAuthenticated && !isAuthRoute) return <Redirect href="/(auth)/login" />;
@@ -25,7 +27,6 @@ function RouteGate() {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
   return (
     <AuthProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -36,5 +37,5 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.light.background },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });

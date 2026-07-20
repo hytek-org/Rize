@@ -1,11 +1,12 @@
 import { useAuth } from '@/auth/AuthProvider';
 import { getAuthErrorMessage } from '@/auth/auth-service';
 import { AuthShell, ErrorAlert, Field, FooterLink, GoogleButton, PrimaryButton } from '@/components/auth-ui';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 
 export default function LoginScreen() {
+  const router = useRouter();
   const { signInWithEmail, signInWithGoogle } = useAuth();
   const passwordRef = useRef<TextInput>(null);
   const [email, setEmail] = useState('');
@@ -32,16 +33,22 @@ export default function LoginScreen() {
       <GoogleButton loading={loading} onPress={() => submit(signInWithGoogle, false)} />
 
       <View className="flex-row items-center mb-6">
-        <View className="flex-1 h-[1px] bg-border" />
-        <Text className="text-muted font-medium text-[11px] tracking-widest mx-4 uppercase">Or continue with email</Text>
-        <View className="flex-1 h-[1px] bg-border" />
+        <View className="flex-1 h-[1px] bg-neutral-200 dark:bg-neutral-800" />
+        <Text className="text-neutral-500 dark:text-neutral-400 font-medium text-[11px] tracking-widest mx-4 uppercase">Or continue with email</Text>
+        <View className="flex-1 h-[1px] bg-neutral-200 dark:bg-neutral-800" />
       </View>
 
       <Field label="Email address" value={email} onChangeText={setEmail} placeholder="you@example.com" onSubmitEditing={() => passwordRef.current?.focus()} returnKeyType="next" />
 
       <View className="relative">
         <Field label="Password" value={password} onChangeText={setPassword} placeholder="Your password" secure onSubmitEditing={() => submit(() => signInWithEmail(email, password))} returnKeyType="done" />
-        <Link href="/(auth)/forgot" className="absolute right-0 top-0 mt-1 pb-2 pl-4 text-neutral-800 dark:text-neutral-100 font-medium text-sm ">Forgot?</Link>
+        <Pressable 
+          onPress={() => router.push('/(auth)/forgot')} 
+          hitSlop={10} 
+          className="absolute right-0 top-0 mt-0.5 z-10"
+        >
+          <Text className="text-[#12D18E] font-medium text-xs tracking-wider uppercase">Forgot?</Text>
+        </Pressable>
       </View>
 
       <ErrorAlert message={error} />
